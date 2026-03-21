@@ -56,7 +56,7 @@ EQUALS = =
 CMAKE_SOURCE_DIR = /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Desktop-Debug
+CMAKE_BINARY_DIR = /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build
 
 # Utility rule file for Rate_AUC_autogen_timestamp_deps.
 
@@ -67,9 +67,9 @@ include CMakeFiles/Rate_AUC_autogen_timestamp_deps.dir/compiler_depend.make
 include CMakeFiles/Rate_AUC_autogen_timestamp_deps.dir/progress.make
 
 CMakeFiles/Rate_AUC_autogen_timestamp_deps: /usr/lib/x86_64-linux-gnu/libQt6Core.so.6.4.2
+CMakeFiles/Rate_AUC_autogen_timestamp_deps: /usr/lib/x86_64-linux-gnu/libQt6Widgets.so.6.4.2
 CMakeFiles/Rate_AUC_autogen_timestamp_deps: /usr/lib/qt6/libexec/moc
 CMakeFiles/Rate_AUC_autogen_timestamp_deps: /usr/lib/qt6/libexec/uic
-CMakeFiles/Rate_AUC_autogen_timestamp_deps: /usr/lib/x86_64-linux-gnu/libQt6Widgets.so.6.4.2
 
 Rate_AUC_autogen_timestamp_deps: CMakeFiles/Rate_AUC_autogen_timestamp_deps
 Rate_AUC_autogen_timestamp_deps: CMakeFiles/Rate_AUC_autogen_timestamp_deps.dir/build.make
@@ -84,6 +84,6 @@ CMakeFiles/Rate_AUC_autogen_timestamp_deps.dir/clean:
 .PHONY : CMakeFiles/Rate_AUC_autogen_timestamp_deps.dir/clean
 
 CMakeFiles/Rate_AUC_autogen_timestamp_deps.dir/depend:
-	cd /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Desktop-Debug && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Desktop-Debug /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Desktop-Debug /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Desktop-Debug/CMakeFiles/Rate_AUC_autogen_timestamp_deps.dir/DependInfo.cmake "--color=$(COLOR)"
+	cd /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles/Rate_AUC_autogen_timestamp_deps.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/Rate_AUC_autogen_timestamp_deps.dir/depend
 

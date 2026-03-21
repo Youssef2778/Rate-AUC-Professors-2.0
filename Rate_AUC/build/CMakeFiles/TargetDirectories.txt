@@ -1,0 +1,9 @@
+/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles/Rate_AUC.dir
+/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles/edit_cache.dir
+/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles/rebuild_cache.dir
+/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles/list_install_components.dir
+/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles/install.dir
+/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles/install/local.dir
+/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles/install/strip.dir
+/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles/Rate_AUC_autogen_timestamp_deps.dir
+/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles/Rate_AUC_autogen.dir
