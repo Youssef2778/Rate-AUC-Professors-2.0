@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QResizeEvent>
+#include <QPixmap>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -20,4 +22,6 @@ public:
 private:
     Ui::MainWindow *ui;
 };
+
+
 #endif // MAINWINDOW_H

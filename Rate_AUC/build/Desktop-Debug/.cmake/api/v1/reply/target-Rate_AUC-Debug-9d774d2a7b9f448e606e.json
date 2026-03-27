@@ -71,13 +71,13 @@
 			{
 				"command" : 4,
 				"file" : 1,
-				"line" : 62,
+				"line" : 63,
 				"parent" : 0
 			},
 			{
 				"command" : 5,
 				"file" : 1,
-				"line" : 45,
+				"line" : 46,
 				"parent" : 0
 			},
 			{
@@ -284,7 +284,8 @@
 			[
 				0,
 				1,
-				2
+				2,
+				8
 			]
 		}
 	],
@@ -368,7 +369,8 @@
 			[
 				0,
 				1,
-				2
+				2,
+				8
 			]
 		},
 		{
@@ -376,7 +378,7 @@
 			"sourceIndexes" : 
 			[
 				3,
-				5
+				6
 			]
 		},
 		{
@@ -384,14 +386,16 @@
 			"sourceIndexes" : 
 			[
 				4,
-				6
+				5,
+				7
 			]
 		},
 		{
 			"name" : "CMake Rules",
 			"sourceIndexes" : 
 			[
-				7
+				9,
+				10
 			]
 		}
 	],
@@ -427,6 +431,11 @@
 			"sourceGroupIndex" : 2
 		},
 		{
+			"backtrace" : 4,
+			"path" : "resources.qrc",
+			"sourceGroupIndex" : 2
+		},
+		{
 			"backtrace" : 0,
 			"isGenerated" : true,
 			"path" : "build/Desktop-Debug/Rate_AUC_autogen/include/ui_mainwindow.h",
@@ -440,8 +449,21 @@
 		},
 		{
 			"backtrace" : 0,
+			"compileGroupIndex" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop-Debug/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 0,
 			"isGenerated" : true,
 			"path" : "build/Desktop-Debug/Rate_AUC_autogen/timestamp.rule",
+			"sourceGroupIndex" : 3
+		},
+		{
+			"backtrace" : 0,
+			"isGenerated" : true,
+			"path" : "build/Desktop-Debug/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp.rule",
 			"sourceGroupIndex" : 3
 		}
 	],

@@ -9,6 +9,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "" "Rate_AUC_autogen/timestamp" "custom" "Rate_AUC_autogen/deps"
+  "/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Desktop-Debug/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp" "CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp.o" "gcc" "CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp.o.d"
   "/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Desktop-Debug/Rate_AUC_autogen/mocs_compilation.cpp" "CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/mocs_compilation.cpp.o" "gcc" "CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/mocs_compilation.cpp.o.d"
   "/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/main.cpp" "CMakeFiles/Rate_AUC.dir/main.cpp.o" "gcc" "CMakeFiles/Rate_AUC.dir/main.cpp.o.d"
   "/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/mainwindow.cpp" "CMakeFiles/Rate_AUC.dir/mainwindow.cpp.o" "gcc" "CMakeFiles/Rate_AUC.dir/mainwindow.cpp.o.d"

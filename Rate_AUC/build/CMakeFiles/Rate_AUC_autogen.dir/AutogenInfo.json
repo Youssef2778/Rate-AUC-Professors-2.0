@@ -197,7 +197,8 @@
 		"/lib/x86_64-linux-gnu/cmake/Qt6Widgets/Qt6WidgetsAdditionalTargetInfo.cmake",
 		"/lib/x86_64-linux-gnu/cmake/Qt6Widgets/Qt6WidgetsVersionlessTargets.cmake",
 		"/lib/x86_64-linux-gnu/cmake/Qt6Widgets/Qt6WidgetsMacros.cmake",
-		"/usr/share/cmake-3.28/Modules/GNUInstallDirs.cmake"
+		"/usr/share/cmake-3.28/Modules/GNUInstallDirs.cmake",
+		"/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/resources.qrc"
 	],
 	"CMAKE_SOURCE_DIR" : "/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC",
 	"DEP_FILE" : "/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Rate_AUC_autogen/deps",

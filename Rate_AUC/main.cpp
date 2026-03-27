@@ -8,11 +8,9 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    MainWindow* w = new MainWindow;
-    QLabel* login_image = new QLabel;
+    MainWindow w;
 
-    // (make the window fill the entire monitor)
-    w.showMaximized();
+    w.show();
 
     return a.exec();
 }

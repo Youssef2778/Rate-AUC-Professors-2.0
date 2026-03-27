@@ -1,0 +1,31 @@
+
+Users {
+	id integer pk increments unique
+	First_Name text unique
+	Last_Name text unique
+	type text
+	Gender boolean
+}
+
+Courses {
+	id integer pk increments unique
+	Course_Name text
+	Department_id integer *> Departments.id
+}
+
+Departments {
+	id integer pk increments unique
+	Department_name text
+}
+
+Instructor-Course {
+	Course_ID integer *>* Courses.id
+	Professor_ID integer *>* professors.professor_id
+}
+
+professors {
+	professor_id integer > Users.id
+	department_id integer *> Departments.id
+	score integer def(0)
+}
+

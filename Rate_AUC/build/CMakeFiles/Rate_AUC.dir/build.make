@@ -76,10 +76,17 @@ Rate_AUC_autogen/timestamp: CMakeFiles/Rate_AUC.dir/compiler_depend.ts
 	/usr/bin/cmake -E cmake_autogen /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles/Rate_AUC_autogen.dir/AutogenInfo.json ""
 	/usr/bin/cmake -E touch /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Rate_AUC_autogen/timestamp
 
+Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp: /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/resources.qrc
+Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp: CMakeFiles/Rate_AUC_autogen.dir/AutoRcc_resources_EWIEGA46WW_Info.json
+Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp: /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/images/auc_logo.png
+Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp: /usr/lib/qt6/libexec/rcc
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Automatic RCC for resources.qrc"
+	/usr/bin/cmake -E cmake_autorcc /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles/Rate_AUC_autogen.dir/AutoRcc_resources_EWIEGA46WW_Info.json 
+
 CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/mocs_compilation.cpp.o: CMakeFiles/Rate_AUC.dir/flags.make
 CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/mocs_compilation.cpp.o: Rate_AUC_autogen/mocs_compilation.cpp
 CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/mocs_compilation.cpp.o: CMakeFiles/Rate_AUC.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/mocs_compilation.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/mocs_compilation.cpp.o"
 	/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/mocs_compilation.cpp.o -MF CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/mocs_compilation.cpp.o.d -o CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/mocs_compilation.cpp.o -c /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Rate_AUC_autogen/mocs_compilation.cpp
 
 CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/mocs_compilation.cpp.i: cmake_force
@@ -93,7 +100,7 @@ CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/mocs_compilation.cpp.s: cmake_force
 CMakeFiles/Rate_AUC.dir/main.cpp.o: CMakeFiles/Rate_AUC.dir/flags.make
 CMakeFiles/Rate_AUC.dir/main.cpp.o: /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/main.cpp
 CMakeFiles/Rate_AUC.dir/main.cpp.o: CMakeFiles/Rate_AUC.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/Rate_AUC.dir/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/Rate_AUC.dir/main.cpp.o"
 	/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Rate_AUC.dir/main.cpp.o -MF CMakeFiles/Rate_AUC.dir/main.cpp.o.d -o CMakeFiles/Rate_AUC.dir/main.cpp.o -c /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/main.cpp
 
 CMakeFiles/Rate_AUC.dir/main.cpp.i: cmake_force
@@ -107,7 +114,7 @@ CMakeFiles/Rate_AUC.dir/main.cpp.s: cmake_force
 CMakeFiles/Rate_AUC.dir/mainwindow.cpp.o: CMakeFiles/Rate_AUC.dir/flags.make
 CMakeFiles/Rate_AUC.dir/mainwindow.cpp.o: /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/mainwindow.cpp
 CMakeFiles/Rate_AUC.dir/mainwindow.cpp.o: CMakeFiles/Rate_AUC.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/Rate_AUC.dir/mainwindow.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/Rate_AUC.dir/mainwindow.cpp.o"
 	/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Rate_AUC.dir/mainwindow.cpp.o -MF CMakeFiles/Rate_AUC.dir/mainwindow.cpp.o.d -o CMakeFiles/Rate_AUC.dir/mainwindow.cpp.o -c /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/mainwindow.cpp
 
 CMakeFiles/Rate_AUC.dir/mainwindow.cpp.i: cmake_force
@@ -118,11 +125,26 @@ CMakeFiles/Rate_AUC.dir/mainwindow.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Rate_AUC.dir/mainwindow.cpp.s"
 	/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/mainwindow.cpp -o CMakeFiles/Rate_AUC.dir/mainwindow.cpp.s
 
+CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp.o: CMakeFiles/Rate_AUC.dir/flags.make
+CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp.o: Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp
+CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp.o: CMakeFiles/Rate_AUC.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp.o"
+	/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp.o -MF CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp.o.d -o CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp.o -c /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp
+
+CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp.i"
+	/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp > CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp.i
+
+CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp.s"
+	/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp -o CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp.s
+
 # Object files for target Rate_AUC
 Rate_AUC_OBJECTS = \
 "CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/mocs_compilation.cpp.o" \
 "CMakeFiles/Rate_AUC.dir/main.cpp.o" \
-"CMakeFiles/Rate_AUC.dir/mainwindow.cpp.o"
+"CMakeFiles/Rate_AUC.dir/mainwindow.cpp.o" \
+"CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp.o"
 
 # External object files for target Rate_AUC
 Rate_AUC_EXTERNAL_OBJECTS =
@@ -130,6 +152,7 @@ Rate_AUC_EXTERNAL_OBJECTS =
 Rate_AUC: CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/mocs_compilation.cpp.o
 Rate_AUC: CMakeFiles/Rate_AUC.dir/main.cpp.o
 Rate_AUC: CMakeFiles/Rate_AUC.dir/mainwindow.cpp.o
+Rate_AUC: CMakeFiles/Rate_AUC.dir/Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp.o
 Rate_AUC: CMakeFiles/Rate_AUC.dir/build.make
 Rate_AUC: /usr/lib/x86_64-linux-gnu/libQt6Widgets.so.6.4.2
 Rate_AUC: /usr/lib/x86_64-linux-gnu/libQt6Gui.so.6.4.2
@@ -137,7 +160,7 @@ Rate_AUC: /usr/lib/x86_64-linux-gnu/libQt6Core.so.6.4.2
 Rate_AUC: /usr/lib/x86_64-linux-gnu/libGLX.so
 Rate_AUC: /usr/lib/x86_64-linux-gnu/libOpenGL.so
 Rate_AUC: CMakeFiles/Rate_AUC.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable Rate_AUC"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX executable Rate_AUC"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Rate_AUC.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -148,6 +171,7 @@ CMakeFiles/Rate_AUC.dir/clean:
 	$(CMAKE_COMMAND) -P CMakeFiles/Rate_AUC.dir/cmake_clean.cmake
 .PHONY : CMakeFiles/Rate_AUC.dir/clean
 
+CMakeFiles/Rate_AUC.dir/depend: Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp
 CMakeFiles/Rate_AUC.dir/depend: Rate_AUC_autogen/timestamp
 	cd /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles/Rate_AUC.dir/DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/Rate_AUC.dir/depend

@@ -1,0 +1,23 @@
+{
+	"BUILD_DIR" : "/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Desktop-Debug/Rate_AUC_autogen",
+	"CMAKE_BINARY_DIR" : "/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Desktop-Debug",
+	"CMAKE_CURRENT_BINARY_DIR" : "/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Desktop-Debug",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC",
+	"CMAKE_SOURCE_DIR" : "/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC",
+	"GENERATOR" : "Unix Makefiles",
+	"INCLUDE_DIR" : "/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Desktop-Debug/Rate_AUC_autogen/include",
+	"INPUTS" : 
+	[
+		"/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/images/auc_logo.png"
+	],
+	"LOCK_FILE" : "/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Desktop-Debug/CMakeFiles/Rate_AUC_autogen.dir/AutoRcc_resources_EWIEGA46WW_Lock.lock",
+	"MULTI_CONFIG" : false,
+	"OPTIONS" : [ "-name", "resources" ],
+	"OUTPUT_CHECKSUM" : "EWIEGA46WW",
+	"OUTPUT_NAME" : "qrc_resources.cpp",
+	"RCC_EXECUTABLE" : "/usr/lib/qt6/libexec/rcc",
+	"RCC_LIST_OPTIONS" : [ "--list" ],
+	"SETTINGS_FILE" : "/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Desktop-Debug/CMakeFiles/Rate_AUC_autogen.dir/AutoRcc_resources_EWIEGA46WW_Used.txt",
+	"SOURCE" : "/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/resources.qrc",
+	"VERBOSITY" : 0
+}
