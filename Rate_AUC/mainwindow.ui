@@ -119,6 +119,16 @@ width: 100px;
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox">
+           <property name="text">
+            <string>Hide Password</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
          <item alignment="Qt::AlignHCenter">
           <widget class="QPushButton" name="pushButton">
            <property name="minimumSize">
