@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/images">
         <file>images/auc_logo.png</file>
+        <file>images/AUC_Background.jpeg</file>
     </qresource>
 </RCC>

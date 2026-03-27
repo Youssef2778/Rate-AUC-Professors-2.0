@@ -8,6 +8,7 @@
 	"INCLUDE_DIR" : "/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/Rate_AUC_autogen/include",
 	"INPUTS" : 
 	[
+		"/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/images/AUC_Background.jpeg",
 		"/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/images/auc_logo.png"
 	],
 	"LOCK_FILE" : "/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles/Rate_AUC_autogen.dir/AutoRcc_resources_EWIEGA46WW_Lock.lock",

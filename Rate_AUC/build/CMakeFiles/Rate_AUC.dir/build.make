@@ -78,6 +78,7 @@ Rate_AUC_autogen/timestamp: CMakeFiles/Rate_AUC.dir/compiler_depend.ts
 
 Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp: /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/resources.qrc
 Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp: CMakeFiles/Rate_AUC_autogen.dir/AutoRcc_resources_EWIEGA46WW_Info.json
+Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp: /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/images/AUC_Background.jpeg
 Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp: /mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/images/auc_logo.png
 Rate_AUC_autogen/EWIEGA46WW/qrc_resources.cpp: /usr/lib/qt6/libexec/rcc
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/mnt/c/Users/aliab/Desktop/Education/Programming/Projects/Rate_AUC_Professor/Rate_AUC/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Automatic RCC for resources.qrc"
