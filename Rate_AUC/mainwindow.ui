@@ -24,7 +24,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_3">
        <property name="styleSheet">
@@ -67,8 +67,8 @@ width: 100px;
        <widget class="QWidget" name="horizontalLayoutWidget">
         <property name="geometry">
          <rect>
-          <x>-1</x>
-          <y>9</y>
+          <x>0</x>
+          <y>20</y>
           <width>1281</width>
           <height>611</height>
          </rect>
@@ -78,8 +78,8 @@ width: 100px;
           <widget class="QWidget" name="widget" native="true">
            <property name="maximumSize">
             <size>
-             <width>500</width>
-             <height>500</height>
+             <width>1504</width>
+             <height>1004</height>
             </size>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_11" stretch="0">
@@ -198,7 +198,203 @@ width: 100px;
         </layout>
        </widget>
       </widget>
-      <widget class="QWidget" name="page_4"/>
+      <widget class="QWidget" name="page_4">
+       <property name="styleSheet">
+        <string notr="true">QWidget#page_4 {background-color: rgb(255, 255, 255);}
+
+
+.QLineEdit {
+border: 2px solid gray;
+border-radius: 5px;
+selection-background-color: dark-gray; 
+}
+
+QVBoxLayout#verticalLayout {
+margin-left:auto;
+margin-right: auto;
+width:70%;
+}
+
+QWidget#widget_2 {
+border: 2px solid gray;
+border-radius: 20px;
+min-width: 500px;
+max-width: 1500px;
+min-height: 400px;
+max-height: 1000px;
+alignment: center;
+	background-color: rgb(255, 255, 255);
+}
+
+QWidget#page_4{
+	background-image: url(:/images/images/AUC_Background.jpeg);
+}
+
+QPushButton#pushButton {
+width: 100px;
+}
+
+</string>
+       </property>
+       <widget class="QWidget" name="widget_2" native="true">
+        <property name="geometry">
+         <rect>
+          <x>600</x>
+          <y>130</y>
+          <width>504</width>
+          <height>453</height>
+         </rect>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>1504</width>
+          <height>1004</height>
+         </size>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_17" stretch="0">
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_18">
+           <item>
+            <widget class="QLabel" name="label_16">
+             <property name="styleSheet">
+              <string notr="true"/>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="pixmap">
+              <pixmap resource="resources.qrc">:/images/images/auc_logo.png</pixmap>
+             </property>
+             <property name="scaledContents">
+              <bool>false</bool>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_19">
+             <item>
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>Username</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_2">
+               <property name="placeholderText">
+                <string>Username</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_17">
+               <property name="text">
+                <string>Email </string>
+               </property>
+               <property name="textFormat">
+                <enum>Qt::PlainText</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="lineEdit_11">
+               <property name="placeholderText">
+                <string>example@aucegypt.edu</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_18">
+             <property name="text">
+              <string>Password</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_12">
+             <property name="inputMask">
+              <string/>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="echoMode">
+              <enum>QLineEdit::Password</enum>
+             </property>
+             <property name="placeholderText">
+              <string>Password</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Confirm Password</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit">
+             <property name="echoMode">
+              <enum>QLineEdit::Password</enum>
+             </property>
+             <property name="placeholderText">
+              <string>Retype Password</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkBox_6">
+             <property name="text">
+              <string>Hide Password</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item alignment="Qt::AlignHCenter">
+            <widget class="QPushButton" name="pushButton_6">
+             <property name="minimumSize">
+              <size>
+               <width>50</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>100</width>
+               <height>100</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Register</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="register_label_6">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Already Have an Account? &lt;a href=&quot;page1&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;Login &lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::RichText</enum>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </widget>
      </widget>
     </item>
    </layout>

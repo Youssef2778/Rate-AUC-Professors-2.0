@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
+    ui->stackedWidget->setCurrentIndex(0);
     // The following lines of code are produced by ChatGPT, their purpose is to constantly center the form no matter the size
     // of the main window
 
@@ -43,18 +43,42 @@ void MainWindow::on_checkBox_4_stateChanged(int arg1)
     }
 }
 
-
-// void MainWindow::on_register_label_linkActivated(const QString &link)
-// {
-//     this->hide();
-// }
-
-
-
-
-
 void MainWindow::on_register_label_4_linkActivated(const QString &link)
 {
     ui->stackedWidget->setCurrentIndex(1);
+    // Assume you have a widget inside the stacked page
+    QWidget* page = ui->stackedWidget->widget(1); // second page
+    QVBoxLayout* vLayout = new QVBoxLayout(page);
+
+    // Create a horizontal layout for centering
+    QHBoxLayout* hLayout = new QHBoxLayout();
+    hLayout->addStretch();            // left spacer
+    hLayout->addWidget(ui->widget_2); // your target widget
+    hLayout->addStretch();            // right spacer
+
+    vLayout->addStretch();   // top spacer
+    vLayout->addLayout(hLayout);
+    vLayout->addStretch();   // bottom spacer
+
+    page->setLayout(vLayout);
+}
+
+
+void MainWindow::on_checkBox_6_stateChanged(int arg1)
+{
+    if (arg1 == 2) {
+        ui->lineEdit->setEchoMode(QLineEdit::Password);
+        ui->lineEdit_12->setEchoMode(QLineEdit::Password);
+    } else if (arg1 == 0) {
+        ui->lineEdit->setEchoMode(QLineEdit::Normal);
+        ui->lineEdit_12->setEchoMode(QLineEdit::Normal);
+    }
+}
+
+
+void MainWindow::on_register_label_6_linkActivated(const QString &link)
+{
+    ui->stackedWidget->setCurrentIndex(0);
+
 }
 
