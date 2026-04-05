@@ -18,12 +18,14 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    Ui::MainWindow *ui;
 
 private slots:
-    void on_checkBox_stateChanged(int arg1);
+    void on_checkBox_4_stateChanged(int arg1);
 
-private:
-    Ui::MainWindow *ui;
+//     void on_register_label_linkActivated(const QString &link);
+
+    void on_register_label_4_linkActivated(const QString &link);
 };
 
 
