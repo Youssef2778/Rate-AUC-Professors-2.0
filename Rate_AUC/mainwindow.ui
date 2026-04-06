@@ -234,15 +234,17 @@ QPushButton#pushButton {
 width: 100px;
 }
 
+QLabel#label_3, #label_4, #label_5, #label_6, #label_7{color: red}
+
 </string>
        </property>
        <widget class="QWidget" name="widget_2" native="true">
         <property name="geometry">
          <rect>
           <x>600</x>
-          <y>130</y>
+          <y>82</y>
           <width>504</width>
-          <height>453</height>
+          <height>501</height>
          </rect>
         </property>
         <property name="maximumSize">
@@ -290,6 +292,13 @@ width: 100px;
               </widget>
              </item>
              <item>
+              <widget class="QLabel" name="label_4">
+               <property name="text">
+                <string>Please add your username</string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QLabel" name="label_17">
                <property name="text">
                 <string>Email </string>
@@ -303,6 +312,23 @@ width: 100px;
               <widget class="QLineEdit" name="lineEdit_11">
                <property name="placeholderText">
                 <string>example@aucegypt.edu</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_7">
+               <property name="text">
+                <string>Please add your email</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_3">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="text">
+                <string>Please use your AUC email. (ends in @aucegypt.edu)</string>
                </property>
               </widget>
              </item>
@@ -332,6 +358,13 @@ width: 100px;
             </widget>
            </item>
            <item>
+            <widget class="QLabel" name="label_5">
+             <property name="text">
+              <string>Please set the password</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QLabel" name="label">
              <property name="text">
               <string>Confirm Password</string>
@@ -345,6 +378,13 @@ width: 100px;
              </property>
              <property name="placeholderText">
               <string>Retype Password</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>Please retype the password.</string>
              </property>
             </widget>
            </item>

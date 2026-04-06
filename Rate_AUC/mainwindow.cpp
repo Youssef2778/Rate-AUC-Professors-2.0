@@ -46,6 +46,15 @@ void MainWindow::on_checkBox_4_stateChanged(int arg1)
 void MainWindow::on_register_label_4_linkActivated(const QString &link)
 {
     ui->stackedWidget->setCurrentIndex(1);
+
+    // Hiding the error messages.
+    ui->label_3->hide();
+    ui->label_4->hide();
+    ui->label_5->hide();
+    ui->label_6->hide();
+    ui->label_7->hide();
+
+
     // Assume you have a widget inside the stacked page
     QWidget* page = ui->stackedWidget->widget(1); // second page
     QVBoxLayout* vLayout = new QVBoxLayout(page);
