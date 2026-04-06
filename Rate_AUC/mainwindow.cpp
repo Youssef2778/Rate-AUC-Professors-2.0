@@ -34,6 +34,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+// "Hide Password" Mechanism of the Login page
 void MainWindow::on_checkBox_4_stateChanged(int arg1)
 {
     if (arg1 == 2) {
@@ -43,6 +44,7 @@ void MainWindow::on_checkBox_4_stateChanged(int arg1)
     }
 }
 
+// Function executed when the user moves to the register page.
 void MainWindow::on_register_label_4_linkActivated(const QString &link)
 {
     ui->stackedWidget->setCurrentIndex(1);
@@ -73,7 +75,7 @@ void MainWindow::on_register_label_4_linkActivated(const QString &link)
     page->setLayout(vLayout);
 }
 
-
+// "Hide Password" Mechanism of the Register Page
 void MainWindow::on_checkBox_6_stateChanged(int arg1)
 {
     if (arg1 == 2) {
@@ -92,15 +94,11 @@ void MainWindow::on_register_label_6_linkActivated(const QString &link)
 
 }
 
-    // ui->empty_email_error->hide();
-    // ui->empty_username_error->hide();
-    // ui->auc_email_error->hide();
-    // ui->empty_pass_error->hide();
-    // ui->empty_confPass_error->hide();
-
 void MainWindow::on_pushButton_6_clicked()
 {
     // Client-side validation (presence check + format check of email)
+
+    // Presence Checks
     if (ui->username_register_lineEdit->text() == "") ui->empty_username_error->show();
     else ui->empty_username_error->hide();
 
@@ -110,9 +108,12 @@ void MainWindow::on_pushButton_6_clicked()
     if (ui->confPassword_register_lineEdit->text() == "") ui->empty_confPass_error->show();
     else ui->empty_confPass_error->hide();
 
+    
     if (ui->email_register_lineEdit->text() == "") ui->empty_email_error->show();
     else {
         ui->empty_email_error->hide();
+
+        // Checking the format of the email..
         std::string email = ui->email_register_lineEdit->text().toStdString();
         int i = email.find('@');
         if (!i) ui->empty_email_error->show();
@@ -122,6 +123,7 @@ void MainWindow::on_pushButton_6_clicked()
         }
     }
 
+    // Checking if the two passwords input are the same..
     if (ui->password_register_lineEdit->text() != ui->confPassword_register_lineEdit->text()) ui->unequal_pass_error->show();
     else ui->unequal_pass_error->hide();
 
