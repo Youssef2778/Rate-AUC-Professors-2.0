@@ -48,11 +48,11 @@ void MainWindow::on_register_label_4_linkActivated(const QString &link)
     ui->stackedWidget->setCurrentIndex(1);
 
     // Hiding the error messages.
-    ui->label_3->hide();
-    ui->label_4->hide();
-    ui->label_5->hide();
-    ui->label_6->hide();
-    ui->label_7->hide();
+    ui->empty_email_error->hide();
+    ui->empty_username_error->hide();
+    ui->auc_email_error->hide();
+    ui->empty_pass_error->hide();
+    ui->empty_confPass_error->hide();
 
 
     // Assume you have a widget inside the stacked page
@@ -76,11 +76,11 @@ void MainWindow::on_register_label_4_linkActivated(const QString &link)
 void MainWindow::on_checkBox_6_stateChanged(int arg1)
 {
     if (arg1 == 2) {
-        ui->lineEdit->setEchoMode(QLineEdit::Password);
-        ui->lineEdit_12->setEchoMode(QLineEdit::Password);
+        ui->password_register_lineEdit->setEchoMode(QLineEdit::Password);
+        ui->confPassword_register_lineEdit->setEchoMode(QLineEdit::Password);
     } else if (arg1 == 0) {
-        ui->lineEdit->setEchoMode(QLineEdit::Normal);
-        ui->lineEdit_12->setEchoMode(QLineEdit::Normal);
+        ui->password_register_lineEdit->setEchoMode(QLineEdit::Normal);
+        ui->confPassword_register_lineEdit->setEchoMode(QLineEdit::Normal);
     }
 }
 
@@ -89,5 +89,16 @@ void MainWindow::on_register_label_6_linkActivated(const QString &link)
 {
     ui->stackedWidget->setCurrentIndex(0);
 
+}
+
+// ui->label_3->hide();
+//     ui->label_4->hide();
+//     ui->label_5->hide();
+//     ui->label_6->hide();
+//     ui->label_7->hide();
+
+void MainWindow::on_pushButton_6_clicked()
+{
+    // if (ui->lineEdit_2 )
 }
 

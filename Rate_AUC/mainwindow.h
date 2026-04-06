@@ -28,6 +28,7 @@ private slots:
     void on_register_label_4_linkActivated(const QString &link);
     void on_checkBox_6_stateChanged(int arg1);
     void on_register_label_6_linkActivated(const QString &link);
+    void on_pushButton_6_clicked();
 };
 
 

@@ -234,7 +234,7 @@ QPushButton#pushButton {
 width: 100px;
 }
 
-QLabel#label_3, #label_4, #label_5, #label_6, #label_7{color: red}
+QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_error, #empty_confPass_error{color: red}
 
 </string>
        </property>
@@ -285,14 +285,14 @@ QLabel#label_3, #label_4, #label_5, #label_6, #label_7{color: red}
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="lineEdit_2">
+              <widget class="QLineEdit" name="username_register_lineEdit">
                <property name="placeholderText">
                 <string>Username</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="label_4">
+              <widget class="QLabel" name="empty_username_error">
                <property name="text">
                 <string>Please add your username</string>
                </property>
@@ -309,21 +309,21 @@ QLabel#label_3, #label_4, #label_5, #label_6, #label_7{color: red}
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="lineEdit_11">
+              <widget class="QLineEdit" name="email_register_lineEdit">
                <property name="placeholderText">
                 <string>example@aucegypt.edu</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="label_7">
+              <widget class="QLabel" name="empty_email_error">
                <property name="text">
                 <string>Please add your email</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="label_3">
+              <widget class="QLabel" name="auc_email_error">
                <property name="enabled">
                 <bool>true</bool>
                </property>
@@ -342,7 +342,7 @@ QLabel#label_3, #label_4, #label_5, #label_6, #label_7{color: red}
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit_12">
+            <widget class="QLineEdit" name="password_register_lineEdit">
              <property name="inputMask">
               <string/>
              </property>
@@ -358,7 +358,7 @@ QLabel#label_3, #label_4, #label_5, #label_6, #label_7{color: red}
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="label_5">
+            <widget class="QLabel" name="empty_pass_error">
              <property name="text">
               <string>Please set the password</string>
              </property>
@@ -372,7 +372,7 @@ QLabel#label_3, #label_4, #label_5, #label_6, #label_7{color: red}
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit">
+            <widget class="QLineEdit" name="confPassword_register_lineEdit">
              <property name="echoMode">
               <enum>QLineEdit::Password</enum>
              </property>
@@ -382,7 +382,7 @@ QLabel#label_3, #label_4, #label_5, #label_6, #label_7{color: red}
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="label_6">
+            <widget class="QLabel" name="empty_confPass_error">
              <property name="text">
               <string>Please retype the password.</string>
              </property>
