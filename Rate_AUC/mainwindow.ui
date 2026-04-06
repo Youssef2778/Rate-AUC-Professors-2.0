@@ -234,7 +234,7 @@ QPushButton#pushButton {
 width: 100px;
 }
 
-QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_error, #empty_confPass_error{color: red}
+QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_error, #empty_confPass_error, #unequal_pass_error{color: red}
 
 </string>
        </property>
@@ -385,6 +385,13 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
             <widget class="QLabel" name="empty_confPass_error">
              <property name="text">
               <string>Please retype the password.</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="unequal_pass_error">
+             <property name="text">
+              <string>The two password are not the same.</string>
              </property>
             </widget>
            </item>

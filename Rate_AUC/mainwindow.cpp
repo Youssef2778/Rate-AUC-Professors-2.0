@@ -53,6 +53,7 @@ void MainWindow::on_register_label_4_linkActivated(const QString &link)
     ui->auc_email_error->hide();
     ui->empty_pass_error->hide();
     ui->empty_confPass_error->hide();
+    ui->unequal_pass_error->hide();
 
 
     // Assume you have a widget inside the stacked page
@@ -91,14 +92,39 @@ void MainWindow::on_register_label_6_linkActivated(const QString &link)
 
 }
 
-// ui->label_3->hide();
-//     ui->label_4->hide();
-//     ui->label_5->hide();
-//     ui->label_6->hide();
-//     ui->label_7->hide();
+    // ui->empty_email_error->hide();
+    // ui->empty_username_error->hide();
+    // ui->auc_email_error->hide();
+    // ui->empty_pass_error->hide();
+    // ui->empty_confPass_error->hide();
 
 void MainWindow::on_pushButton_6_clicked()
 {
-    // if (ui->lineEdit_2 )
+    // Client-side validation (presence check + format check of email)
+    if (ui->username_register_lineEdit->text() == "") ui->empty_username_error->show();
+    else ui->empty_username_error->hide();
+
+    if (ui->password_register_lineEdit->text() == "") ui->empty_pass_error->show();
+    else ui->empty_pass_error->hide();
+
+    if (ui->confPassword_register_lineEdit->text() == "") ui->empty_confPass_error->show();
+    else ui->empty_confPass_error->hide();
+
+    if (ui->email_register_lineEdit->text() == "") ui->empty_email_error->show();
+    else {
+        ui->empty_email_error->hide();
+        std::string email = ui->email_register_lineEdit->text().toStdString();
+        int i = email.find('@');
+        if (!i) ui->empty_email_error->show();
+        else {
+            if (email.substr(i + 1, email.size() - i - 1) != "aucegypt.edu") ui->auc_email_error->show();
+            else ui->auc_email_error->hide();
+        }
+    }
+
+    if (ui->password_register_lineEdit->text() != ui->confPassword_register_lineEdit->text()) ui->unequal_pass_error->show();
+    else ui->unequal_pass_error->hide();
+
+
 }
 
