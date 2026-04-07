@@ -1,7 +1,9 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include <boost/asio.hpp>
+#include <boost/json.hpp>
 #include <iostream>
+#include <fstream>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -182,7 +184,12 @@ void MainWindow::on_pushButton_6_clicked()
         std::cout.flush();
     }
 
+    // Let's now form the JSON to send the data to the server.
 
+    boost::json::object registration;
+    registration["username"] = ui->username_register_lineEdit->text().toStdString();
+    registration["email"] = ui->email_register_lineEdit->text().toStdString();
+    registration["password"] = ui->password_register_lineEdit->text().toStdString();
 
 }
 

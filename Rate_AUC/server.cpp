@@ -2,6 +2,7 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
+#include <boost/json.hpp>
 
 namespace beast = boost::beast;
 namespace http = beast::http;
