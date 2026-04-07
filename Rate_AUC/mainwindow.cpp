@@ -96,6 +96,8 @@ void MainWindow::on_register_label_6_linkActivated(const QString &link)
 
 }
 
+// Function called when the "Register" Button in the Register page is clicked.
+// This involves the networking logic.
 void MainWindow::on_pushButton_6_clicked()
 {
     // Client-side validation (presence check + format check of email)
@@ -175,6 +177,7 @@ void MainWindow::on_pushButton_6_clicked()
         else if (error) 
             throw boost::system::system_error(error);
 
+        // If "Connected!" is displayed, then we formed a successful TCP connection with the server.
         std::cout.write(buf.data(), len);
         std::cout.flush();
     }
