@@ -2,6 +2,8 @@
 #include "./ui_mainwindow.h"
 #include <boost/asio.hpp>
 #include <boost/json.hpp>
+#include <boost/beast/http.hpp>
+#include <boost/beast/core.hpp>
 #include <iostream>
 #include <fstream>
 
@@ -154,10 +156,10 @@ void MainWindow::on_pushButton_6_clicked()
 
 
     // Now, let's see what the server thinks about the data!
-
+    const std::string server_address = "127.0.0.1";
     boost::asio::io_context io;
     boost::asio::ip::tcp::resolver resolver(io);
-    boost::asio::ip::tcp::resolver::results_type endpoints = resolver.resolve("127.0.0.1", "8080");
+    boost::asio::ip::tcp::resolver::results_type endpoints = resolver.resolve(server_address, "8080");
     boost::asio::ip::tcp::socket socket(io);
     try {
         boost::asio::connect(socket, endpoints);
@@ -182,14 +184,24 @@ void MainWindow::on_pushButton_6_clicked()
         // If "Connected!" is displayed, then we formed a successful TCP connection with the server.
         std::cout.write(buf.data(), len);
         std::cout.flush();
+
+        // Let's now form the JSON to send the data to the server.
+        boost::json::object registration;
+        registration["username"] = ui->username_register_lineEdit->text().toStdString();
+        registration["email"] = ui->email_register_lineEdit->text().toStdString();
+        registration["password"] = ui->password_register_lineEdit->text().toStdString();
+
+        // Preparing the request...
+        boost::beast::http::request<boost::beast::http::string_body> request(boost::beast::http::verb::post, "/register", 11);
+        request.set(boost::beast::http::field::host, server_address);
+        request.set(boost::beast::http::field::content_type, "application/json");
+        request.body() = boost::json::serialize(registration);
+        request.prepare_payload();
+
+        // Let's send it!
+        boost::beast::http::write(socket, request);
     }
 
-    // Let's now form the JSON to send the data to the server.
-
-    boost::json::object registration;
-    registration["username"] = ui->username_register_lineEdit->text().toStdString();
-    registration["email"] = ui->email_register_lineEdit->text().toStdString();
-    registration["password"] = ui->password_register_lineEdit->text().toStdString();
 
 }
 
