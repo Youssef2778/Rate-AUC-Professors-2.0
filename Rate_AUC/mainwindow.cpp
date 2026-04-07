@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include <boost/asio.hpp>
+#include <iostream>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -99,17 +101,30 @@ void MainWindow::on_pushButton_6_clicked()
     // Client-side validation (presence check + format check of email)
 
     // Presence Checks
-    if (ui->username_register_lineEdit->text() == "") ui->empty_username_error->show();
+    if (ui->username_register_lineEdit->text() == "") {
+        ui->empty_username_error->show();
+        return;
+    }
     else ui->empty_username_error->hide();
 
-    if (ui->password_register_lineEdit->text() == "") ui->empty_pass_error->show();
+    if (ui->password_register_lineEdit->text() == "") {
+        ui->empty_pass_error->show();
+        return;
+    }
     else ui->empty_pass_error->hide();
 
-    if (ui->confPassword_register_lineEdit->text() == "") ui->empty_confPass_error->show();
+    if (ui->confPassword_register_lineEdit->text() == "") {
+        ui->empty_confPass_error->show();
+        return;
+    }
     else ui->empty_confPass_error->hide();
 
     
-    if (ui->email_register_lineEdit->text() == "") ui->empty_email_error->show();
+    if (ui->email_register_lineEdit->text() == "") 
+    {
+        ui->empty_email_error->show();
+        return;
+    }
     else {
         ui->empty_email_error->hide();
 
@@ -118,14 +133,52 @@ void MainWindow::on_pushButton_6_clicked()
         int i = email.find('@');
         if (!i) ui->empty_email_error->show();
         else {
-            if (email.substr(i + 1, email.size() - i - 1) != "aucegypt.edu") ui->auc_email_error->show();
+            if (email.substr(i + 1, email.size() - i - 1) != "aucegypt.edu") {
+                ui->auc_email_error->show();
+                return;
+            }
             else ui->auc_email_error->hide();
         }
     }
 
     // Checking if the two passwords input are the same..
-    if (ui->password_register_lineEdit->text() != ui->confPassword_register_lineEdit->text()) ui->unequal_pass_error->show();
+    if (ui->password_register_lineEdit->text() != ui->confPassword_register_lineEdit->text()) {
+        ui->unequal_pass_error->show();
+        return;
+    }
     else ui->unequal_pass_error->hide();
+
+
+    // Now, let's see what the server thinks about the data!
+
+    boost::asio::io_context io;
+    boost::asio::ip::tcp::resolver resolver(io);
+    boost::asio::ip::tcp::resolver::results_type endpoints = resolver.resolve("127.0.0.1", "8080");
+    boost::asio::ip::tcp::socket socket(io);
+    try {
+        boost::asio::connect(socket, endpoints);
+        std::cout << "Connected to the server!" << std::endl;
+    } catch (std::exception& e) {
+        std::cout << "Connection failed: " << e.what() << std::endl;
+    }
+
+
+    while (true) {
+        std::array<char, 128> buf;
+        boost::system::error_code error;
+
+        size_t len = socket.read_some(boost::asio::buffer(buf), error);
+
+        if (error == boost::asio::error::eof) {
+            break;
+        }
+        else if (error) 
+            throw boost::system::system_error(error);
+
+        std::cout.write(buf.data(), len);
+        std::cout.flush();
+    }
+
 
 
 }
