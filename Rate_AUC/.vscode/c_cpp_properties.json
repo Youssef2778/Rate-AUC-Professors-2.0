@@ -8,7 +8,8 @@
                 "/usr/include/x86_64-linux-gnu/qt6",
                 "/usr/include/x86_64-linux-gnu/qt6/QtGui",
                 "/usr/include/x86_64-linux-gnu/qt6/QtCore",
-                "../Rate_AUC/build/Rate_AUC_autogen/include"
+                "../Rate_AUC/build/Rate_AUC_autogen/include",
+                "/usr/include/x86_64-linux-gnu/qt6/QtSql"
             ],
             "defines": [],
             "cStandard": "c17",

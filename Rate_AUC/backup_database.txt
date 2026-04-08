@@ -1,30 +1,42 @@
+--@block
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) UNIQUE,
+    encrypted_password VARCHAR(255),
+    email VARCHAR(255) UNIQUE,
+    account_type VARCHAR(1)
+);
 
-Users {
-	id integer pk increments unique
-	username text unique
-	email text unique
-	type text
-}
+--@block
+CREATE TABLE departments (
+    id INT AUTO_INCREMENT PRIMARY KEY UNIQUE,
+    department_name VARCHAR(255) UNIQUE
+);
 
-Courses {
-	id integer pk increments unique
-	Course_Name text
-	Department_id integer *> Departments.id
-}
+--@block
+CREATE TABLE courses (
+    id INT AUTO_INCREMENT PRIMARY KEY  UNIQUE,
+    course_name VARCHAR(255) UNIQUE,
+    Department_id INT,
+    FOREIGN KEY (Department_id) REFERENCES departments(id)
+);
 
-Departments {
-	id integer pk increments unique
-	Department_name text
-}
+--@block
+CREATE TABLE professors (
+    id INT PRIMARY KEY,
+    department_id INT,
+    score INT DEFAULT 0,
+    FOREIGN KEY (id) REFERENCES users(id),
+    FOREIGN KEY (department_id) REFERENCES departments(id)
+);
 
-Instructor-Course {
-	Course_ID integer *>* Courses.id
-	Professor_ID integer *>* professors.professor_id
-}
+--@block
+CREATE TABLE professor_course (
+    course_id INT,
+    professor_id INT,
+    FOREIGN KEY (course_id) REFERENCES courses(id),
+    FOREIGN KEY (professor_id) REFERENCES professors(id)
+);
 
-professors {
-	professor_id integer > Users.id
-	department_id integer *> Departments.id
-	score integer def(0)
-}
-
+--@block 
+SELECT * FROM users;

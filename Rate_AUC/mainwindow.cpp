@@ -201,7 +201,7 @@ void MainWindow::on_pushButton_6_clicked()
 
         // Let's send it!
         boost::beast::http::write(socket, request);
-    }
+        }
     } catch (std::exception& e) {
         std::cout << "Connection failed: " << e.what() << std::endl;
     }

@@ -3,6 +3,10 @@
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <boost/json.hpp>
+#include <mysql_driver.h>
+#include <mysql_connection.h>
+#include <cppconn/statement.h>
+#include <cppconn/resultset.h>
 
 namespace beast = boost::beast;
 namespace http = beast::http;
@@ -32,15 +36,17 @@ int main () {
         http::read(socket, buffer, req);
 
         auto parsed = json::parse(req.body());
-        std::cout << "Here it is: " << req.body() << std::endl;
         json::object obj = parsed.as_object();
 
-        // http::response<http::string_body> response(http::status::ok, req.version());
-        // response.set(http::field::content_type, "text/plain");
-        // response.body() = req.body();
-        // response.prepare_payload();
+        sql::mysql::MySQL_Driver *driver = sql::mysql::get_mysql_driver_instance();
+        sql::Connection* con = driver->connect("tcp://centerbeam.proxy.rlwy.net:11239", "root" , "lTfeKOSlLMYPoYSyCQXLVBXKugsnOAHk");
+        con->setSchema("railway");
 
-        // http::write(socket, response);
+        sql::Statement* stmt = con->createStatement();
+        sql::ResultSet* res = stmt->executeQuery("SELECT * FROM users");
+        while (res->next()) {
+            std::cout << res->getString("username") << std::endl;
+        }
 
     }
 
