@@ -13,26 +13,24 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        build_type: [Release]
-        c_compiler: [gcc, clang, cl]
         include:
-          - os: windows-latest
-            c_compiler: cl
-            cpp_compiler: cl
+          # Ubuntu with GCC
           - os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
+            build_type: Release
+          
+          # Ubuntu with Clang
           - os: ubuntu-latest
             c_compiler: clang
             cpp_compiler: clang++
-        exclude:
+            build_type: Release
+          
+          # Windows with MSVC
           - os: windows-latest
-            c_compiler: gcc
-          - os: windows-latest
-            c_compiler: clang
-          - os: ubuntu-latest
             c_compiler: cl
+            cpp_compiler: cl
+            build_type: Release
 
     steps:
     - uses: actions/checkout@v4
@@ -50,17 +48,13 @@ jobs:
       if: runner.os == 'Windows'
       shell: powershell
       run: |
-        # Install Chocolatey packages
+        # Install CMake
         choco install -y cmake
-        
-        # Install Qt6
-        choco install -y qt6
         
         # Install Boost via Chocolatey
         choco install -y boost-msvc-14.3
         
-        # Set Qt paths for CMake
-        echo "Qt6_DIR=C:\tools\qt\6.x.x\msvc2022_64\lib\cmake\Qt6" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+        # Set environment variables for CMake
         echo "Boost_INCLUDE_DIR=C:\local\boost" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     # ============================================================================
@@ -73,21 +67,19 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y \
           cmake \
-          qt6-base-dev \
-          qt6-tools-dev \
           libboost-all-dev \
           mysql-server \
           libmysqlcppconn-dev \
           libssl-dev
 
     # ============================================================================
-    # INSTALL QT VIA ACTION (ALTERNATIVE - More Reliable)
+    # INSTALL QT VIA ACTION (Cross-platform)
     # ============================================================================
-    - name: Install Qt (Cross-platform)
+    - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
         version: '6.5.0'
-        modules: 'qt5compat qtbase qttools'
+        modules: 'qt5compat'
         cache: true
 
     # ============================================================================
