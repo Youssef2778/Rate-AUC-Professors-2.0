@@ -75,3 +75,4 @@ CMakeLists.txt.user*
 test.cpp
 *.json
 *.session.sql
+flaws.txt

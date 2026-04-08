@@ -180,7 +180,6 @@ void MainWindow::on_pushButton_6_clicked()
         // If "Connected!" is displayed, then we formed a successful TCP connection with the server.
         std::cout.write(buf.data(), len);
         std::cout.flush();
-
         // Let's now form the JSON to send the data to the server.
         boost::json::object registration;
         registration["username"] = ui->username_register_lineEdit->text().toStdString();
