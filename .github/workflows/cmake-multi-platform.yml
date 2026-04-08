@@ -87,7 +87,7 @@ jobs:
       uses: jurplel/install-qt-action@v4
       with:
         version: '6.5.0'
-        modules: 'qtbase qttools'
+        modules: 'qt5compat qtbase qttools'
         cache: true
 
     # ============================================================================
