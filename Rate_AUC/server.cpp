@@ -7,6 +7,8 @@
 #include <mysql_connection.h>
 #include <cppconn/statement.h>
 #include <cppconn/resultset.h>
+#include <cppconn/prepared_statement.h>
+
 
 namespace beast = boost::beast;
 namespace http = beast::http;
@@ -37,17 +39,25 @@ int main () {
 
         auto parsed = json::parse(req.body());
         json::object obj = parsed.as_object();
+        try {
+            sql::mysql::MySQL_Driver *driver = sql::mysql::get_mysql_driver_instance();
+            sql::Connection* con = driver->connect("tcp://centerbeam.proxy.rlwy.net:11239", "root" , "lTfeKOSlLMYPoYSyCQXLVBXKugsnOAHk");
+            con->setSchema("railway");
 
-        sql::mysql::MySQL_Driver *driver = sql::mysql::get_mysql_driver_instance();
-        sql::Connection* con = driver->connect("tcp://centerbeam.proxy.rlwy.net:11239", "root" , "lTfeKOSlLMYPoYSyCQXLVBXKugsnOAHk");
-        con->setSchema("railway");
+            sql::Statement* stmt = con->createStatement();
+            sql::PreparedStatement* pstmt(
+                con->prepareStatement("INSERT INTO users (username, email, encrypted_password, account_type) VALUES (?, ?, ?, ?)")
+            );
+            pstmt->setString(1, (std::string) obj["username"].as_string());
+            pstmt->setString(2, (std::string) obj["email"].as_string());
+            pstmt->setString(3, (std::string) obj["hashed_password"].as_string());
+            pstmt->setString(4, "S");
 
-        sql::Statement* stmt = con->createStatement();
-        sql::ResultSet* res = stmt->executeQuery("SELECT * FROM users");
-        while (res->next()) {
-            std::cout << res->getString("username") << std::endl;
+            pstmt->executeUpdate();
         }
-
+        catch (sql::SQLException &e) {
+            std::cerr << "Error: " << e.what() << "(Error code: " << e.getErrorCode() << ")" << std::endl;
+        }
     }
 
 
