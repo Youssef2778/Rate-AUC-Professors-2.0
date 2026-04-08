@@ -22,10 +22,12 @@ boost::asio::thread_pool pool(std::thread::hardware_concurrency());
 void handle_request(const http::request<http::string_body>& req) {
     std::cout << "Request target: " << req.target() << "\n";
 
+    // The user clicks on the "Register" button on the register page..
     if (req.target() == "/register") {
         auto parsed = json::parse(req.body());
         json::object obj = parsed.as_object();
         try {
+            // Let's update the database!
             sql::mysql::MySQL_Driver *driver = sql::mysql::get_mysql_driver_instance();
             sql::Connection* con = driver->connect("tcp://centerbeam.proxy.rlwy.net:11239", "root" , "lTfeKOSlLMYPoYSyCQXLVBXKugsnOAHk");
             con->setSchema("railway");
