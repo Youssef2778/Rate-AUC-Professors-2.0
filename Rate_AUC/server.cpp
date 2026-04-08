@@ -35,12 +35,12 @@ int main () {
         std::cout << "Here it is: " << req.body() << std::endl;
         json::object obj = parsed.as_object();
 
-        http::response<http::string_body> response(http::status::ok, req.version());
-        response.set(http::field::content_type, "text/plain");
-        response.body() = req.body();
-        response.prepare_payload();
+        // http::response<http::string_body> response(http::status::ok, req.version());
+        // response.set(http::field::content_type, "text/plain");
+        // response.body() = req.body();
+        // response.prepare_payload();
 
-        http::write(socket, response);
+        // http::write(socket, response);
 
     }
 

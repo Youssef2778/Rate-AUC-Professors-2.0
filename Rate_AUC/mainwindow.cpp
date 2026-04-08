@@ -6,6 +6,7 @@
 #include <boost/beast/core.hpp>
 #include <iostream>
 #include <fstream>
+#include "bcrypt/BCrypt.hpp"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -164,12 +165,7 @@ void MainWindow::on_pushButton_6_clicked()
     try {
         boost::asio::connect(socket, endpoints);
         std::cout << "Connected to the server!" << std::endl;
-    } catch (std::exception& e) {
-        std::cout << "Connection failed: " << e.what() << std::endl;
-    }
-
-
-    while (true) {
+        while (true) {
         std::array<char, 128> buf;
         boost::system::error_code error;
 
@@ -189,7 +185,12 @@ void MainWindow::on_pushButton_6_clicked()
         boost::json::object registration;
         registration["username"] = ui->username_register_lineEdit->text().toStdString();
         registration["email"] = ui->email_register_lineEdit->text().toStdString();
-        registration["password"] = ui->password_register_lineEdit->text().toStdString();
+
+        // Let's Hash the password to be stored in the database (this prevents us from knowing the users' passwords for their security)
+        std::string password = ui->password_register_lineEdit->text().toStdString();
+        std::string hash = BCrypt::generateHash(password);
+
+        registration["hashed_password"] = hash;
 
         // Preparing the request...
         boost::beast::http::request<boost::beast::http::string_body> request(boost::beast::http::verb::post, "/register", 11);
@@ -201,6 +202,12 @@ void MainWindow::on_pushButton_6_clicked()
         // Let's send it!
         boost::beast::http::write(socket, request);
     }
+    } catch (std::exception& e) {
+        std::cout << "Connection failed: " << e.what() << std::endl;
+    }
+
+
+   
 
 
 }

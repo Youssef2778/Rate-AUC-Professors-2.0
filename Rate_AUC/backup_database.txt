@@ -1,10 +1,9 @@
 
 Users {
 	id integer pk increments unique
-	First_Name text unique
-	Last_Name text unique
+	username text unique
+	email text unique
 	type text
-	Gender boolean
 }
 
 Courses {
