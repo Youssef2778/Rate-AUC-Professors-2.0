@@ -81,7 +81,12 @@ jobs:
         version: '6.5.0'
         modules: 'qt5compat'
         cache: true
-
+        
+    - name: Install dependencies
+      run: 
+        sudo apt-get update
+        sudo apt-get install -y libbcrypt-dev
+        
     # ============================================================================
     # CONFIGURE CMAKE
     # ============================================================================
