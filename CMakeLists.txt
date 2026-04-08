@@ -13,6 +13,14 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql)
 find_package(Boost REQUIRED COMPONENTS json)
 
+# Find and configure bcrypt
+find_path(BCRYPT_INCLUDE_DIR bcrypt/BCrypt.hpp)
+if(BCRYPT_INCLUDE_DIR)
+    message(STATUS "BCrypt found at: ${BCRYPT_INCLUDE_DIR}")
+    target_include_directories(Rate_AUC PRIVATE ${BCRYPT_INCLUDE_DIR})
+else()
+    message(FATAL_ERROR "BCrypt header not found")
+endif()
 
 set(PROJECT_SOURCES
         main.cpp
