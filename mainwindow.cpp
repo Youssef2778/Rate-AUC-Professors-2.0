@@ -1,13 +1,12 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include <boost/asio.hpp>
-#include <boost/json.hpp>
-#include <boost/beast/http.hpp>
-#include <boost/beast/core.hpp>
-#include <iostream>
-#include <fstream>
 #include "bcrypt/BCrypt.hpp"
-
+#include <boost/asio.hpp>
+#include <boost/beast/core.hpp>
+#include <boost/beast/http.hpp>
+#include <boost/json.hpp>
+#include <fstream>
+#include <iostream>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -18,20 +17,19 @@ MainWindow::MainWindow(QWidget *parent)
     // The following lines of code are produced by ChatGPT, their purpose is to constantly center the form no matter the size
     // of the main window
 
-
     // Assume you have a widget inside the stacked page
-    QWidget* page = ui->stackedWidget->widget(0); // first page
-    QVBoxLayout* vLayout = new QVBoxLayout(page);
+    QWidget *page = ui->stackedWidget->widget(0); // first page
+    QVBoxLayout *vLayout = new QVBoxLayout(page);
 
     // Create a horizontal layout for centering
-    QHBoxLayout* hLayout = new QHBoxLayout();
-    hLayout->addStretch();            // left spacer
+    QHBoxLayout *hLayout = new QHBoxLayout();
+    hLayout->addStretch();          // left spacer
     hLayout->addWidget(ui->widget); // your target widget
-    hLayout->addStretch();            // right spacer
+    hLayout->addStretch();          // right spacer
 
-    vLayout->addStretch();   // top spacer
+    vLayout->addStretch(); // top spacer
     vLayout->addLayout(hLayout);
-    vLayout->addStretch();   // bottom spacer
+    vLayout->addStretch(); // bottom spacer
 
     page->setLayout(vLayout);
 }
@@ -64,20 +62,19 @@ void MainWindow::on_register_label_4_linkActivated(const QString &link)
     ui->empty_confPass_error->hide();
     ui->unequal_pass_error->hide();
 
-
     // Assume you have a widget inside the stacked page
-    QWidget* page = ui->stackedWidget->widget(1); // second page
-    QVBoxLayout* vLayout = new QVBoxLayout(page);
+    QWidget *page = ui->stackedWidget->widget(1); // second page
+    QVBoxLayout *vLayout = new QVBoxLayout(page);
 
     // Create a horizontal layout for centering
-    QHBoxLayout* hLayout = new QHBoxLayout();
+    QHBoxLayout *hLayout = new QHBoxLayout();
     hLayout->addStretch();            // left spacer
     hLayout->addWidget(ui->widget_2); // your target widget
     hLayout->addStretch();            // right spacer
 
-    vLayout->addStretch();   // top spacer
+    vLayout->addStretch(); // top spacer
     vLayout->addLayout(hLayout);
-    vLayout->addStretch();   // bottom spacer
+    vLayout->addStretch(); // bottom spacer
 
     page->setLayout(vLayout);
 }
@@ -94,11 +91,9 @@ void MainWindow::on_checkBox_6_stateChanged(int arg1)
     }
 }
 
-
 void MainWindow::on_register_label_6_linkActivated(const QString &link)
 {
     ui->stackedWidget->setCurrentIndex(0);
-
 }
 
 // Function called when the "Register" Button in the Register page is clicked.
@@ -111,40 +106,38 @@ void MainWindow::on_pushButton_6_clicked()
     if (ui->username_register_lineEdit->text() == "") {
         ui->empty_username_error->show();
         return;
-    }
-    else ui->empty_username_error->hide();
+    } else
+        ui->empty_username_error->hide();
 
     if (ui->password_register_lineEdit->text() == "") {
         ui->empty_pass_error->show();
         return;
-    }
-    else ui->empty_pass_error->hide();
+    } else
+        ui->empty_pass_error->hide();
 
     if (ui->confPassword_register_lineEdit->text() == "") {
         ui->empty_confPass_error->show();
         return;
-    }
-    else ui->empty_confPass_error->hide();
+    } else
+        ui->empty_confPass_error->hide();
 
-    
-    if (ui->email_register_lineEdit->text() == "") 
-    {
+    if (ui->email_register_lineEdit->text() == "") {
         ui->empty_email_error->show();
         return;
-    }
-    else {
+    } else {
         ui->empty_email_error->hide();
 
         // Checking the format of the email..
         std::string email = ui->email_register_lineEdit->text().toStdString();
         int i = email.find('@');
-        if (!i) ui->empty_email_error->show();
+        if (!i)
+            ui->empty_email_error->show();
         else {
             if (email.substr(i + 1, email.size() - i - 1) != "aucegypt.edu") {
                 ui->auc_email_error->show();
                 return;
-            }
-            else ui->auc_email_error->hide();
+            } else
+                ui->auc_email_error->hide();
         }
     }
 
@@ -152,62 +145,68 @@ void MainWindow::on_pushButton_6_clicked()
     if (ui->password_register_lineEdit->text() != ui->confPassword_register_lineEdit->text()) {
         ui->unequal_pass_error->show();
         return;
-    }
-    else ui->unequal_pass_error->hide();
-
+    } else
+        ui->unequal_pass_error->hide();
 
     // Now, let's see what the server thinks about the data!
     const std::string server_address = "127.0.0.1";
     boost::asio::io_context io;
     boost::asio::ip::tcp::resolver resolver(io);
-    boost::asio::ip::tcp::resolver::results_type endpoints = resolver.resolve(server_address, "8080");
+    boost::asio::ip::tcp::resolver::results_type endpoints = resolver.resolve(server_address,
+                                                                              "8080");
     boost::asio::ip::tcp::socket socket(io);
     try {
         boost::asio::connect(socket, endpoints);
         std::cout << "Connected to the server!" << std::endl;
         while (true) {
-        std::array<char, 128> buf;
-        boost::system::error_code error;
+            std::array<char, 128> buf;
+            boost::system::error_code error;
 
-        size_t len = socket.read_some(boost::asio::buffer(buf), error);
+            size_t len = socket.read_some(boost::asio::buffer(buf), error);
 
-        if (error == boost::asio::error::eof) {
-            break;
+            if (error == boost::asio::error::eof) {
+                break;
+            } else if (error)
+                throw boost::system::system_error(error);
+
+            // If "Connected!" is displayed, then we formed a successful TCP connection with the server.
+            std::cout.write(buf.data(), len);
+            std::cout.flush();
+            // Let's now form the JSON to send the data to the server.
+            boost::json::object registration;
+            registration["username"] = ui->username_register_lineEdit->text().toStdString();
+            registration["email"] = ui->email_register_lineEdit->text().toStdString();
+
+            // Let's Hash the password to be stored in the database (this prevents us from knowing the users' passwords for their security)
+            std::string password = ui->password_register_lineEdit->text().toStdString();
+            std::string hash = BCrypt::generateHash(password);
+
+            registration["hashed_password"] = hash;
+
+            // Preparing the request...
+            boost::beast::http::request<boost::beast::http::string_body>
+                request(boost::beast::http::verb::post, "/register", 11);
+            request.set(boost::beast::http::field::host, server_address);
+            request.set(boost::beast::http::field::content_type, "application/json");
+            request.body() = boost::json::serialize(registration);
+            request.prepare_payload();
+
+            // Let's send it!
+            boost::beast::http::write(socket, request);
+
+            //Send user to *student* homepage
+            ui->stackedWidget->setCurrentIndex(2);
         }
-        else if (error) 
-            throw boost::system::system_error(error);
-
-        // If "Connected!" is displayed, then we formed a successful TCP connection with the server.
-        std::cout.write(buf.data(), len);
-        std::cout.flush();
-        // Let's now form the JSON to send the data to the server.
-        boost::json::object registration;
-        registration["username"] = ui->username_register_lineEdit->text().toStdString();
-        registration["email"] = ui->email_register_lineEdit->text().toStdString();
-
-        // Let's Hash the password to be stored in the database (this prevents us from knowing the users' passwords for their security)
-        std::string password = ui->password_register_lineEdit->text().toStdString();
-        std::string hash = BCrypt::generateHash(password);
-
-        registration["hashed_password"] = hash;
-
-        // Preparing the request...
-        boost::beast::http::request<boost::beast::http::string_body> request(boost::beast::http::verb::post, "/register", 11);
-        request.set(boost::beast::http::field::host, server_address);
-        request.set(boost::beast::http::field::content_type, "application/json");
-        request.body() = boost::json::serialize(registration);
-        request.prepare_payload();
-
-        // Let's send it!
-        boost::beast::http::write(socket, request);
-        }
-    } catch (std::exception& e) {
+    } catch (std::exception &e) {
         std::cout << "Connection failed: " << e.what() << std::endl;
     }
+}
 
-
-   
-
+//login module
+void MainWindow::on_pushButton_4_clicked()
+{
+    //Temporary login for testing purposes
+    ui->stackedWidget->setCurrentIndex(2);
 
 }
 

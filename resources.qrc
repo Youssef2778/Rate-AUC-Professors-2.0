@@ -2,5 +2,9 @@
     <qresource prefix="/images">
         <file>images/auc_logo.png</file>
         <file>images/AUC_Background.jpeg</file>
+        <file>images/Background.jpg</file>
+    </qresource>
+    <qresource prefix="/icons">
+        <file>icons/MG.png</file>
     </qresource>
 </RCC>

@@ -24,7 +24,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="page_3">
        <property name="styleSheet">
@@ -440,6 +440,44 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
           </layout>
          </item>
         </layout>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="page_2">
+       <property name="cursor">
+        <cursorShape>ArrowCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QWidget#page_2 {
+    background-image: url(:/images/AUC_Background.jpeg);
+}</string>
+       </property>
+       <widget class="QComboBox" name="comboBox">
+        <property name="geometry">
+         <rect>
+          <x>380</x>
+          <y>290</y>
+          <width>381</width>
+          <height>61</height>
+         </rect>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="pushButton">
+        <property name="geometry">
+         <rect>
+          <x>757</x>
+          <y>290</y>
+          <width>71</width>
+          <height>61</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="resources.qrc">
+          <normaloff>:/icons/icons/MG.png</normaloff>
+          <normalon>:/icons/icons/MG.png</normalon>:/icons/icons/MG.png</iconset>
+        </property>
        </widget>
       </widget>
      </widget>

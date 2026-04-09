@@ -2,8 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QResizeEvent>
 #include <QPixmap>
+#include <QResizeEvent>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -23,13 +23,13 @@ public:
 private slots:
     void on_checkBox_4_stateChanged(int arg1);
 
-//     void on_register_label_linkActivated(const QString &link);
+    //     void on_register_label_linkActivated(const QString &link);
 
     void on_register_label_4_linkActivated(const QString &link);
     void on_checkBox_6_stateChanged(int arg1);
     void on_register_label_6_linkActivated(const QString &link);
     void on_pushButton_6_clicked();
+    void on_pushButton_4_clicked();
 };
-
 
 #endif // MAINWINDOW_H
