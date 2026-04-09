@@ -460,6 +460,12 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
           <height>61</height>
          </rect>
         </property>
+        <property name="iconSize">
+         <size>
+          <width>512</width>
+          <height>512</height>
+         </size>
+        </property>
        </widget>
        <widget class="QPushButton" name="pushButton">
         <property name="geometry">
