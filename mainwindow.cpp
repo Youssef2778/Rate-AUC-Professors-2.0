@@ -207,6 +207,4 @@ void MainWindow::on_pushButton_4_clicked()
 {
     //Temporary login for testing purposes
     ui->stackedWidget->setCurrentIndex(2);
-
 }
-
