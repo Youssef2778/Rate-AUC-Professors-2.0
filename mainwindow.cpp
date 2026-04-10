@@ -207,4 +207,21 @@ void MainWindow::on_pushButton_4_clicked()
 {
     //Temporary login for testing purposes
     ui->stackedWidget->setCurrentIndex(2);
+
+    // Assume you have a widget inside the stacked page
+    QWidget *page = ui->stackedWidget->widget(2); // thrd page
+    QVBoxLayout *vLayout = new QVBoxLayout(page);
+
+    // Create a horizontal layout for centering
+    QHBoxLayout *hLayout = new QHBoxLayout();
+    hLayout->addStretch();          // left spacer
+    hLayout->addWidget(ui->widget_3); // your target widget
+    hLayout->addStretch();          // right spacer
+
+    vLayout->addStretch(); // top spacer
+    vLayout->addLayout(hLayout);
+    vLayout->addStretch(); // bottom spacer
+
+    page->setLayout(vLayout);
+
 }

@@ -3,6 +3,6 @@
         <file>images/auc_logo.png</file>
         <file>images/AUC_Background.jpeg</file>
         <file>images/Background.jpg</file>
-	<file>icons/MG.png</file>
+        <file>icons/MG.svg</file>
     </qresource>
 </RCC>
