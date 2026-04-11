@@ -205,9 +205,5 @@ void MainWindow::on_pushButton_6_clicked()
         std::cout << "Connection failed: " << e.what() << std::endl;
     }
 
-
-   
-
-
 }
 
