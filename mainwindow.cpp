@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->stackedWidget->setCurrentIndex(0);
+    ui->stackedWidget->setCurrentIndex(1);
     // The following lines of code are produced by ChatGPT, their purpose is to constantly center the form no matter the size
     // of the main window
 
@@ -34,7 +34,47 @@ MainWindow::MainWindow(QWidget *parent)
     vLayout->addStretch();   // bottom spacer
 
     page->setLayout(vLayout);
-}
+    // 1. Initialize the table structure
+    ui->tableWidget->setColumnCount(5);
+    ui->tableWidget->setRowCount(6);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableWidget->verticalHeader()->setVisible(false);
+    ui->tableWidget->setShowGrid(false);
+
+    // 2. Loop to create the 6 professor "cards"
+    for (int i = 0; i < ui->tableWidget->rowCount(); ++i) {
+        // Text Data
+        QTableWidgetItem *rank = new QTableWidgetItem(QString::number(i + 1));
+        QTableWidgetItem *name = new QTableWidgetItem("Professor " + QString::number(i + 1));
+        QTableWidgetItem *score = new QTableWidgetItem("10 points");
+
+        // 2. Now that they have names, we can center them
+        rank->setTextAlignment(Qt::AlignCenter);
+        name->setTextAlignment(Qt::AlignCenter);
+        score->setTextAlignment(Qt::AlignCenter);
+
+        // 3. Finally, put the finished items into the table
+        ui->tableWidget->setItem(i, 0, rank);
+        ui->tableWidget->setItem(i, 1, name);
+        ui->tableWidget->setItem(i, 2, score);
+
+        // Change the buttons to text or standard symbols
+        QPushButton *up = new QPushButton("+ Upvote");
+        QPushButton *down = new QPushButton("- Downvote");
+
+        // Button Styling
+        QString btnStyle = "QPushButton { background-color: #0b2239; color: white; border-radius: 5px; border: 1px solid #ffd700; font-family: 'Segoe UI Emoji'; }";
+        up->setStyleSheet(btnStyle);
+        down->setStyleSheet(btnStyle);
+
+        // Put buttons in the correct columns
+        ui->tableWidget->setCellWidget(i, 3, up);
+        ui->tableWidget->setCellWidget(i, 4, down);
+
+        // Match the row height to the design
+        ui->tableWidget->setRowHeight(i, 60);
+    }
+} // the desin of the leaderboard was coassisted by AI in order to get the right color pallets and design down
 
 MainWindow::~MainWindow()
 {
