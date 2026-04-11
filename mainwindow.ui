@@ -547,12 +547,17 @@ QHeaderView::section {
         </column>
         <column>
          <property name="text">
-          <string>upvote </string>
+          <string>up</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>downvote</string>
+          <string>down</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>bar</string>
          </property>
         </column>
         <item row="0" column="0">
