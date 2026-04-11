@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->stackedWidget->setCurrentIndex(1);
+    ui->stackedWidget->setCurrentIndex(2);
     // The following lines of code are produced by ChatGPT, their purpose is to constantly center the form no matter the size
     // of the main window
 
@@ -59,8 +59,15 @@ MainWindow::MainWindow(QWidget *parent)
         ui->tableWidget->setItem(i, 2, score);
 
         // Change the buttons to text or standard symbols
-        QPushButton *up = new QPushButton("+ Upvote");
-        QPushButton *down = new QPushButton("- Downvote");
+        QPushButton *up = new QPushButton;
+        up->setIcon(QIcon("/home/adham/labproject/Rate-AUC-Professors-2.0/images/up.png")); // <--- Paste your path here
+        up->setIconSize(QSize(24, 24));
+        QPushButton *down = new QPushButton;
+        down->setIcon(QIcon("/home/adham/labproject/Rate-AUC-Professors-2.0/images/down.png")); // <--- Paste your path here
+        down->setIconSize(QSize(24, 24));
+
+        //QPushButton *up = new QPushButton("+ Upvote");
+        //QPushButton *down = new QPushButton("- Downvote");
 
         // Button Styling
         QString btnStyle = "QPushButton { background-color: #0b2239; color: white; border-radius: 5px; border: 1px solid #ffd700; font-family: 'Segoe UI Emoji'; }";
