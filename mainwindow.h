@@ -30,7 +30,7 @@ public:
     boost::asio::ip::tcp::socket socket{ io };
 
     void EstablishConnection();
-	void CenterWidget(Ui::MainWindow* ui, int pageIndex);
+	void CenterWidget(int pageIndex, QWidget* TargetWidget);
 
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
