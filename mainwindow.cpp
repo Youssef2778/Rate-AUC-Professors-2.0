@@ -7,8 +7,13 @@
 #include <boost/json.hpp>
 #include <fstream>
 #include <iostream>
+#include <thread>
+#include <chrono>
 
-MainWindow::MainWindow(QWidget *parent)
+namespace beast = boost::beast;
+namespace http = beast::http;
+
+MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
@@ -17,12 +22,13 @@ MainWindow::MainWindow(QWidget *parent)
     // The following lines of code are produced by ChatGPT, their purpose is to constantly center the form no matter the size
     // of the main window
 
+
     // Assume you have a widget inside the stacked page
-    QWidget *page = ui->stackedWidget->widget(0); // first page
-    QVBoxLayout *vLayout = new QVBoxLayout(page);
+    QWidget* page = ui->stackedWidget->widget(0); // first page
+    QVBoxLayout* vLayout = new QVBoxLayout(page);
 
     // Create a horizontal layout for centering
-    QHBoxLayout *hLayout = new QHBoxLayout();
+    QHBoxLayout* hLayout = new QHBoxLayout();
     hLayout->addStretch();          // left spacer
     hLayout->addWidget(ui->widget); // your target widget
     hLayout->addStretch();          // right spacer
@@ -32,6 +38,27 @@ MainWindow::MainWindow(QWidget *parent)
     vLayout->addStretch(); // bottom spacer
 
     page->setLayout(vLayout);
+
+    // Attempt to establish a persistent connection once the app launches
+    const std::string server_address = "127.0.0.1";
+    boost::asio::ip::tcp::resolver resolver(io);
+    auto endpoints = resolver.resolve(server_address, "8080");
+    while (true) {
+        try {
+            boost::asio::connect(socket, endpoints);
+            // Read the "Connected!" handshake once
+            std::array<char, 128> buf;
+            boost::system::error_code error;
+            socket.read_some(boost::asio::buffer(buf), error); 
+			std::cout << "Connected to the server!" << std::endl; // Confirm connection if handshake didn't throw an error
+            break; // Connection successful, exit the loop
+        }
+        catch (std::exception& e) {
+            std::cout << "Connection failed: " << e.what() << std::endl;
+            socket.close(); // Reset the socket before retrying
+            std::this_thread::sleep_for(std::chrono::seconds(1)); // Wait 1 second before retrying
+        }
+    }
 }
 
 MainWindow::~MainWindow()
@@ -44,13 +71,14 @@ void MainWindow::on_checkBox_4_stateChanged(int arg1)
 {
     if (arg1 == 2) {
         ui->lineEdit_8->setEchoMode(QLineEdit::Password);
-    } else if (arg1 == 0) {
+    }
+    else if (arg1 == 0) {
         ui->lineEdit_8->setEchoMode(QLineEdit::Normal);
     }
 }
 
 // Function executed when the user moves to the register page.
-void MainWindow::on_register_label_4_linkActivated(const QString &link)
+void MainWindow::on_register_label_4_linkActivated(const QString& link)
 {
     ui->stackedWidget->setCurrentIndex(1);
 
@@ -63,11 +91,11 @@ void MainWindow::on_register_label_4_linkActivated(const QString &link)
     ui->unequal_pass_error->hide();
 
     // Assume you have a widget inside the stacked page
-    QWidget *page = ui->stackedWidget->widget(1); // second page
-    QVBoxLayout *vLayout = new QVBoxLayout(page);
+    QWidget* page = ui->stackedWidget->widget(1); // second page
+    QVBoxLayout* vLayout = new QVBoxLayout(page);
 
     // Create a horizontal layout for centering
-    QHBoxLayout *hLayout = new QHBoxLayout();
+    QHBoxLayout* hLayout = new QHBoxLayout();
     hLayout->addStretch();            // left spacer
     hLayout->addWidget(ui->widget_2); // your target widget
     hLayout->addStretch();            // right spacer
@@ -85,13 +113,14 @@ void MainWindow::on_checkBox_6_stateChanged(int arg1)
     if (arg1 == 2) {
         ui->password_register_lineEdit->setEchoMode(QLineEdit::Password);
         ui->confPassword_register_lineEdit->setEchoMode(QLineEdit::Password);
-    } else if (arg1 == 0) {
+    }
+    else if (arg1 == 0) {
         ui->password_register_lineEdit->setEchoMode(QLineEdit::Normal);
         ui->confPassword_register_lineEdit->setEchoMode(QLineEdit::Normal);
     }
 }
 
-void MainWindow::on_register_label_6_linkActivated(const QString &link)
+void MainWindow::on_register_label_6_linkActivated(const QString& link)
 {
     ui->stackedWidget->setCurrentIndex(0);
 }
@@ -106,25 +135,29 @@ void MainWindow::on_pushButton_6_clicked()
     if (ui->username_register_lineEdit->text() == "") {
         ui->empty_username_error->show();
         return;
-    } else
+    }
+    else
         ui->empty_username_error->hide();
 
     if (ui->password_register_lineEdit->text() == "") {
         ui->empty_pass_error->show();
         return;
-    } else
+    }
+    else
         ui->empty_pass_error->hide();
 
     if (ui->confPassword_register_lineEdit->text() == "") {
         ui->empty_confPass_error->show();
         return;
-    } else
+    }
+    else
         ui->empty_confPass_error->hide();
 
     if (ui->email_register_lineEdit->text() == "") {
         ui->empty_email_error->show();
         return;
-    } else {
+    }
+    else {
         ui->empty_email_error->hide();
 
         // Checking the format of the email..
@@ -136,7 +169,8 @@ void MainWindow::on_pushButton_6_clicked()
             if (email.substr(i + 1, email.size() - i - 1) != "aucegypt.edu") {
                 ui->auc_email_error->show();
                 return;
-            } else
+            }
+            else
                 ui->auc_email_error->hide();
         }
     }
@@ -145,59 +179,37 @@ void MainWindow::on_pushButton_6_clicked()
     if (ui->password_register_lineEdit->text() != ui->confPassword_register_lineEdit->text()) {
         ui->unequal_pass_error->show();
         return;
-    } else
+    }
+    else
         ui->unequal_pass_error->hide();
 
     // Now, let's see what the server thinks about the data!
-    const std::string server_address = "127.0.0.1";
-    boost::asio::io_context io;
-    boost::asio::ip::tcp::resolver resolver(io);
-    boost::asio::ip::tcp::resolver::results_type endpoints = resolver.resolve(server_address,
-                                                                              "8080");
-    boost::asio::ip::tcp::socket socket(io);
     try {
-        boost::asio::connect(socket, endpoints);
-        std::cout << "Connected to the server!" << std::endl;
-        while (true) {
-            std::array<char, 128> buf;
-            boost::system::error_code error;
+        // Let's now form the JSON to send the data to the server.
+        boost::json::object registration;
+        registration["username"] = ui->username_register_lineEdit->text().toStdString();
+        registration["email"] = ui->email_register_lineEdit->text().toStdString();
 
-            size_t len = socket.read_some(boost::asio::buffer(buf), error);
+        // Let's Hash the password to be stored in the database (this prevents us from knowing the users' passwords for their security)
+        std::string password = ui->password_register_lineEdit->text().toStdString();
+        std::string hash = BCrypt::generateHash(password);
+        registration["hashed_password"] = hash;
 
-            if (error == boost::asio::error::eof) {
-                break;
-            } else if (error)
-                throw boost::system::system_error(error);
+        // Preparing the request...
+        boost::beast::http::request<boost::beast::http::string_body>
+            request(boost::beast::http::verb::post, "/register", 11);
+        request.set(boost::beast::http::field::host, "127.0.0.1");
+        request.set(boost::beast::http::field::content_type, "application/json");
+        request.body() = boost::json::serialize(registration);
+        request.prepare_payload();
 
-            // If "Connected!" is displayed, then we formed a successful TCP connection with the server.
-            std::cout.write(buf.data(), len);
-            std::cout.flush();
-            // Let's now form the JSON to send the data to the server.
-            boost::json::object registration;
-            registration["username"] = ui->username_register_lineEdit->text().toStdString();
-            registration["email"] = ui->email_register_lineEdit->text().toStdString();
+        // Let's send it!
+        boost::beast::http::write(socket, request);
 
-            // Let's Hash the password to be stored in the database (this prevents us from knowing the users' passwords for their security)
-            std::string password = ui->password_register_lineEdit->text().toStdString();
-            std::string hash = BCrypt::generateHash(password);
-
-            registration["hashed_password"] = hash;
-
-            // Preparing the request...
-            boost::beast::http::request<boost::beast::http::string_body>
-                request(boost::beast::http::verb::post, "/register", 11);
-            request.set(boost::beast::http::field::host, server_address);
-            request.set(boost::beast::http::field::content_type, "application/json");
-            request.body() = boost::json::serialize(registration);
-            request.prepare_payload();
-
-            // Let's send it!
-            boost::beast::http::write(socket, request);
-
-            //Send user to *student* homepage
-            ui->stackedWidget->setCurrentIndex(2);
-        }
-    } catch (std::exception &e) {
+        //Send user to *student* homepage
+        ui->stackedWidget->setCurrentIndex(2);
+    }
+    catch (std::exception& e) {
         std::cout << "Connection failed: " << e.what() << std::endl;
     }
 }
@@ -209,11 +221,11 @@ void MainWindow::on_pushButton_4_clicked()
     ui->stackedWidget->setCurrentIndex(2);
 
     // Assume you have a widget inside the stacked page
-    QWidget *page = ui->stackedWidget->widget(2); // thrd page
-    QVBoxLayout *vLayout = new QVBoxLayout(page);
+    QWidget* page = ui->stackedWidget->widget(2); // thrd page
+    QVBoxLayout* vLayout = new QVBoxLayout(page);
 
     // Create a horizontal layout for centering
-    QHBoxLayout *hLayout = new QHBoxLayout();
+    QHBoxLayout* hLayout = new QHBoxLayout();
     hLayout->addStretch();          // left spacer
     hLayout->addWidget(ui->widget_3); // your target widget
     hLayout->addStretch();          // right spacer
@@ -224,4 +236,69 @@ void MainWindow::on_pushButton_4_clicked()
 
     page->setLayout(vLayout);
 
+    //Request the departments from the server
+    try {
+        // Send GET /get-departments
+        http::request<http::string_body> request(http::verb::get, "/get-departments", 11);
+        request.set(http::field::host, "127.0.0.1");
+        request.prepare_payload();
+        http::write(socket, request);
+
+        // Read the response
+        beast::flat_buffer buffer;
+        http::response<http::string_body> response;
+        http::read(socket, buffer, response);
+
+        // Parse the JSON array
+        auto parsed = boost::json::parse(response.body());
+        boost::json::array& departments = parsed.as_array();
+
+        for (auto& entry : departments) {
+            boost::json::object& dept = entry.as_object();
+            std::string name = (std::string)dept["department_name"].as_string();
+            int ID = (int)dept["id"].as_int64();
+            Deps[name] = ID; // Store the mapping of department name to ID
+            // populate the QComboBox
+            ui->DepartmentCB->addItem(QString::fromStdString(name));
+        }
+    }
+    catch (std::exception& e) {
+        std::cout << "Failed: " << e.what() << std::endl;
+    }
+}
+
+void MainWindow::on_DepartmentCB_currentIndexChanged(int index)
+{
+    //Request the Courses from the server
+    try {
+        std::string DepName = ui->DepartmentCB->currentText().toStdString();
+        int DepID = Deps[DepName]; // Get the department ID using the mapping stored
+        // Send GET /get-courses?Id=DepID
+        http::request<http::string_body> request(http::verb::get, "/get-courses?Id=" + std::to_string(DepID), 11);
+        request.set(http::field::host, "127.0.0.1");
+        request.prepare_payload();
+        http::write(socket, request);
+
+        // Read the response
+        beast::flat_buffer buffer;
+        http::response<http::string_body> response;
+        http::read(socket, buffer, response);
+
+        // Parse the JSON array
+        auto parsed = boost::json::parse(response.body());
+        boost::json::array& courses = parsed.as_array();
+
+        ui->CourseCB->clear(); // Clear previous courses before adding new ones
+        for (auto& entry : courses) {
+            boost::json::object& course = entry.as_object();
+            std::string name = (std::string)course["course_name"].as_string();
+            int ID = (int)course["id"].as_int64();
+            Courses[name] = ID; // Store the mapping of course name to ID
+            // populate the QComboBox
+            ui->CourseCB->addItem(QString::fromStdString(name));
+        }
+    }
+    catch (std::exception& e) {
+        std::cout << "Failed: " << e.what() << std::endl;
+    }
 }
