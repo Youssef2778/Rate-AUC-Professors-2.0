@@ -2,33 +2,42 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1300</width>
-    <height>707</height>
+    <width>1644</width>
+    <height>1017</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Rate AUC Professor</string>
   </property>
   <property name="layoutDirection">
-   <enum>Qt::LeftToRight</enum>
+   <enum>Qt::LayoutDirection::LeftToRight</enum>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_3">
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
-      <property name="currentIndex">
-       <number>1</number>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777214</height>
+       </size>
       </property>
-      <widget class="QWidget" name="page_3">
+      <property name="currentIndex">
+       <number>2</number>
+      </property>
+      <widget class="QWidget" name="page_0">
        <property name="styleSheet">
-        <string notr="true">QWidget#page_3 {background-color: rgb(255, 255, 255);}
+        <string notr="true">QWidget#page_0 {background-color: rgb(255, 255, 255);}
 
 
 .QLineEdit {
@@ -54,8 +63,8 @@ alignment: center;
 	background-color: rgb(255, 255, 255);
 }
 
-QWidget#page_3{
-	background-image: url(:/images/images/AUC_Background.jpeg);
+QWidget#page_0{
+	background-image: url(:/images/AUC_Background.jpeg);
 }
 
 QPushButton#pushButton {
@@ -74,7 +83,7 @@ width: 100px;
          </rect>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
-         <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+         <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
           <widget class="QWidget" name="widget" native="true">
            <property name="maximumSize">
             <size>
@@ -94,13 +103,13 @@ width: 100px;
                  <string/>
                 </property>
                 <property name="pixmap">
-                 <pixmap resource="resources.qrc">:/images/images/auc_logo.png</pixmap>
+                 <pixmap resource="resources.qrc">:/images/auc_logo.png</pixmap>
                 </property>
                 <property name="scaledContents">
                  <bool>false</bool>
                 </property>
                 <property name="alignment">
-                 <set>Qt::AlignCenter</set>
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
                 </property>
                </widget>
               </item>
@@ -112,7 +121,7 @@ width: 100px;
                    <string>Email</string>
                   </property>
                   <property name="textFormat">
-                   <enum>Qt::PlainText</enum>
+                   <enum>Qt::TextFormat::PlainText</enum>
                   </property>
                  </widget>
                 </item>
@@ -141,7 +150,7 @@ width: 100px;
                  <string/>
                 </property>
                 <property name="echoMode">
-                 <enum>QLineEdit::Password</enum>
+                 <enum>QLineEdit::EchoMode::Password</enum>
                 </property>
                 <property name="placeholderText">
                  <string>Password</string>
@@ -158,7 +167,7 @@ width: 100px;
                 </property>
                </widget>
               </item>
-              <item alignment="Qt::AlignHCenter">
+              <item alignment="Qt::AlignmentFlag::AlignHCenter">
                <widget class="QPushButton" name="pushButton_4">
                 <property name="minimumSize">
                  <size>
@@ -183,10 +192,10 @@ width: 100px;
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Don't Have An Account? &lt;a href=&quot;register_page.ui&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;Register &lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="textFormat">
-                 <enum>Qt::RichText</enum>
+                 <enum>Qt::TextFormat::RichText</enum>
                 </property>
                 <property name="alignment">
-                 <set>Qt::AlignCenter</set>
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
                 </property>
                </widget>
               </item>
@@ -198,9 +207,9 @@ width: 100px;
         </layout>
        </widget>
       </widget>
-      <widget class="QWidget" name="page_4">
+      <widget class="QWidget" name="page_1">
        <property name="styleSheet">
-        <string notr="true">QWidget#page_4 {background-color: rgb(255, 255, 255);}
+        <string notr="true">QWidget#page_1 {background-color: rgb(255, 255, 255);}
 
 
 .QLineEdit {
@@ -223,11 +232,11 @@ max-width: 1500px;
 min-height: 400px;
 max-height: 1000px;
 alignment: center;
-	background-color: rgb(255, 255, 255);
+background-color: rgb(255, 255, 255);
 }
 
-QWidget#page_4{
-	background-image: url(:/images/images/AUC_Background.jpeg);
+QWidget#page_1{
+	background-image: url(:/images/AUC_Background.jpeg);
 }
 
 QPushButton#pushButton {
@@ -241,16 +250,22 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
        <widget class="QWidget" name="widget_2" native="true">
         <property name="geometry">
          <rect>
-          <x>600</x>
-          <y>82</y>
+          <x>610</x>
+          <y>160</y>
           <width>504</width>
-          <height>501</height>
+          <height>665</height>
          </rect>
         </property>
         <property name="maximumSize">
          <size>
           <width>1504</width>
           <height>1004</height>
+         </size>
+        </property>
+        <property name="sizeIncrement">
+         <size>
+          <width>1</width>
+          <height>100</height>
          </size>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_17" stretch="0">
@@ -265,13 +280,13 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
               <string/>
              </property>
              <property name="pixmap">
-              <pixmap resource="resources.qrc">:/images/images/auc_logo.png</pixmap>
+              <pixmap resource="resources.qrc">:/images/auc_logo.png</pixmap>
              </property>
              <property name="scaledContents">
               <bool>false</bool>
              </property>
              <property name="alignment">
-              <set>Qt::AlignCenter</set>
+              <set>Qt::AlignmentFlag::AlignCenter</set>
              </property>
             </widget>
            </item>
@@ -304,7 +319,7 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
                 <string>Email </string>
                </property>
                <property name="textFormat">
-                <enum>Qt::PlainText</enum>
+                <enum>Qt::TextFormat::PlainText</enum>
                </property>
               </widget>
              </item>
@@ -350,7 +365,7 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
               <string/>
              </property>
              <property name="echoMode">
-              <enum>QLineEdit::Password</enum>
+              <enum>QLineEdit::EchoMode::Password</enum>
              </property>
              <property name="placeholderText">
               <string>Password</string>
@@ -374,7 +389,7 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
            <item>
             <widget class="QLineEdit" name="confPassword_register_lineEdit">
              <property name="echoMode">
-              <enum>QLineEdit::Password</enum>
+              <enum>QLineEdit::EchoMode::Password</enum>
              </property>
              <property name="placeholderText">
               <string>Retype Password</string>
@@ -405,7 +420,7 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
              </property>
             </widget>
            </item>
-           <item alignment="Qt::AlignHCenter">
+           <item alignment="Qt::AlignmentFlag::AlignHCenter">
             <widget class="QPushButton" name="pushButton_6">
              <property name="minimumSize">
               <size>
@@ -430,12 +445,289 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Already Have an Account? &lt;a href=&quot;page1&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;Login &lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="textFormat">
-              <enum>Qt::RichText</enum>
+              <enum>Qt::TextFormat::RichText</enum>
              </property>
              <property name="alignment">
-              <set>Qt::AlignCenter</set>
+              <set>Qt::AlignmentFlag::AlignCenter</set>
              </property>
             </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="page_2">
+       <property name="cursor">
+        <cursorShape>ArrowCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QWidget#page_2 {
+    border-image: url(:/images/Background.jpg);
+}
+/* General font (optional but nicer) */
+QWidget {
+    font-family: Segoe UI;
+    font-size: 24px;
+}
+/* QPushButton */
+QPushButton {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    color: white;
+}
+QPushButton:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+QPushButton:pressed {
+    background-color: rgba(255, 255, 255, 0.35);
+}
+/* QComboBox */
+QComboBox {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 6px 35px;
+    color: white;
+}
+/* Dropdown arrow area */
+QComboBox::drop-down {
+    border: none;
+}
+/* Dropdown list */
+QComboBox QAbstractItemView {
+    background-color: rgba(30, 30, 30, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    selection-background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border-radius: 8px;
+}
+</string>
+       </property>
+       <widget class="QWidget" name="widget_3" native="true">
+        <property name="geometry">
+         <rect>
+          <x>320</x>
+          <y>170</y>
+          <width>853</width>
+          <height>521</height>
+         </rect>
+        </property>
+        <property name="sizeIncrement">
+         <size>
+          <width>1</width>
+          <height>1</height>
+         </size>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <property name="sizeConstraint">
+              <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+             </property>
+             <item>
+              <spacer name="horizontalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>200</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_3">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>128</width>
+                 <height>128</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>320</width>
+                 <height>320</height>
+                </size>
+               </property>
+               <property name="baseSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="pixmap">
+                <pixmap resource="resources.qrc">:/images/Glass_AUC.png</pixmap>
+               </property>
+               <property name="scaledContents">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_3">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>200</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <property name="sizeConstraint">
+              <enum>QLayout::SizeConstraint::SetMaximumSize</enum>
+             </property>
+             <item>
+              <widget class="QComboBox" name="DepartmentCB">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>350</width>
+                 <height>100</height>
+                </size>
+               </property>
+               <property name="placeholderText">
+                <string>Select Department</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="CourseCB">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>350</width>
+                 <height>100</height>
+                </size>
+               </property>
+               <property name="currentText">
+                <string/>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="placeholderText">
+                <string>Select Course</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>8</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButton">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>100</width>
+                 <height>100</height>
+                </size>
+               </property>
+               <property name="sizeIncrement">
+                <size>
+                 <width>1</width>
+                 <height>1</height>
+                </size>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="resources.qrc">
+                 <normaloff>:/icons/MG.svg</normaloff>:/icons/MG.svg</iconset>
+               </property>
+               <property name="iconSize">
+                <size>
+                 <width>64</width>
+                 <height>64</height>
+                </size>
+               </property>
+               <property name="checkable">
+                <bool>false</bool>
+               </property>
+               <property name="autoDefault">
+                <bool>false</bool>
+               </property>
+               <property name="default">
+                <bool>false</bool>
+               </property>
+               <property name="flat">
+                <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </item>
@@ -460,6 +752,7 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
   </widget>
  </widget>
  <resources>
+  <include location="resources.qrc"/>
   <include location="resources.qrc"/>
  </resources>
  <connections/>
