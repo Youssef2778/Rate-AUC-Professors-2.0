@@ -19,38 +19,31 @@ MainWindow::MainWindow(QWidget* parent)
 {
     ui->setupUi(this);
     ui->stackedWidget->setCurrentIndex(0);
-    // The following lines of code are produced by ChatGPT, their purpose is to constantly center the form no matter the size
-    // of the main window
 
+    CenterWidget(0, ui->widget_1);
 
-    // Assume you have a widget inside the stacked page
-    QWidget* page = ui->stackedWidget->widget(0); // first page
-    QVBoxLayout* vLayout = new QVBoxLayout(page);
+    // Attempt to establish a persistent connection in the background once the app launches
+    std::thread(&MainWindow::EstablishConnection, this).detach();
+}
 
-    // Create a horizontal layout for centering
-    QHBoxLayout* hLayout = new QHBoxLayout();
-    hLayout->addStretch();          // left spacer
-    hLayout->addWidget(ui->widget); // your target widget
-    hLayout->addStretch();          // right spacer
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
 
-    vLayout->addStretch(); // top spacer
-    vLayout->addLayout(hLayout);
-    vLayout->addStretch(); // bottom spacer
-
-    page->setLayout(vLayout);
-
-    // Attempt to establish a persistent connection once the app launches
+void MainWindow::EstablishConnection() {
     const std::string server_address = "127.0.0.1";
     boost::asio::ip::tcp::resolver resolver(io);
     auto endpoints = resolver.resolve(server_address, "8080");
+	// continuously attempt to connect to the server until successful
     while (true) {
         try {
             boost::asio::connect(socket, endpoints);
             // Read the "Connected!" handshake once
             std::array<char, 128> buf;
             boost::system::error_code error;
-            socket.read_some(boost::asio::buffer(buf), error); 
-			std::cout << "Connected to the server!" << std::endl; // Confirm connection if handshake didn't throw an error
+            socket.read_some(boost::asio::buffer(buf), error);
+            std::cout << "Connected to the server!" << std::endl; // Confirm connection if handshake didn't throw an error
             break; // Connection successful, exit the loop
         }
         catch (std::exception& e) {
@@ -61,9 +54,25 @@ MainWindow::MainWindow(QWidget* parent)
     }
 }
 
-MainWindow::~MainWindow()
-{
-    delete ui;
+void MainWindow::CenterWidget(int pageIndex, QWidget* TargetWidget) {
+    // The following lines of code are produced by ChatGPT, their purpose is to constantly center the form no matter the size
+    // of the main window
+
+    // Assume you have a widget inside the stacked page
+    QWidget* page = ui->stackedWidget->widget(pageIndex); // page by index
+    QVBoxLayout* vLayout = new QVBoxLayout(page);
+
+    // Create a horizontal layout for centering
+    QHBoxLayout* hLayout = new QHBoxLayout();
+    hLayout->addStretch();          // left spacer
+    hLayout->addWidget(TargetWidget); // your target widget
+    hLayout->addStretch();          // right spacer
+
+    vLayout->addStretch(); // top spacer
+    vLayout->addLayout(hLayout);
+    vLayout->addStretch(); // bottom spacer
+
+    page->setLayout(vLayout);
 }
 
 // "Hide Password" Mechanism of the Login page
@@ -82,6 +91,7 @@ void MainWindow::on_register_label_4_linkActivated(const QString& link)
 {
     ui->stackedWidget->setCurrentIndex(1);
 
+
     // Hiding the error messages.
     ui->empty_email_error->hide();
     ui->empty_username_error->hide();
@@ -90,21 +100,7 @@ void MainWindow::on_register_label_4_linkActivated(const QString& link)
     ui->empty_confPass_error->hide();
     ui->unequal_pass_error->hide();
 
-    // Assume you have a widget inside the stacked page
-    QWidget* page = ui->stackedWidget->widget(1); // second page
-    QVBoxLayout* vLayout = new QVBoxLayout(page);
-
-    // Create a horizontal layout for centering
-    QHBoxLayout* hLayout = new QHBoxLayout();
-    hLayout->addStretch();            // left spacer
-    hLayout->addWidget(ui->widget_2); // your target widget
-    hLayout->addStretch();            // right spacer
-
-    vLayout->addStretch(); // top spacer
-    vLayout->addLayout(hLayout);
-    vLayout->addStretch(); // bottom spacer
-
-    page->setLayout(vLayout);
+	CenterWidget(1, ui->widget_2);
 }
 
 // "Hide Password" Mechanism of the Register Page
@@ -220,21 +216,7 @@ void MainWindow::on_pushButton_4_clicked()
     //Temporary login for testing purposes
     ui->stackedWidget->setCurrentIndex(2);
 
-    // Assume you have a widget inside the stacked page
-    QWidget* page = ui->stackedWidget->widget(2); // thrd page
-    QVBoxLayout* vLayout = new QVBoxLayout(page);
-
-    // Create a horizontal layout for centering
-    QHBoxLayout* hLayout = new QHBoxLayout();
-    hLayout->addStretch();          // left spacer
-    hLayout->addWidget(ui->widget_3); // your target widget
-    hLayout->addStretch();          // right spacer
-
-    vLayout->addStretch(); // top spacer
-    vLayout->addLayout(hLayout);
-    vLayout->addStretch(); // bottom spacer
-
-    page->setLayout(vLayout);
+    CenterWidget(2, ui->widget_3);
 
     //Request the departments from the server
     try {

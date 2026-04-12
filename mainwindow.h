@@ -25,9 +25,12 @@ public:
     std::unordered_map<std::string, int> Deps;
     std::unordered_map<std::string, int> Courses;
 
-    // Persistent connection to be established once at startup
+    // For persistent connection to be established once at startup
     boost::asio::io_context io;
     boost::asio::ip::tcp::socket socket{ io };
+
+    void EstablishConnection();
+	void CenterWidget(Ui::MainWindow* ui, int pageIndex);
 
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
