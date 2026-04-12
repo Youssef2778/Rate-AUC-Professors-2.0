@@ -33,7 +33,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="page_0">
        <property name="styleSheet">
@@ -52,7 +52,7 @@ margin-right: auto;
 width:70%;
 }
 
-QWidget#widget {
+QWidget#widget_1 {
 border: 2px solid gray;
 border-radius: 20px;
 min-width: 500px;
@@ -84,7 +84,7 @@ width: 100px;
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
          <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignVCenter">
-          <widget class="QWidget" name="widget" native="true">
+          <widget class="QWidget" name="widget_1" native="true">
            <property name="maximumSize">
             <size>
              <width>1504</width>
@@ -392,7 +392,7 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
               <enum>QLineEdit::EchoMode::Password</enum>
              </property>
              <property name="placeholderText">
-              <string>Retype Password</string>
+              <string>Re-enter Password</string>
              </property>
             </widget>
            </item>
