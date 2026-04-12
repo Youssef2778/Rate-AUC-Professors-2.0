@@ -312,9 +312,9 @@ void MainWindow::on_pushButton_6_clicked()
 void MainWindow::on_pushButton_4_clicked()
 {
     //Temporary login for testing purposes
-    ui->stackedWidget->setCurrentIndex(2);
+    ui->stackedWidget->setCurrentIndex(3);
 
-    CenterWidget(2, ui->widget_3);
+    CenterWidget(3, ui->widget_3);
 
     //Request the departments from the server
     try {
