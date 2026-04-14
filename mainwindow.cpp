@@ -6,7 +6,6 @@
 #include <boost/beast/http.hpp>
 #include <boost/json.hpp>
 #include <fstream>
-#include "bcrypt/BCrypt.hpp"
 #include <QProgressBar>
 #include <iostream>
 #include <thread>
@@ -21,6 +20,10 @@ MainWindow::MainWindow(QWidget* parent)
 {
     ui->setupUi(this);
     ui->stackedWidget->setCurrentIndex(0);
+
+    // Hiding error messages 
+    ui->email_notFound_error->hide();
+    ui->password_incorrect_error->hide();
 
     CenterWidget(0, ui->widget_1);
 
@@ -177,10 +180,10 @@ void MainWindow::CenterWidget(int pageIndex, QWidget* TargetWidget) {
 void MainWindow::on_checkBox_4_stateChanged(int arg1)
 {
     if (arg1 == 2) {
-        ui->lineEdit_8->setEchoMode(QLineEdit::Password);
+        ui->password_login_lineEdit->setEchoMode(QLineEdit::Password);
     }
     else if (arg1 == 0) {
-        ui->lineEdit_8->setEchoMode(QLineEdit::Normal);
+        ui->password_login_lineEdit->setEchoMode(QLineEdit::Normal);
     }
 }
 
@@ -198,7 +201,21 @@ void MainWindow::on_register_label_4_linkActivated(const QString& link)
     ui->empty_confPass_error->hide();
     ui->unequal_pass_error->hide();
 
-	CenterWidget(1, ui->widget_2);
+    // Assume you have a widget inside the stacked page
+    QWidget* page = ui->stackedWidget->widget(1); // second page
+    QVBoxLayout* vLayout = new QVBoxLayout(page);
+
+    // Create a horizontal layout for centering
+    QHBoxLayout* hLayout = new QHBoxLayout();
+    hLayout->addStretch();            // left spacer
+    hLayout->addWidget(ui->widget_2); // your target widget
+    hLayout->addStretch();            // right spacer
+
+    vLayout->addStretch();   // top spacer
+    vLayout->addLayout(hLayout);
+    vLayout->addStretch();   // bottom spacer
+
+    page->setLayout(vLayout);
 }
 
 // "Hide Password" Mechanism of the Register Page
@@ -301,50 +318,113 @@ void MainWindow::on_pushButton_6_clicked()
         boost::beast::http::write(socket, request);
 
         //Send user to *student* homepage
-        ui->stackedWidget->setCurrentIndex(2);
+        ui->stackedWidget->setCurrentIndex(3);
+
+        //Request the departments from the server
+        try {
+            // Send GET /get-departments
+            http::request<http::string_body> request(http::verb::get, "/get-departments", 11);
+            request.set(http::field::host, "127.0.0.1");
+            request.prepare_payload();
+            http::write(socket, request);
+
+            // Read the response
+            beast::flat_buffer buffer;
+            http::response<http::string_body> response;
+            http::read(socket, buffer, response);
+
+            // Parse the JSON array
+            auto parsed = boost::json::parse(response.body());
+            boost::json::array& departments = parsed.as_array();
+
+            for (auto& entry : departments) {
+                boost::json::object& dept = entry.as_object();
+                std::string name = (std::string)dept["department_name"].as_string();
+                int ID = (int)dept["id"].as_int64();
+                Deps[name] = ID; // Store the mapping of department name to ID
+                // populate the QComboBox
+                ui->DepartmentCB->addItem(QString::fromStdString(name));
+            }
+        }
+        catch (std::exception& e) {
+            std::cout << "Failed: " << e.what() << std::endl;
+        }
     }
     catch (std::exception& e) {
         std::cout << "Connection failed: " << e.what() << std::endl;
     }
 }
 
-//login module
+// Function that gets called after clicking on the "login" button in the login page.
 void MainWindow::on_pushButton_4_clicked()
 {
-    //Temporary login for testing purposes
-    ui->stackedWidget->setCurrentIndex(3);
+    boost::json::object login;
+    login["email"] = ui->email_login_lineEdit->text().toStdString();
+    login["password"] = ui->password_login_lineEdit->text().toStdString();
 
-    CenterWidget(3, ui->widget_3);
+    // Preparing the request...
+    boost::beast::http::request<boost::beast::http::string_body>
+        request(boost::beast::http::verb::post, "/login", 11);
+    request.set(boost::beast::http::field::host, "127.0.0.1");
+    request.set(boost::beast::http::field::content_type, "application/json");
+    request.body() = boost::json::serialize(login);
+    request.prepare_payload();
 
-    //Request the departments from the server
-    try {
-        // Send GET /get-departments
-        http::request<http::string_body> request(http::verb::get, "/get-departments", 11);
-        request.set(http::field::host, "127.0.0.1");
-        request.prepare_payload();
-        http::write(socket, request);
+    // Let's send it!
+    boost::beast::http::write(socket, request);
 
-        // Read the response
-        beast::flat_buffer buffer;
-        http::response<http::string_body> response;
-        http::read(socket, buffer, response);
+    boost::beast::flat_buffer buf;
+    boost::beast::http::response<boost::beast::http::string_body> server_response;
+    http::read(socket, buf, server_response);
+    std::cout << "read from the server\n";
+    auto parsed_response = boost::json::parse(server_response.body());
+    boost::json::object json_response = parsed_response.as_object();
+    bool logged_in = (bool) json_response["status"].as_bool();
+    if (logged_in)
+    {   
+        ui->stackedWidget->setCurrentIndex(3);
+        CenterWidget(3, ui->widget_3);
 
-        // Parse the JSON array
-        auto parsed = boost::json::parse(response.body());
-        boost::json::array& departments = parsed.as_array();
+        //Request the departments from the server
+        try {
+            // Send GET /get-departments
+            http::request<http::string_body> request(http::verb::get, "/get-departments", 11);
+            request.set(http::field::host, "127.0.0.1");
+            request.prepare_payload();
+            http::write(socket, request);
 
-        for (auto& entry : departments) {
-            boost::json::object& dept = entry.as_object();
-            std::string name = (std::string)dept["department_name"].as_string();
-            int ID = (int)dept["id"].as_int64();
-            Deps[name] = ID; // Store the mapping of department name to ID
-            // populate the QComboBox
-            ui->DepartmentCB->addItem(QString::fromStdString(name));
+            // Read the response
+            beast::flat_buffer buffer;
+            http::response<http::string_body> response;
+            http::read(socket, buffer, response);
+
+            // Parse the JSON array
+            auto parsed = boost::json::parse(response.body());
+            boost::json::array& departments = parsed.as_array();
+
+            for (auto& entry : departments) {
+                boost::json::object& dept = entry.as_object();
+                std::string name = (std::string)dept["department_name"].as_string();
+                int ID = (int)dept["id"].as_int64();
+                Deps[name] = ID; // Store the mapping of department name to ID
+                // populate the QComboBox
+                ui->DepartmentCB->addItem(QString::fromStdString(name));
+            }
         }
+        catch (std::exception& e) {
+            std::cout << "Failed: " << e.what() << std::endl;
+        }
+
     }
-    catch (std::exception& e) {
-        std::cout << "Failed: " << e.what() << std::endl;
+    else {
+        std::string error = (std::string) json_response["error"].as_string();
+        if (error == "email not found") ui->email_notFound_error->show();
+        else ui->email_notFound_error->hide();
+        if (error == "incorrect password") ui->password_incorrect_error->show();
+        else ui->password_incorrect_error->hide();
     }
+    
+
 }
 
 void MainWindow::on_DepartmentCB_currentIndexChanged(int index)

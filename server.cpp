@@ -11,6 +11,7 @@
 #include <mysql_driver.h>
 #include <queue>
 #include <mutex>
+#include "bcrypt/BCrypt.hpp"
 
 namespace beast = boost::beast;
 namespace http = beast::http;
@@ -144,6 +145,44 @@ void handle_request(const http::request<http::string_body>& req, tcp::socket& so
         res.prepare_payload();
         http::write(socket, res);
     }
+    else if (req.target() == "/login") {
+        auto parsed = json::parse(req.body());
+        json::object login = parsed.as_object();
+        json::object response;
+        response["status"] = true;
+        try {
+            sql::Connection* con = dbPool->get();
+            sql::PreparedStatement* pstmt(
+            con->prepareStatement("SELECT encrypted_password FROM users WHERE email = ?"));
+            pstmt->setString(1, (std::string)login["email"].as_string());
+            sql::ResultSet* res = pstmt->executeQuery();
+            if (!res->next()) {
+                response["status"] = false;
+                response["error"] = "email not found";
+            } else {
+                if (!BCrypt::validatePassword((std::string)login["password"].as_string(), res->getString("encrypted_password"))) {
+                    response["status"] = false;
+                    response["error"] = "incorrect password";
+                }
+            }
+            // Send the response back
+            http::response<http::string_body> http_response(http::status::ok, req.version());
+            http_response.set(http::field::content_type, "application/json");
+            http_response.body() = boost::json::serialize(response);
+            http_response.prepare_payload();
+            http::write(socket, http_response);
+            delete res;
+            delete pstmt;
+            dbPool->release(con);
+
+            // In this case, we are sending a "report" to the user. The GUI will vary according to the report's contents.
+        
+        }
+        catch (sql::SQLException& e) {
+            std::cerr << "Error: " << e.what() << " (Error code: " << e.getErrorCode() << ")" << std::endl;
+        }
+    }
+
 }
 
 int main()
