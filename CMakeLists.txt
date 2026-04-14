@@ -13,7 +13,7 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql)
 find_package(Boost REQUIRED COMPONENTS json)
 
-set(CMAKE_CXX_CLANG_TIDY clang-tidy;-checks=*;-header-filter=.*)
+set(CMAKE_CXX_CLANG_TIDY clang-tidy)
 
 set(PROJECT_SOURCES
         main.cpp

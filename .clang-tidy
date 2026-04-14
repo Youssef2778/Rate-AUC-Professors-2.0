@@ -1,0 +1,19 @@
+# .clang-tidy
+Checks: >
+  clang-diagnostic-*,
+  clang-analyzer-*,
+  bugprone-*,
+  modernize-*,
+  performance-*,
+  readability-*,
+  -llvmlibc-*,
+  -llvm-*,
+  -fuchsia-*,
+  -zircon-*,
+  -abseil-*,
+  -android-*,
+  -linuxkernel-*,
+  -objc-*
+
+HeaderFilterRegex: ".*"
+WarningsAsErrors: "bugprone-*"
