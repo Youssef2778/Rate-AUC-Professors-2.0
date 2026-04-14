@@ -12,9 +12,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql)
 find_package(Boost REQUIRED COMPONENTS json)
-find_program(CLANG_TIDY_EXE NAMES clang-tidy)
-message(STATUS "clang-tidy: ${CLANG_TIDY_EXE}")
-set(CMAKE_CXX_CLANG_TIDY clang-tidy)
+# find_program(CLANG_TIDY_EXE NAMES clang-tidy)
+# message(STATUS "clang-tidy: ${CLANG_TIDY_EXE}")
+# set(CMAKE_CXX_CLANG_TIDY clang-tidy)
 
 set(PROJECT_SOURCES
         main.cpp

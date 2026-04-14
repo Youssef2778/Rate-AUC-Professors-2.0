@@ -1,11 +1,12 @@
-# .clang-tidy
 Checks: >
   clang-diagnostic-*,
   clang-analyzer-*,
   bugprone-*,
-  modernize-*,
   performance-*,
-  readability-*,
+  modernize-use-nullptr,
+  modernize-use-override,
+  modernize-make-unique,
+  modernize-make-shared,
   -llvmlibc-*,
   -llvm-*,
   -fuchsia-*,
@@ -13,7 +14,10 @@ Checks: >
   -abseil-*,
   -android-*,
   -linuxkernel-*,
-  -objc-*
+  -objc-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-forward-declaration-namespace,
+  -performance-avoid-endl
 
-HeaderFilterRegex: ".*"
 WarningsAsErrors: "bugprone-*"
+HeaderFilterRegex: ".*"
