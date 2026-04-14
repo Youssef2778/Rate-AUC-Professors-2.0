@@ -3,39 +3,44 @@
 #include <string>
 using namespace std;
 
-class User {
-private:
+class User
+{
+   private:
     string Username;
     string Password;
     string Email;
     const int ID;
 
-    bool verification() {
-        //Verify Email
+    bool verification()
+    {
+        // Verify Email
     }
 
-public:
+   public:
+    User(string username, string password, string email, int id) : ID(id)
+    {
+        Username = username;
+        Password = password;
+        Email = email;
+    }
 
-    User(string username, string password,string email, int id) : ID(id) {
-		Username = username;
-		Password = password;
-		Email = email;
-	}
-
-
-    string GetUsername() {
+    string GetUsername()
+    {
         return Username;
     }
 
-    string GetPassword() {
+    string GetPassword()
+    {
         return Password;
     }
 
-    string GetEmail() {
+    string GetEmail()
+    {
         return Email;
     }
 
-    int GetID() {
+    int GetID()
+    {
         return ID;
-	}
+    }
 };

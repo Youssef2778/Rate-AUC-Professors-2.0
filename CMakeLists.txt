@@ -12,7 +12,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql)
 find_package(Boost REQUIRED COMPONENTS json)
-
+# find_program(CLANG_TIDY_EXE NAMES clang-tidy)
+# message(STATUS "clang-tidy: ${CLANG_TIDY_EXE}")
+# set(CMAKE_CXX_CLANG_TIDY clang-tidy)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -53,6 +55,7 @@ add_executable(server server.cpp)
 target_link_libraries(server PRIVATE Boost::json)
 target_link_libraries(server PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(server PRIVATE mysqlcppconn)
+target_link_libraries(server PRIVATE bcrypt)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
