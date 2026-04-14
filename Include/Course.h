@@ -7,18 +7,21 @@
 #include "Teacher.h"
 using namespace std;
 
-class Course {
+class Course
+{
    private:
     string Name;
     vector<Teacher> Teachers;
     int ID;
 
    public:
-    Course(string name, int id) : ID(id) {
+    Course(string name, int id) : ID(id)
+    {
         Name = name;
     }
 
-    vector<Teacher> Leaderboard() {
+    vector<Teacher> Leaderboard()
+    {
         bool Sorted;
         for (int i = 0; i < Teachers.size(); i++) {
             Sorted = true;
@@ -35,11 +38,13 @@ class Course {
         return Teachers;
     }
 
-    string GetName() {
+    string GetName()
+    {
         return Name;
     }
 
-    bool AddTeacher(Teacher teacher) {
+    bool AddTeacher(Teacher teacher)
+    {
         for (Teacher T : Teachers) {
             if (T.GetID() == teacher.GetID()) {
                 return false;

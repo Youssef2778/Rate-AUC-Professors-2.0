@@ -25,13 +25,15 @@ boost::asio::thread_pool pool(std::thread::hardware_concurrency());
 
 // This class was generated with the help of Claude, to handle multiple requests simultaneously
 // instead of establishing a new connection for each request.
-class MySQLConnectionPool {
+class MySQLConnectionPool
+{
     std::queue<sql::Connection*> pool;
     std::mutex mtx;
 
    public:
     // Establishing the connections at startup and storing them in the pool
-    MySQLConnectionPool(int size) {
+    MySQLConnectionPool(int size)
+    {
         sql::mysql::MySQL_Driver* driver = sql::mysql::get_mysql_driver_instance();
         for (int i = 0; i < size; i++) {
             sql::Connection* con = driver->connect("tcp://centerbeam.proxy.rlwy.net:11239", "root",
@@ -41,14 +43,16 @@ class MySQLConnectionPool {
         }
     }
 
-    sql::Connection* get() {
+    sql::Connection* get()
+    {
         std::unique_lock<std::mutex> lock(mtx);
         sql::Connection* con = pool.front();
         pool.pop();
         return con;
     }
 
-    void release(sql::Connection* con) {
+    void release(sql::Connection* con)
+    {
         std::unique_lock<std::mutex> lock(mtx);
         pool.push(con);
     }
@@ -118,7 +122,8 @@ void handle_request(const http::request<http::string_body>& req,
         std::string DeptID;
         // Extract the department ID from the query parameter
         size_t pos = target.find("?Id=");
-        if (pos != std::string::npos) DeptID = target.substr(pos + 4);  // 4 = length of "?Id="
+        if (pos != std::string::npos)
+            DeptID = target.substr(pos + 4);  // 4 = length of "?Id="
         try {
             sql::Connection* con = dbPool->get();
             sql::PreparedStatement* pstmt(
@@ -187,7 +192,8 @@ void handle_request(const http::request<http::string_body>& req,
     }
 }
 
-int main() {
+int main()
+{
     std::cout << "Server starting..." << std::endl;
 
     try {
@@ -232,7 +238,8 @@ int main() {
                     http::request<http::string_body> req;
                     boost::system::error_code ec;
                     http::read(socket, buffer, req, ec);
-                    if (ec == http::error::end_of_stream || ec) break;
+                    if (ec == http::error::end_of_stream || ec)
+                        break;
                     handle_request(req, socket);
                 }
             } catch (std::exception& e) {

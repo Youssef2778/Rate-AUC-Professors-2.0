@@ -6,25 +6,30 @@
 #include "Course.h"
 using namespace std;
 
-class Department {
+class Department
+{
    private:
     string Name;
     vector<Course> Courses;
     int ID;
 
    public:
-    Department(string name, int id) : ID(id) {
+    Department(string name, int id) : ID(id)
+    {
     }
 
-    string GetName() {
+    string GetName()
+    {
         return Name;
     }
 
-    int GetID() {
+    int GetID()
+    {
         return ID;
     }
 
-    vector<Course> GetCourses(string CourseName) {
+    vector<Course> GetCourses(string CourseName)
+    {
         return Courses;
     }
 };

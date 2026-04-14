@@ -10,7 +10,8 @@ struct Vote {
     Teacher* teacher;
     int Value;
 
-    bool operator==(const Vote v) {
+    bool operator==(const Vote v)
+    {
         if (this->CourseName == v.CourseName && this->teacher == v.teacher) {
             return true;
         }

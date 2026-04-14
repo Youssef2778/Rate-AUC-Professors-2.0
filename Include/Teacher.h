@@ -8,7 +8,8 @@
 #include "User.h"
 using namespace std;
 
-class Teacher : public User {
+class Teacher : public User
+{
    private:
     string Name;
     vector<string> Courses;
@@ -18,38 +19,47 @@ class Teacher : public User {
 
    public:
     Teacher(string name, string username, string password, string email, int id)
-        : User(username, password, email, id) {
+        : User(username, password, email, id)
+    {
     }
 
-    void ChangeRating(string CourseName, int Value) {
+    void ChangeRating(string CourseName, int Value)
+    {
         Rating[CourseName] += Value;
     }
 
-    void ChangeRatingCount(string CourseName, int Value) {
+    void ChangeRatingCount(string CourseName, int Value)
+    {
         RateCount[CourseName] += Value;
     }
 
-    void AddComment(string CourseName, Comment comment) {
+    void AddComment(string CourseName, Comment comment)
+    {
         Comments[CourseName].push_back(comment);
     }
 
-    int GetRating(string CourseName) {
+    int GetRating(string CourseName)
+    {
         return Rating[CourseName];
     }
 
-    int GetRateCount(string CourseName) {
+    int GetRateCount(string CourseName)
+    {
         return RateCount[CourseName];
     }
 
-    string GetName() {
+    string GetName()
+    {
         return Name;
     }
 
-    vector<string> GetCourses(string CourseName) {
+    vector<string> GetCourses(string CourseName)
+    {
         return Courses;
     }
 
-    vector<Comment> GetComments(string CourseName) {
+    vector<Comment> GetComments(string CourseName)
+    {
         return Comments[CourseName];
     }
 };

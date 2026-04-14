@@ -16,7 +16,8 @@
 namespace beast = boost::beast;
 namespace http = beast::http;
 
-MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
+{
     ui->setupUi(this);
     ui->stackedWidget->setCurrentIndex(0);
 
@@ -30,11 +31,13 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     std::thread(&MainWindow::EstablishConnection, this).detach();
 }
 
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow()
+{
     delete ui;
 }
 
-void MainWindow::EstablishConnection() {
+void MainWindow::EstablishConnection()
+{
     const std::string server_address = "127.0.0.1";
     boost::asio::ip::tcp::resolver resolver(io);
     auto endpoints = resolver.resolve(server_address, "8080");
@@ -57,7 +60,8 @@ void MainWindow::EstablishConnection() {
     }
 }
 
-void MainWindow::CenterWidget(int pageIndex, QWidget* TargetWidget) {
+void MainWindow::CenterWidget(int pageIndex, QWidget* TargetWidget)
+{
     // The following lines of code are produced by ChatGPT, their purpose is to constantly center
     // the form no matter the size of the main window
 
@@ -181,7 +185,8 @@ void MainWindow::CenterWidget(int pageIndex, QWidget* TargetWidget) {
    // design down
 
 // "Hide Password" Mechanism of the Login page
-void MainWindow::on_checkBox_4_stateChanged(int arg1) {
+void MainWindow::on_checkBox_4_stateChanged(int arg1)
+{
     if (arg1 == 2) {
         ui->password_login_lineEdit->setEchoMode(QLineEdit::Password);
     } else if (arg1 == 0) {
@@ -190,7 +195,8 @@ void MainWindow::on_checkBox_4_stateChanged(int arg1) {
 }
 
 // Function executed when the user moves to the register page.
-void MainWindow::on_register_label_4_linkActivated(const QString& link) {
+void MainWindow::on_register_label_4_linkActivated(const QString& link)
+{
     ui->stackedWidget->setCurrentIndex(1);
 
     // Hiding the error messages.
@@ -219,7 +225,8 @@ void MainWindow::on_register_label_4_linkActivated(const QString& link) {
 }
 
 // "Hide Password" Mechanism of the Register Page
-void MainWindow::on_checkBox_6_stateChanged(int arg1) {
+void MainWindow::on_checkBox_6_stateChanged(int arg1)
+{
     if (arg1 == 2) {
         ui->password_register_lineEdit->setEchoMode(QLineEdit::Password);
         ui->confPassword_register_lineEdit->setEchoMode(QLineEdit::Password);
@@ -229,13 +236,15 @@ void MainWindow::on_checkBox_6_stateChanged(int arg1) {
     }
 }
 
-void MainWindow::on_register_label_6_linkActivated(const QString& link) {
+void MainWindow::on_register_label_6_linkActivated(const QString& link)
+{
     ui->stackedWidget->setCurrentIndex(0);
 }
 
 // Function called when the "Register" Button in the Register page is clicked.
 // This involves the networking logic.
-void MainWindow::on_pushButton_6_clicked() {
+void MainWindow::on_pushButton_6_clicked()
+{
     // Client-side validation (presence check + format check of email)
 
     // Presence Checks
@@ -345,7 +354,8 @@ void MainWindow::on_pushButton_6_clicked() {
 }
 
 // Function that gets called after clicking on the "login" button in the login page.
-void MainWindow::on_pushButton_4_clicked() {
+void MainWindow::on_pushButton_4_clicked()
+{
     boost::json::object login;
     login["email"] = ui->email_login_lineEdit->text().toStdString();
     login["password"] = ui->password_login_lineEdit->text().toStdString();
@@ -414,7 +424,8 @@ void MainWindow::on_pushButton_4_clicked() {
     }
 }
 
-void MainWindow::on_DepartmentCB_currentIndexChanged(int index) {
+void MainWindow::on_DepartmentCB_currentIndexChanged(int index)
+{
     // Request the Courses from the server
     try {
         std::string DepName = ui->DepartmentCB->currentText().toStdString();
