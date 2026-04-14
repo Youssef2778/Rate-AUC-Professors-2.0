@@ -4,24 +4,22 @@
 using namespace std;
 
 class User {
-private:
+   private:
     string Username;
     string Password;
     string Email;
     const int ID;
 
     bool verification() {
-        //Verify Email
+        // Verify Email
     }
 
-public:
-
-    User(string username, string password,string email, int id) : ID(id) {
-		Username = username;
-		Password = password;
-		Email = email;
-	}
-
+   public:
+    User(string username, string password, string email, int id) : ID(id) {
+        Username = username;
+        Password = password;
+        Email = email;
+    }
 
     string GetUsername() {
         return Username;
@@ -37,5 +35,5 @@ public:
 
     int GetID() {
         return ID;
-	}
+    }
 };

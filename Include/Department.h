@@ -1,26 +1,27 @@
 #pragma once
 #include <iostream>
-#include <vector>
 #include <string>
+#include <vector>
+
 #include "Course.h"
 using namespace std;
 
 class Department {
-private:
+   private:
     string Name;
     vector<Course> Courses;
     int ID;
 
-public:
-
-    Department(string name, int id) : ID(id) {}
+   public:
+    Department(string name, int id) : ID(id) {
+    }
 
     string GetName() {
-		return Name;
+        return Name;
     }
 
     int GetID() {
-		return ID;
+        return ID;
     }
 
     vector<Course> GetCourses(string CourseName) {
