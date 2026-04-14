@@ -46,7 +46,6 @@ class MainWindow : public QMainWindow
     void on_pushButton_6_clicked();
     void on_pushButton_4_clicked();
     void on_DepartmentCB_currentIndexChanged(int index);
-    void on_pushButton_clicked();
 };
 
 #endif  // MAINWINDOW_H

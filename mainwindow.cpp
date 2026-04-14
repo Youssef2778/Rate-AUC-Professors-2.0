@@ -317,38 +317,10 @@ void MainWindow::on_pushButton_6_clicked()
         // Let's send it!
         boost::beast::http::write(socket, request);
 
-        // Send user to *student* homepage
-        ui->stackedWidget->setCurrentIndex(3);
-
-        // Request the departments from the server
-        try {
-            // Send GET /get-departments
-            http::request<http::string_body> request(http::verb::get, "/get-departments", 11);
-            request.set(http::field::host, "127.0.0.1");
-            request.prepare_payload();
-            http::write(socket, request);
-
-            // Read the response
-            beast::flat_buffer buffer;
-            http::response<http::string_body> response;
-            http::read(socket, buffer, response);
-
-            // Parse the JSON array
-            auto parsed = boost::json::parse(response.body());
-            boost::json::array& departments = parsed.as_array();
-
-            for (auto& entry : departments) {
-                boost::json::object& dept = entry.as_object();
-                std::string name = (std::string)dept["department_name"].as_string();
-                int ID = (int)dept["id"].as_int64();
-                Deps[name] = ID;  // Store the mapping of department name to ID
-                // populate the QComboBox
-                ui->DepartmentCB->addItem(QString::fromStdString(name));
-            }
-        } catch (std::exception& e) {
-            std::cout << "Failed: " << e.what() << std::endl;
-        }
-    } catch (std::exception& e) {
+        //Send user to *student* homepage
+        ui->stackedWidget->setCurrentIndex(2);
+    }
+    catch (std::exception& e) {
         std::cout << "Connection failed: " << e.what() << std::endl;
     }
 }
@@ -459,14 +431,3 @@ void MainWindow::on_DepartmentCB_currentIndexChanged(int index)
         std::cout << "Failed: " << e.what() << std::endl;
     }
 }
-void MainWindow::on_pushButton_clicked()
-{
-    //Pass the selected course_id
-	std::string CourseName = ui->CourseCB->currentText().toStdString();
-    int CoursedID = Courses[CourseName]; // Get the course ID using the mapping stored
-	// Load the leaderboard page
-    ui->stackedWidget->setCurrentIndex(2);
-	CenterWidget(2, ui->tableWidget);
-
-}
-
