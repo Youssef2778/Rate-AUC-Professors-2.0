@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "./ui_mainwindow.h"
+#include "ui_mainwindow.h" //removed "./" because ui_mainwindow.h is generated in build\Rate_AUC_autogen\include\ and not the build directory
 #include "bcrypt/BCrypt.hpp"
 #include <boost/asio.hpp>
 #include <boost/beast/core.hpp>
@@ -301,7 +301,7 @@ void MainWindow::on_pushButton_6_clicked()
         boost::beast::http::write(socket, request);
 
         //Send user to *student* homepage
-        ui->stackedWidget->setCurrentIndex(2);
+        ui->stackedWidget->setCurrentIndex(3);
     }
     catch (std::exception& e) {
         std::cout << "Connection failed: " << e.what() << std::endl;
@@ -382,3 +382,14 @@ void MainWindow::on_DepartmentCB_currentIndexChanged(int index)
         std::cout << "Failed: " << e.what() << std::endl;
     }
 }
+void MainWindow::on_pushButton_clicked()
+{
+    //Pass the selected course_id
+	std::string CourseName = ui->CourseCB->currentText().toStdString();
+    int CoursedID = Courses[CourseName]; // Get the course ID using the mapping stored
+	// Load the leaderboard page
+    ui->stackedWidget->setCurrentIndex(2);
+	CenterWidget(2, ui->tableWidget);
+
+}
+
