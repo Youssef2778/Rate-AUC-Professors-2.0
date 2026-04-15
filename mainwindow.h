@@ -23,6 +23,8 @@ class MainWindow : public QMainWindow
     // Map department_name to id
     std::unordered_map<std::string, int> Deps;
     std::unordered_map<std::string, int> Courses;
+    std::unordered_map<std::string, std::string> Profs;
+
 
     // For persistent connection to be established once at startup
     boost::asio::io_context io;
@@ -46,6 +48,7 @@ class MainWindow : public QMainWindow
     void on_pushButton_6_clicked();
     void on_pushButton_4_clicked();
     void on_DepartmentCB_currentIndexChanged(int index);
+    void on_pushButton_clicked();
 };
 
 #endif  // MAINWINDOW_H

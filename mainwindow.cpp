@@ -1,6 +1,6 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h" //removed "./" because ui_mainwindow.h is generated in build\Rate_AUC_autogen\include\ and not the build directory
-#include "bcrypt/BCrypt.hpp"
+
+#include <QProgressBar>
 #include <boost/asio.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
@@ -80,109 +80,7 @@ void MainWindow::CenterWidget(int pageIndex, QWidget* TargetWidget)
     vLayout->addStretch();  // bottom spacer
 
     page->setLayout(vLayout);
-    // 1. Initialize the table structure
-    ui->tableWidget->setColumnCount(5);
-    ui->tableWidget->setRowCount(6);
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->tableWidget->verticalHeader()->setVisible(false);
-    ui->tableWidget->setShowGrid(false);
-
-    // 1. FORCE the table to have 6 columns and set their names
-    ui->tableWidget->setColumnCount(6);
-    ui->tableWidget->setHorizontalHeaderLabels({"Rank", "Name", "Score", "up", "down", "Approval"});
-
-    // 2. Stop Qt from auto-stretching the final column
-    ui->tableWidget->horizontalHeader()->setStretchLastSection(false);
-    ui->tableWidget->horizontalHeader()->setMinimumSectionSize(30);
-
-    // 3. Let Name and Score stretch to fill the middle space
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
-
-    // 4. Set Fixed Widths (Widened the buttons to 70px so they aren't squished!)
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
-    ui->tableWidget->setColumnWidth(0, 60);  // Rank
-
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Fixed);
-    ui->tableWidget->setColumnWidth(3, 70);  // Upvote Button (Widened!)
-
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(4, QHeaderView::Fixed);
-    ui->tableWidget->setColumnWidth(4, 70);  // Downvote Button (Widened!)
-
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(5, QHeaderView::Fixed);
-    ui->tableWidget->setColumnWidth(5, 120);  // Progress Bar
-    // 2. Loop to create the 6 professor "cards"
-    for (int i = 0; i < ui->tableWidget->rowCount(); ++i) {
-        // Text Data
-        QTableWidgetItem* rank = new QTableWidgetItem(QString::number(i + 1));
-        QTableWidgetItem* name = new QTableWidgetItem("Professor " + QString::number(i + 1));
-        QTableWidgetItem* score = new QTableWidgetItem("10 points");
-        // Assuming you have a loop going through your rows using an integer 'row'
-        // int progressValue = 85; // You will calculate this based on upvotes/downvotes
-
-        QProgressBar* progressBar = new QProgressBar();
-        progressBar->setRange(0, 100);
-        progressBar->setValue(85);                   // Example value
-        progressBar->setAlignment(Qt::AlignCenter);  // Puts the text "85%" in the middle
-
-        // Style it to perfectly match your dark mode / teal theme
-        progressBar->setStyleSheet(
-            "QProgressBar {"
-            "   background-color: #0b2239;"
-            "   border: 1px solid #1d8e9e;"
-            "   border-radius: 5px;"
-            "   color: white;"
-            "   text-align: center;"
-            "}"
-            "QProgressBar::chunk {"
-            "   background-color: ##2ecc71;"
-            "   border-radius: 4px;"
-            "}");
-
-        // Inject it into Column 5 of the current row
-        ui->tableWidget->setCellWidget(i, 5, progressBar);
-
-        // 2. Now that they have names, we can center them
-        rank->setTextAlignment(Qt::AlignCenter);
-        name->setTextAlignment(Qt::AlignCenter);
-        score->setTextAlignment(Qt::AlignCenter);
-
-        // 3. Finally, put the finished items into the table
-        ui->tableWidget->setItem(i, 0, rank);
-        ui->tableWidget->setItem(i, 1, name);
-        ui->tableWidget->setItem(i, 2, score);
-
-        // Change the buttons to text or standard symbols
-        QPushButton* up = new QPushButton;
-        up->setIcon(QIcon(
-            "/home/adham/labproject/Rate-AUC-Professors-2.0/images/up.png"));  // <--- Paste your
-                                                                               // path here
-        up->setIconSize(QSize(24, 24));
-        QPushButton* down = new QPushButton;
-        down->setIcon(QIcon(
-            "/home/adham/labproject/Rate-AUC-Professors-2.0/images/down.png"));  // <--- Paste your
-                                                                                 // path here
-        down->setIconSize(QSize(24, 24));
-
-        // QPushButton *up = new QPushButton("+ Upvote");
-        // QPushButton *down = new QPushButton("- Downvote");
-
-        // Button Styling
-        QString btnStyle =
-            "QPushButton { background-color: #0b2239; color: white; border-radius: 5px; border: "
-            "1px solid #1d8e9e; font-family: 'Segoe UI Emoji'; }";
-        up->setStyleSheet(btnStyle);
-        down->setStyleSheet(btnStyle);
-
-        // Put buttons in the correct columns
-        ui->tableWidget->setCellWidget(i, 3, up);
-        ui->tableWidget->setCellWidget(i, 4, down);
-
-        // Match the row height to the design
-        ui->tableWidget->setRowHeight(i, 60);
-    }
-}  // the desin of the leaderboard was coassisted by AI in order to get the right color pallets and
-   // design down
+}
 
 // "Hide Password" Mechanism of the Login page
 void MainWindow::on_checkBox_4_stateChanged(int arg1)
@@ -317,10 +215,38 @@ void MainWindow::on_pushButton_6_clicked()
         // Let's send it!
         boost::beast::http::write(socket, request);
 
-        //Send user to *student* homepage
-        ui->stackedWidget->setCurrentIndex(2);
-    }
-    catch (std::exception& e) {
+        // Send user to *student* homepage
+        ui->stackedWidget->setCurrentIndex(3);
+
+        // Request the departments from the server
+        try {
+            // Send GET /get-departments
+            http::request<http::string_body> request(http::verb::get, "/get-departments", 11);
+            request.set(http::field::host, "127.0.0.1");
+            request.prepare_payload();
+            http::write(socket, request);
+
+            // Read the response
+            beast::flat_buffer buffer;
+            http::response<http::string_body> response;
+            http::read(socket, buffer, response);
+
+            // Parse the JSON array
+            auto parsed = boost::json::parse(response.body());
+            boost::json::array& departments = parsed.as_array();
+
+            for (auto& entry : departments) {
+                boost::json::object& dept = entry.as_object();
+                std::string name = (std::string)dept["department_name"].as_string();
+                int ID = (int)dept["id"].as_int64();
+                Deps[name] = ID;  // Store the mapping of department name to ID
+                // populate the QComboBox
+                ui->DepartmentCB->addItem(QString::fromStdString(name));
+            }
+        } catch (std::exception& e) {
+            std::cout << "Failed: " << e.what() << std::endl;
+        }
+    } catch (std::exception& e) {
         std::cout << "Connection failed: " << e.what() << std::endl;
     }
 }
@@ -428,6 +354,131 @@ void MainWindow::on_DepartmentCB_currentIndexChanged(int index)
             ui->CourseCB->addItem(QString::fromStdString(name));
         }
     } catch (std::exception& e) {
+        std::cout << "Failed: " << e.what() << std::endl;
+    }
+}
+void MainWindow::on_pushButton_clicked()
+{
+    //Pass the selected course_id
+    std::string CourseName = ui->CourseCB->currentText().toStdString();
+    int CourseID = Courses[CourseName]; // Get the course ID using the mapping stored
+    //Load the leaderboard page
+    ui->stackedWidget->setCurrentIndex(2);
+    CenterWidget(2, ui->tableWidget);
+    // // 1. Initialize the table structure
+    ui->tableWidget->setColumnCount(5);
+    ui->tableWidget->setRowCount(6);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableWidget->verticalHeader()->setVisible(false);
+    ui->tableWidget->setShowGrid(false);
+
+    // 1. FORCE the table to have 6 columns and set their names
+    ui->tableWidget->setColumnCount(6);
+    ui->tableWidget->setHorizontalHeaderLabels({"Rank", "Name", "Score", "up", "down", "Approval"});
+
+    // 2. Stop Qt from auto-stretching the final column
+    ui->tableWidget->horizontalHeader()->setStretchLastSection(false);
+    ui->tableWidget->horizontalHeader()->setMinimumSectionSize(30);
+
+    // 3. Let Name and Score stretch to fill the middle space
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
+
+    // 4. Set Fixed Widths (Widened the buttons to 70px so they aren't squished!)
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
+    ui->tableWidget->setColumnWidth(0, 60);  // Rank
+
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Fixed);
+    ui->tableWidget->setColumnWidth(3, 70);  // Upvote Button (Widened!)
+
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(4, QHeaderView::Fixed);
+    ui->tableWidget->setColumnWidth(4, 70);  // Downvote Button (Widened!)
+
+    // ui->tableWidget->horizontalHeader()->setSectionResizeMode(5, QHeaderView::Fixed);
+    // ui->tableWidget->setColumnWidth(5, 120); // Progress Bar
+
+    // the desin of the leaderboard was coassisted by AI in order to get the right color pallets and design down
+    try {
+        // Send GET /get-professors
+        http::request<http::string_body> request(http::verb::get, "/get-professors?Id=" + std::to_string(CourseID), 11);
+        request.set(http::field::host, "127.0.0.1");
+        request.prepare_payload();
+        http::write(socket, request);
+        std::cout << "Send req" << std::endl;
+
+        // Read the response
+        beast::flat_buffer buffer;
+        http::response<http::string_body> response;
+        http::read(socket, buffer, response);
+        std::cout << "Read Response" << std::endl;
+
+        // Parse the JSON array
+        auto parsed = boost::json::parse(response.body());
+        boost::json::array& professors = parsed.as_array();
+        std::cout << "Parsed" << std::endl;
+
+        int Max;
+        bool first = true;
+
+        ui->tableWidget->setRowCount(professors.size()); 
+
+        int row = 0; 
+        std::cout << "Before loop" << std::endl;
+
+        for (auto& entry : professors) {
+
+            std::cout << entry << std::endl;
+            boost::json::object& prof = entry.as_object();
+            std::string Name = (std::string)prof["name"].as_string();
+            std::string ID = (std::string)prof["id"].as_string();
+            std::string Score = (std::string)prof["score"].as_string();
+            Profs[Name] = ID; // Store the mapping of professor name to ID
+
+            // populate the the table
+            // 2. Loop to create the 6 professor "cards"
+
+            // Text Data
+            QTableWidgetItem *rank = new QTableWidgetItem(QString::number(row + 1));
+            QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(Name));
+            QTableWidgetItem *score = new QTableWidgetItem(QString::fromStdString(Score)); // ✅ FIX
+
+
+            // Inject it into Column 5 of the current row
+
+            // 2. Now that they have names, we can center them
+            rank->setTextAlignment(Qt::AlignCenter);
+            name->setTextAlignment(Qt::AlignCenter);
+            score->setTextAlignment(Qt::AlignCenter);
+
+            // 3. Finally, put the finished items into the table
+            ui->tableWidget->setItem(row, 0, rank);
+            ui->tableWidget->setItem(row, 1, name);
+            ui->tableWidget->setItem(row, 2, score);
+
+            // Change the buttons to text or standard symbols
+            QPushButton *up = new QPushButton;
+            up->setIcon(QIcon("/home/adham/labproject/Rate-AUC-Professors-2.0/images/up.png")); // <--- Paste your path here
+            up->setIconSize(QSize(24, 24));
+            QPushButton *down = new QPushButton;
+            down->setIcon(QIcon("/home/adham/labproject/Rate-AUC-Professors-2.0/images/down.png")); // <--- Paste your path here
+            down->setIconSize(QSize(24, 24));
+
+            // Button Styling
+            QString btnStyle = "QPushButton { background-color: #0b2239; color: white; border-radius: 5px; border: 1px solid #1d8e9e; font-family: 'Segoe UI Emoji'; }";
+            up->setStyleSheet(btnStyle);
+            down->setStyleSheet(btnStyle);
+
+            // Put buttons in the correct columns
+            ui->tableWidget->setCellWidget(row, 3, up);
+            ui->tableWidget->setCellWidget(row, 4, down);
+
+            // Match the row height to the design
+            ui->tableWidget->setRowHeight(row, 60);
+
+            row++; // ✅ FIX: move to next row
+        }
+    }
+    catch (std::exception& e) {
         std::cout << "Failed: " << e.what() << std::endl;
     }
 }
