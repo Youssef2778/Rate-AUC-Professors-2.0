@@ -17,7 +17,7 @@
    <string>Rate AUC Professor</string>
   </property>
   <property name="layoutDirection">
-   <enum>Qt::LeftToRight</enum>
+   <enum>Qt::LayoutDirection::LeftToRight</enum>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -94,7 +94,7 @@ QLabel#email_notFound_error, #password_incorrect_error{color: red}</string>
            <layout class="QVBoxLayout" name="verticalLayout_11" stretch="0">
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_12">
-              <item alignment="Qt::AlignHCenter">
+              <item alignment="Qt::AlignmentFlag::AlignHCenter">
                <widget class="QLabel" name="label_10">
                 <property name="styleSheet">
                  <string notr="true"/>
@@ -118,12 +118,15 @@ QLabel#email_notFound_error, #password_incorrect_error{color: red}</string>
                    <string>Email</string>
                   </property>
                   <property name="textFormat">
-                   <enum>Qt::PlainText</enum>
+                   <enum>Qt::TextFormat::PlainText</enum>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QLineEdit" name="email_login_lineEdit">
+                  <property name="text">
+                   <string>@aucegypt.edu</string>
+                  </property>
                   <property name="placeholderText">
                    <string>example@aucegypt.edu</string>
                   </property>
@@ -151,10 +154,10 @@ QLabel#email_notFound_error, #password_incorrect_error{color: red}</string>
                  <string/>
                 </property>
                 <property name="text">
-                 <string/>
+                 <string>a</string>
                 </property>
                 <property name="echoMode">
-                 <enum>QLineEdit::Normal</enum>
+                 <enum>QLineEdit::EchoMode::Normal</enum>
                 </property>
                 <property name="placeholderText">
                  <string>Password</string>
@@ -178,7 +181,7 @@ QLabel#email_notFound_error, #password_incorrect_error{color: red}</string>
                 </property>
                </widget>
               </item>
-              <item alignment="Qt::AlignHCenter">
+              <item alignment="Qt::AlignmentFlag::AlignHCenter">
                <widget class="QPushButton" name="pushButton_4">
                 <property name="minimumSize">
                  <size>
@@ -197,13 +200,13 @@ QLabel#email_notFound_error, #password_incorrect_error{color: red}</string>
                 </property>
                </widget>
               </item>
-              <item alignment="Qt::AlignHCenter">
+              <item alignment="Qt::AlignmentFlag::AlignHCenter">
                <widget class="QLabel" name="register_label_4">
                 <property name="text">
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Don't Have An Account? &lt;a href=&quot;register_page.ui&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;Register &lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="textFormat">
-                 <enum>Qt::RichText</enum>
+                 <enum>Qt::TextFormat::RichText</enum>
                 </property>
                </widget>
               </item>
@@ -279,7 +282,7 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
         <layout class="QVBoxLayout" name="verticalLayout_17" stretch="0">
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_18">
-           <item alignment="Qt::AlignHCenter">
+           <item alignment="Qt::AlignmentFlag::AlignHCenter">
             <widget class="QLabel" name="label_16">
              <property name="styleSheet">
               <string notr="true"/>
@@ -324,7 +327,7 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
                 <string>Email </string>
                </property>
                <property name="textFormat">
-                <enum>Qt::PlainText</enum>
+                <enum>Qt::TextFormat::PlainText</enum>
                </property>
               </widget>
              </item>
@@ -370,7 +373,7 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
               <string/>
              </property>
              <property name="echoMode">
-              <enum>QLineEdit::Password</enum>
+              <enum>QLineEdit::EchoMode::Password</enum>
              </property>
              <property name="placeholderText">
               <string>Password</string>
@@ -394,7 +397,7 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
            <item>
             <widget class="QLineEdit" name="confPassword_register_lineEdit">
              <property name="echoMode">
-              <enum>QLineEdit::Password</enum>
+              <enum>QLineEdit::EchoMode::Password</enum>
              </property>
              <property name="placeholderText">
               <string>Re-enter Password</string>
@@ -425,7 +428,7 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
              </property>
             </widget>
            </item>
-           <item alignment="Qt::AlignHCenter">
+           <item alignment="Qt::AlignmentFlag::AlignHCenter">
             <widget class="QPushButton" name="pushButton_6">
              <property name="minimumSize">
               <size>
@@ -444,13 +447,13 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
              </property>
             </widget>
            </item>
-           <item alignment="Qt::AlignHCenter">
+           <item alignment="Qt::AlignmentFlag::AlignHCenter">
             <widget class="QLabel" name="register_label_6">
              <property name="text">
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Already Have an Account? &lt;a href=&quot;page1&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;Login &lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="textFormat">
-              <enum>Qt::RichText</enum>
+              <enum>Qt::TextFormat::RichText</enum>
              </property>
             </widget>
            </item>
@@ -497,13 +500,13 @@ QHeaderView::section {
 }</string>
         </property>
         <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
+         <enum>QFrame::Shape::NoFrame</enum>
         </property>
         <property name="editTriggers">
-         <set>QAbstractItemView::NoEditTriggers</set>
+         <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
         </property>
         <property name="selectionMode">
-         <enum>QAbstractItemView::NoSelection</enum>
+         <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
         </property>
         <property name="showGrid">
          <bool>false</bool>
@@ -692,13 +695,19 @@ QComboBox::drop-down {
 }
 /* Dropdown list */
 QComboBox QAbstractItemView {
-    background-color: rgba(30, 30, 30, 0.9);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    selection-background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgb(30, 120, 190);
+    selection-background-color: rgb(50, 150, 220);
     color: white;
-    border-radius: 8px;
+    border: none;
+    outline: 0;
 }
-</string>
+QComboBox QAbstractItemView::item {
+    padding: 6px 12px;
+    color: white;
+}
+QComboBox QAbstractItemView::item:selected {
+    background-color: rgb(50, 150, 220);
+}</string>
        </property>
        <widget class="QWidget" name="widget_3" native="true">
         <property name="geometry">
@@ -724,15 +733,15 @@ QComboBox QAbstractItemView {
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <property name="sizeConstraint">
-              <enum>QLayout::SetDefaultConstraint</enum>
+              <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
              </property>
              <item>
               <spacer name="horizontalSpacer_2">
                <property name="orientation">
-                <enum>Qt::Vertical</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
+                <enum>QSizePolicy::Policy::Fixed</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -785,10 +794,10 @@ QComboBox QAbstractItemView {
              <item>
               <spacer name="horizontalSpacer_3">
                <property name="orientation">
-                <enum>Qt::Vertical</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
+                <enum>QSizePolicy::Policy::Fixed</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -806,7 +815,7 @@ QComboBox QAbstractItemView {
               <number>0</number>
              </property>
              <property name="sizeConstraint">
-              <enum>QLayout::SetDefaultConstraint</enum>
+              <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
              </property>
              <item>
               <widget class="QComboBox" name="DepartmentCB">
@@ -858,15 +867,15 @@ QComboBox QAbstractItemView {
              <item>
               <spacer name="horizontalSpacer">
                <property name="orientation">
-                <enum>Qt::Vertical</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
+                <enum>QSizePolicy::Policy::Fixed</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>8</width>
-                 <height>20</height>
+                 <width>20</width>
+                 <height>8</height>
                 </size>
                </property>
               </spacer>
@@ -946,6 +955,7 @@ QComboBox QAbstractItemView {
   </widget>
  </widget>
  <resources>
+  <include location="resources.qrc"/>
   <include location="resources.qrc"/>
  </resources>
  <connections/>

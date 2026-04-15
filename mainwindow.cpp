@@ -10,7 +10,7 @@
 #include <iostream>
 #include <thread>
 
-#include "./ui_mainwindow.h"
+#include "ui_mainwindow.h" //removed "./" because ui_mainwindow.h is generated in build\Rate_AUC_autogen\include\ and not the build directory
 #include "bcrypt/BCrypt.hpp"
 
 namespace beast = boost::beast;
