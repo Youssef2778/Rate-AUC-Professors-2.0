@@ -1,4 +1,7 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
+#include <thread>
+#include <exception>
 #include <cppconn/prepared_statement.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>

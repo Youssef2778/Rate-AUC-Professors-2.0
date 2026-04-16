@@ -57,6 +57,19 @@ jobs:
         # Set environment variables for CMake
         echo "Boost_INCLUDE_DIR=C:\local\boost" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+    - name: Build and install libbcrypt from source (Windows)
+      if: runner.os == 'Windows'
+      shell: cmd
+      run: |
+        git clone https://github.com/trusch/libbcrypt
+        cd libbcrypt
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_INSTALL_PREFIX=C:\libbcrypt
+        cmake --build . --config Release
+        cmake --install . --config Release
+        echo "CMAKE_PREFIX_PATH=C:\libbcrypt" >> "%GITHUB_ENV%"
+
     # ============================================================================
     # UBUNTU DEPENDENCIES
     # ============================================================================
