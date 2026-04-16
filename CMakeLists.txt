@@ -55,7 +55,15 @@ add_executable(server server.cpp)
 target_link_libraries(server PRIVATE Boost::json)
 target_link_libraries(server PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(server PRIVATE mysqlcppconn)
+if(WIN32) # Package is named differently in vckpg(Windows)
+    target_link_libraries(server PRIVATE mysql::concpp)  # add this for Windows
+endif()
 target_link_libraries(server PRIVATE bcrypt)
+if(WIN32)
+    # Required for vckpg(windows)
+    target_link_libraries(Rate_AUC PRIVATE Boost::system)
+    target_link_libraries(server PRIVATE Boost::system)
+endif()
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
