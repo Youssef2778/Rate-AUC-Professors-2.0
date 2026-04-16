@@ -72,6 +72,19 @@ jobs:
           libmysqlcppconn-dev \
           libssl-dev
 
+    - name: Build and install libbcrypt from source (Ubuntu)
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        git clone https://github.com/trusch/libbcrypt
+        cd libbcrypt
+        mkdir build
+        cd build
+        cmake ..
+        make
+        sudo make install
+        sudo ldconfig
+
     # ============================================================================
     # INSTALL QT VIA ACTION (Cross-platform)
     # ============================================================================
@@ -81,11 +94,6 @@ jobs:
         version: '6.5.0'
         modules: 'qt5compat'
         cache: true
-        
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libbcrypt-dev
         
     # ============================================================================
     # CONFIGURE CMAKE
