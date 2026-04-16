@@ -50,7 +50,8 @@ jobs:
       run: |
         # vcpkg is pre-installed on GitHub Actions Windows runners at C:\vcpkg
         vcpkg install boost-json:x64-windows
-        vcpkg install mysql-connector-cpp:x64-windows
+        vcpkg install boost-asio:x64-windows
+        vcpkg install mysql-connector-cpp[jdbc]:x64-windows
 
     - name: Build and install libbcrypt from source (Windows)
       if: runner.os == 'Windows'
