@@ -1,0 +1,23 @@
+Checks: >
+  clang-diagnostic-*,
+  clang-analyzer-*,
+  bugprone-*,
+  performance-*,
+  modernize-use-nullptr,
+  modernize-use-override,
+  modernize-make-unique,
+  modernize-make-shared,
+  -llvmlibc-*,
+  -llvm-*,
+  -fuchsia-*,
+  -zircon-*,
+  -abseil-*,
+  -android-*,
+  -linuxkernel-*,
+  -objc-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-forward-declaration-namespace,
+  -performance-avoid-endl
+
+WarningsAsErrors: "bugprone-*"
+HeaderFilterRegex: ".*"

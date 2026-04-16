@@ -1,10 +1,10 @@
-#include "mainwindow.h"
 #include <QApplication>
-#include <QLabel>
 #include <QHBoxLayout>
-#include <QPixmap>
+#include <QLabel>
 #include <QObject>
+#include <QPixmap>
 
+#include "mainwindow.h"
 
 int main(int argc, char *argv[])
 {
@@ -12,8 +12,6 @@ int main(int argc, char *argv[])
     MainWindow w;
 
     w.show();
-
-
 
     return a.exec();
 }
