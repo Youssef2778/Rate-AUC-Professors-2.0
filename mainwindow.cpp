@@ -19,13 +19,8 @@ namespace http = beast::http;
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->stackedWidget->setCurrentIndex(0);
 
-    // Hiding error messages
-    ui->email_notFound_error->hide();
-    ui->password_incorrect_error->hide();
-
-    CenterWidget(0, ui->widget_1);
+    LoginPage();
 
     // Attempt to establish a persistent connection in the background once the app launches
     std::thread(&MainWindow::EstablishConnection, this).detach();
@@ -34,6 +29,192 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void ::MainWindow::LoginPage()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+
+    // Hiding error messages
+    ui->email_notFound_error->hide();
+    ui->password_incorrect_error->hide();
+
+    CenterWidget(0, ui->widget_1);
+}
+
+MainWindow::RegisterPage()
+{
+    ui->stackedWidget->setCurrentIndex(1);
+
+    // Hiding the error messages.
+    ui->empty_email_error->hide();
+    ui->empty_username_error->hide();
+    ui->auc_email_error->hide();
+    ui->empty_pass_error->hide();
+    ui->empty_confPass_error->hide();
+    ui->unequal_pass_error->hide();
+
+    CenterWidget(1, ui->widget_2);
+}
+
+void MainWindow::HomePage()
+{
+    ui->stackedWidget->setCurrentIndex(3);
+    CenterWidget(3, ui->widget_3);
+
+    // Request the departments from the server
+    try {
+        // Send GET /get-departments
+        http::request<http::string_body> request(http::verb::get, "/get-departments", 11);
+        request.set(http::field::host, "127.0.0.1");
+        request.prepare_payload();
+        http::write(socket, request);
+
+        // Read the response
+        beast::flat_buffer buffer;
+        http::response<http::string_body> response;
+        http::read(socket, buffer, response);
+
+        // Parse the JSON array
+        auto parsed = boost::json::parse(response.body());
+        boost::json::array& departments = parsed.as_array();
+
+        for (auto& entry : departments) {
+            boost::json::object& dept = entry.as_object();
+            std::string name = (std::string)dept["department_name"].as_string();
+            int ID = (int)dept["id"].as_int64();
+            Deps[name] = ID;  // Store the mapping of department name to ID
+            // populate the QComboBox
+            ui->DepartmentCB->addItem(QString::fromStdString(name));
+        }
+    } catch (std::exception& e) {
+        std::cout << "Failed: " << e.what() << std::endl;
+    }
+}
+
+MainWindow::LeaderboardPage(int CourseID)
+{
+    // Load the leaderboard page
+    ui->stackedWidget->setCurrentIndex(2);
+    CenterWidget(2, ui->tableWidget);
+    // // 1. Initialize the table structure
+    ui->tableWidget->setColumnCount(5);
+    ui->tableWidget->setRowCount(6);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableWidget->verticalHeader()->setVisible(false);
+    ui->tableWidget->setShowGrid(false);
+
+    // 1. FORCE the table to have 6 columns and set their names
+    ui->tableWidget->setColumnCount(6);
+    ui->tableWidget->setHorizontalHeaderLabels({"Rank", "Name", "Score", "up", "down", "Approval"});
+
+    // 2. Stop Qt from auto-stretching the final column
+    ui->tableWidget->horizontalHeader()->setStretchLastSection(false);
+    ui->tableWidget->horizontalHeader()->setMinimumSectionSize(30);
+
+    // 3. Let Name and Score stretch to fill the middle space
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
+
+    // 4. Set Fixed Widths (Widened the buttons to 70px so they aren't squished!)
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
+    ui->tableWidget->setColumnWidth(0, 60);  // Rank
+
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Fixed);
+    ui->tableWidget->setColumnWidth(3, 70);  // Upvote Button (Widened!)
+
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(4, QHeaderView::Fixed);
+    ui->tableWidget->setColumnWidth(4, 70);  // Downvote Button (Widened!)
+
+    // ui->tableWidget->horizontalHeader()->setSectionResizeMode(5, QHeaderView::Fixed);
+    // ui->tableWidget->setColumnWidth(5, 120); // Progress Bar
+
+    // the desin of the leaderboard was coassisted by AI in order to get the right color pallets and
+    // design down
+    try {
+        // Send GET /get-professors
+        http::request<http::string_body> request(
+            http::verb::get, "/get-professors?Id=" + std::to_string(CourseID), 11);
+        request.set(http::field::host, "127.0.0.1");
+        request.prepare_payload();
+        http::write(socket, request);
+        std::cout << "Send req" << std::endl;
+
+        // Read the response
+        beast::flat_buffer buffer;
+        http::response<http::string_body> response;
+        http::read(socket, buffer, response);
+        std::cout << "Read Response" << std::endl;
+
+        // Parse the JSON array
+        auto parsed = boost::json::parse(response.body());
+        boost::json::array& professors = parsed.as_array();
+        std::cout << "Parsed" << std::endl;
+
+        int Max;
+        bool first = true;
+
+        ui->tableWidget->setRowCount(professors.size());
+
+        int row = 0;
+        std::cout << "Before loop" << std::endl;
+
+        for (auto& entry : professors) {
+            std::cout << entry << std::endl;
+            boost::json::object& prof = entry.as_object();
+            std::string Name = (std::string)prof["name"].as_string();
+            std::string ID = (std::string)prof["id"].as_string();
+            std::string Score = (std::string)prof["score"].as_string();
+            Profs[Name] = ID;  // Store the mapping of professor name to ID
+
+            // populate the the table
+            // 2. Loop to create the 6 professor "cards"
+
+            // Text Data
+            QTableWidgetItem* rank = new QTableWidgetItem(QString::number(row + 1));
+            QTableWidgetItem* name = new QTableWidgetItem(QString::fromStdString(Name));
+            QTableWidgetItem* score =
+                new QTableWidgetItem(QString::fromStdString(Score));  // ✅ FIX
+
+            // Inject it into Column 5 of the current row
+
+            // 2. Now that they have names, we can center them
+            rank->setTextAlignment(Qt::AlignCenter);
+            name->setTextAlignment(Qt::AlignCenter);
+            score->setTextAlignment(Qt::AlignCenter);
+
+            // 3. Finally, put the finished items into the table
+            ui->tableWidget->setItem(row, 0, rank);
+            ui->tableWidget->setItem(row, 1, name);
+            ui->tableWidget->setItem(row, 2, score);
+
+            // Change the buttons to text or standard symbols
+            QPushButton* up = new QPushButton;
+            up->setIcon(QIcon("://images/up.png"));  // <--- Paste your path here
+            up->setIconSize(QSize(24, 24));
+            QPushButton* down = new QPushButton;
+            down->setIcon(QIcon("://images/down.png"));  // <--- Paste your path here
+            down->setIconSize(QSize(24, 24));
+
+            // Button Styling
+            QString btnStyle =
+                "QPushButton { background-color: #0b2239; color: white; border-radius: 5px; "
+                "border: 1px solid #1d8e9e; font-family: 'Segoe UI Emoji'; }";
+            up->setStyleSheet(btnStyle);
+            down->setStyleSheet(btnStyle);
+
+            // Put buttons in the correct columns
+            ui->tableWidget->setCellWidget(row, 3, up);
+            ui->tableWidget->setCellWidget(row, 4, down);
+
+            // Match the row height to the design
+            ui->tableWidget->setRowHeight(row, 60);
+
+            row++;  // ✅ FIX: move to next row
+        }
+    } catch (std::exception& e) {
+        std::cout << "Failed: " << e.what() << std::endl;
+    }
 }
 
 void MainWindow::EstablishConnection()
@@ -95,31 +276,7 @@ void MainWindow::on_checkBox_4_stateChanged(int arg1)
 // Function executed when the user moves to the register page.
 void MainWindow::on_register_label_4_linkActivated(const QString& link)
 {
-    ui->stackedWidget->setCurrentIndex(1);
-
-    // Hiding the error messages.
-    ui->empty_email_error->hide();
-    ui->empty_username_error->hide();
-    ui->auc_email_error->hide();
-    ui->empty_pass_error->hide();
-    ui->empty_confPass_error->hide();
-    ui->unequal_pass_error->hide();
-
-    // Assume you have a widget inside the stacked page
-    QWidget* page = ui->stackedWidget->widget(1);  // second page
-    QVBoxLayout* vLayout = new QVBoxLayout(page);
-
-    // Create a horizontal layout for centering
-    QHBoxLayout* hLayout = new QHBoxLayout();
-    hLayout->addStretch();             // left spacer
-    hLayout->addWidget(ui->widget_2);  // your target widget
-    hLayout->addStretch();             // right spacer
-
-    vLayout->addStretch();  // top spacer
-    vLayout->addLayout(hLayout);
-    vLayout->addStretch();  // bottom spacer
-
-    page->setLayout(vLayout);
+    RegisterPage();
 }
 
 // "Hide Password" Mechanism of the Register Page
@@ -136,7 +293,7 @@ void MainWindow::on_checkBox_6_stateChanged(int arg1)
 
 void MainWindow::on_register_label_6_linkActivated(const QString& link)
 {
-    ui->stackedWidget->setCurrentIndex(0);
+    LoginPage();
 }
 
 // Function called when the "Register" Button in the Register page is clicked.
@@ -215,37 +372,8 @@ void MainWindow::on_pushButton_6_clicked()
         // Let's send it!
         boost::beast::http::write(socket, request);
 
-        // Send user to *student* homepage
-        ui->stackedWidget->setCurrentIndex(3);
-
-        // Request the departments from the server
-        try {
-            // Send GET /get-departments
-            http::request<http::string_body> request(http::verb::get, "/get-departments", 11);
-            request.set(http::field::host, "127.0.0.1");
-            request.prepare_payload();
-            http::write(socket, request);
-
-            // Read the response
-            beast::flat_buffer buffer;
-            http::response<http::string_body> response;
-            http::read(socket, buffer, response);
-
-            // Parse the JSON array
-            auto parsed = boost::json::parse(response.body());
-            boost::json::array& departments = parsed.as_array();
-
-            for (auto& entry : departments) {
-                boost::json::object& dept = entry.as_object();
-                std::string name = (std::string)dept["department_name"].as_string();
-                int ID = (int)dept["id"].as_int64();
-                Deps[name] = ID;  // Store the mapping of department name to ID
-                // populate the QComboBox
-                ui->DepartmentCB->addItem(QString::fromStdString(name));
-            }
-        } catch (std::exception& e) {
-            std::cout << "Failed: " << e.what() << std::endl;
-        }
+        // Send user to homepage
+        HomePage();
     } catch (std::exception& e) {
         std::cout << "Connection failed: " << e.what() << std::endl;
     }
@@ -277,37 +405,7 @@ void MainWindow::on_pushButton_4_clicked()
     boost::json::object json_response = parsed_response.as_object();
     bool logged_in = (bool)json_response["status"].as_bool();
     if (logged_in) {
-        ui->stackedWidget->setCurrentIndex(3);
-        CenterWidget(3, ui->widget_3);
-
-        // Request the departments from the server
-        try {
-            // Send GET /get-departments
-            http::request<http::string_body> request(http::verb::get, "/get-departments", 11);
-            request.set(http::field::host, "127.0.0.1");
-            request.prepare_payload();
-            http::write(socket, request);
-
-            // Read the response
-            beast::flat_buffer buffer;
-            http::response<http::string_body> response;
-            http::read(socket, buffer, response);
-
-            // Parse the JSON array
-            auto parsed = boost::json::parse(response.body());
-            boost::json::array& departments = parsed.as_array();
-
-            for (auto& entry : departments) {
-                boost::json::object& dept = entry.as_object();
-                std::string name = (std::string)dept["department_name"].as_string();
-                int ID = (int)dept["id"].as_int64();
-                Deps[name] = ID;  // Store the mapping of department name to ID
-                // populate the QComboBox
-                ui->DepartmentCB->addItem(QString::fromStdString(name));
-            }
-        } catch (std::exception& e) {
-            std::cout << "Failed: " << e.what() << std::endl;
-        }
+        HomePage();
 
     } else {
         std::string error = (std::string)json_response["error"].as_string();
@@ -362,123 +460,5 @@ void MainWindow::on_pushButton_clicked()
     //Pass the selected course_id
     std::string CourseName = ui->CourseCB->currentText().toStdString();
     int CourseID = Courses[CourseName]; // Get the course ID using the mapping stored
-    //Load the leaderboard page
-    ui->stackedWidget->setCurrentIndex(2);
-    CenterWidget(2, ui->tableWidget);
-    // // 1. Initialize the table structure
-    ui->tableWidget->setColumnCount(5);
-    ui->tableWidget->setRowCount(6);
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->tableWidget->verticalHeader()->setVisible(false);
-    ui->tableWidget->setShowGrid(false);
-
-    // 1. FORCE the table to have 6 columns and set their names
-    ui->tableWidget->setColumnCount(6);
-    ui->tableWidget->setHorizontalHeaderLabels({"Rank", "Name", "Score", "up", "down", "Approval"});
-
-    // 2. Stop Qt from auto-stretching the final column
-    ui->tableWidget->horizontalHeader()->setStretchLastSection(false);
-    ui->tableWidget->horizontalHeader()->setMinimumSectionSize(30);
-
-    // 3. Let Name and Score stretch to fill the middle space
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
-
-    // 4. Set Fixed Widths (Widened the buttons to 70px so they aren't squished!)
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
-    ui->tableWidget->setColumnWidth(0, 60);  // Rank
-
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Fixed);
-    ui->tableWidget->setColumnWidth(3, 70);  // Upvote Button (Widened!)
-
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(4, QHeaderView::Fixed);
-    ui->tableWidget->setColumnWidth(4, 70);  // Downvote Button (Widened!)
-
-    // ui->tableWidget->horizontalHeader()->setSectionResizeMode(5, QHeaderView::Fixed);
-    // ui->tableWidget->setColumnWidth(5, 120); // Progress Bar
-
-    // the desin of the leaderboard was coassisted by AI in order to get the right color pallets and design down
-    try {
-        // Send GET /get-professors
-        http::request<http::string_body> request(http::verb::get, "/get-professors?Id=" + std::to_string(CourseID), 11);
-        request.set(http::field::host, "127.0.0.1");
-        request.prepare_payload();
-        http::write(socket, request);
-        std::cout << "Send req" << std::endl;
-
-        // Read the response
-        beast::flat_buffer buffer;
-        http::response<http::string_body> response;
-        http::read(socket, buffer, response);
-        std::cout << "Read Response" << std::endl;
-
-        // Parse the JSON array
-        auto parsed = boost::json::parse(response.body());
-        boost::json::array& professors = parsed.as_array();
-        std::cout << "Parsed" << std::endl;
-
-        int Max;
-        bool first = true;
-
-        ui->tableWidget->setRowCount(professors.size()); 
-
-        int row = 0; 
-        std::cout << "Before loop" << std::endl;
-
-        for (auto& entry : professors) {
-
-            std::cout << entry << std::endl;
-            boost::json::object& prof = entry.as_object();
-            std::string Name = (std::string)prof["name"].as_string();
-            std::string ID = (std::string)prof["id"].as_string();
-            std::string Score = (std::string)prof["score"].as_string();
-            Profs[Name] = ID; // Store the mapping of professor name to ID
-
-            // populate the the table
-            // 2. Loop to create the 6 professor "cards"
-
-            // Text Data
-            QTableWidgetItem *rank = new QTableWidgetItem(QString::number(row + 1));
-            QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(Name));
-            QTableWidgetItem *score = new QTableWidgetItem(QString::fromStdString(Score)); // ✅ FIX
-
-
-            // Inject it into Column 5 of the current row
-
-            // 2. Now that they have names, we can center them
-            rank->setTextAlignment(Qt::AlignCenter);
-            name->setTextAlignment(Qt::AlignCenter);
-            score->setTextAlignment(Qt::AlignCenter);
-
-            // 3. Finally, put the finished items into the table
-            ui->tableWidget->setItem(row, 0, rank);
-            ui->tableWidget->setItem(row, 1, name);
-            ui->tableWidget->setItem(row, 2, score);
-
-            // Change the buttons to text or standard symbols
-            QPushButton *up = new QPushButton;
-            up->setIcon(QIcon("://images/up.png")); // <--- Paste your path here
-            up->setIconSize(QSize(24, 24));
-            QPushButton *down = new QPushButton;
-            down->setIcon(QIcon("://images/down.png")); // <--- Paste your path here
-            down->setIconSize(QSize(24, 24));
-
-            // Button Styling
-            QString btnStyle = "QPushButton { background-color: #0b2239; color: white; border-radius: 5px; border: 1px solid #1d8e9e; font-family: 'Segoe UI Emoji'; }";
-            up->setStyleSheet(btnStyle);
-            down->setStyleSheet(btnStyle);
-
-            // Put buttons in the correct columns
-            ui->tableWidget->setCellWidget(row, 3, up);
-            ui->tableWidget->setCellWidget(row, 4, down);
-
-            // Match the row height to the design
-            ui->tableWidget->setRowHeight(row, 60);
-
-            row++; // ✅ FIX: move to next row
-        }
-    }
-    catch (std::exception& e) {
-        std::cout << "Failed: " << e.what() << std::endl;
-    }
+    LeaderboardPage(CourseID);
 }
