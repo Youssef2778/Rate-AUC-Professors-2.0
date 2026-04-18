@@ -457,10 +457,10 @@ void MainWindow::on_pushButton_clicked()
 
             // Change the buttons to text or standard symbols
             QPushButton *up = new QPushButton;
-            up->setIcon(QIcon("/home/adham/labproject/Rate-AUC-Professors-2.0/images/up.png")); // <--- Paste your path here
+            up->setIcon(QIcon("://images/up.png")); // <--- Paste your path here
             up->setIconSize(QSize(24, 24));
             QPushButton *down = new QPushButton;
-            down->setIcon(QIcon("/home/adham/labproject/Rate-AUC-Professors-2.0/images/down.png")); // <--- Paste your path here
+            down->setIcon(QIcon("://images/down.png")); // <--- Paste your path here
             down->setIconSize(QSize(24, 24));
 
             // Button Styling

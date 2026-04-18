@@ -1,5 +1,9 @@
-#include <bits/stdc++.h>
-#include <cppconn/prepared_statement.h>
+#include <iostream>
+#include <string>
+#include <thread>
+#include <exception>
+// #include <cppconn/prepared_statement.h>
+#include <mysql/jdbc.h> // equivalent to commented include, but doesn't cause conflict on Windows 
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
 #include <mysql_connection.h>

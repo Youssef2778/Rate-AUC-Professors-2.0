@@ -5,5 +5,7 @@
         <file>images/Background.jpg</file>
         <file>images/Glass_AUC.png</file>
         <file>icons/MG.svg</file>
+        <file>images/up.png</file>
+        <file>images/down.png</file>
     </qresource>
 </RCC>
