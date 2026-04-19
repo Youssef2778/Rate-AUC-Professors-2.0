@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-
+#include "./include/User.h"
 #include <QProgressBar>
 #include <boost/asio.hpp>
 #include <boost/beast/core.hpp>
@@ -19,6 +19,8 @@ namespace http = beast::http;
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    // Initialize the user pointer to nullptr at the start of the application
+    user = nullptr;
 
     LoginPage();
 
@@ -31,7 +33,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void ::MainWindow::LoginPage()
+void MainWindow::LoginPage()
 {
     ui->stackedWidget->setCurrentIndex(0);
 
@@ -42,7 +44,7 @@ void ::MainWindow::LoginPage()
     CenterWidget(0, ui->widget_1);
 }
 
-MainWindow::RegisterPage()
+void MainWindow::RegisterPage()
 {
     ui->stackedWidget->setCurrentIndex(1);
 
@@ -92,7 +94,7 @@ void MainWindow::HomePage()
     }
 }
 
-MainWindow::LeaderboardPage(int CourseID)
+void MainWindow::LeaderboardPage(int CourseID)
 {
     // Load the leaderboard page
     ui->stackedWidget->setCurrentIndex(2);
@@ -215,6 +217,15 @@ MainWindow::LeaderboardPage(int CourseID)
     } catch (std::exception& e) {
         std::cout << "Failed: " << e.what() << std::endl;
     }
+}
+
+void MainWindow::Logout()
+{
+    // Clear the user session
+    delete user;
+    user = nullptr;
+    // Return to the login page
+    LoginPage();
 }
 
 void MainWindow::EstablishConnection()
@@ -372,6 +383,17 @@ void MainWindow::on_pushButton_6_clicked()
         // Let's send it!
         boost::beast::http::write(socket, request);
 
+        // Retrieve the generated user ID
+        boost::beast::flat_buffer buf;
+        boost::beast::http::response<boost::beast::http::string_body> server_response;
+        boost::beast::http::read(socket, buf, server_response);
+        auto parsed_response = boost::json::parse(server_response.body());
+        boost::json::object response = parsed_response.as_object();
+        
+        // Create user for this session
+        user = new User((std::string)registration["username"].as_string(), (std::string)registration["email"].as_string(),
+                              (int)response["id"].as_int64());
+
         // Send user to homepage
         HomePage();
     } catch (std::exception& e) {
@@ -404,9 +426,13 @@ void MainWindow::on_pushButton_4_clicked()
     auto parsed_response = boost::json::parse(server_response.body());
     boost::json::object json_response = parsed_response.as_object();
     bool logged_in = (bool)json_response["status"].as_bool();
-    if (logged_in) {
-        HomePage();
 
+
+    if (logged_in) {
+        // Create a user for this session
+        user = new User((std::string)json_response["username"].as_string(), (std::string)login["email"].as_string(),
+                              (int)json_response["id"].as_int64());
+        HomePage();
     } else {
         std::string error = (std::string)json_response["error"].as_string();
         if (error == "email not found")

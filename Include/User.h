@@ -7,21 +7,15 @@ class User
 {
    private:
     string Username;
-    string Password;
     string Email;
     const int ID;
 
-    bool verification()
-    {
-        // Verify Email
-    }
-
    public:
-    User(string username, string password, string email, int id) : ID(id)
+    User(string username, string email, int id) : ID(id)
     {
         Username = username;
-        Password = password;
         Email = email;
+        cout << "Created user with username: " << Username << ", email: " << Email << ", and ID: " << ID << endl;
     }
 
     string GetUsername()
@@ -29,10 +23,6 @@ class User
         return Username;
     }
 
-    string GetPassword()
-    {
-        return Password;
-    }
 
     string GetEmail()
     {

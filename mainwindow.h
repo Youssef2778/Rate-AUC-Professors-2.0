@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "./include/User.h"
 #include <QMainWindow>
 #include <QPixmap>
 #include <QResizeEvent>
@@ -19,12 +20,19 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+
    public:
+    MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
+    Ui::MainWindow *ui;
+
+   private:
     // Map department_name to id
     std::unordered_map<std::string, int> Deps;
     std::unordered_map<std::string, int> Courses;
     std::unordered_map<std::string, std::string> Profs;
 
+    User *user;
 
     // For persistent connection to be established once at startup
     boost::asio::io_context io;
@@ -32,10 +40,11 @@ class MainWindow : public QMainWindow
 
     void EstablishConnection();
     void CenterWidget(int pageIndex, QWidget *TargetWidget);
+    void LoginPage();
+    void RegisterPage();
+    void HomePage();
+    void LeaderboardPage(int);
 
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
-    Ui::MainWindow *ui;
 
    private slots:
     void on_checkBox_4_stateChanged(int arg1);

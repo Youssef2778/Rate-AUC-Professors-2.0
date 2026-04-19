@@ -2,8 +2,7 @@
 #include <string>
 #include <thread>
 #include <exception>
-// #include <cppconn/prepared_statement.h>
-#include <mysql/jdbc.h> // equivalent to commented include, but doesn't cause conflict on Windows 
+#include <cppconn/prepared_statement.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
 #include <mysql_connection.h>
@@ -36,15 +35,21 @@ class MySQLConnectionPool
 
    public:
     // Establishing the connections at startup and storing them in the pool
-    MySQLConnectionPool(int size)
-    {
-        sql::mysql::MySQL_Driver* driver = sql::mysql::get_mysql_driver_instance();
+    MySQLConnectionPool(int size) {
+        std::vector<std::thread> threads;
+        std::mutex poolMtx;
         for (int i = 0; i < size; i++) {
-            sql::Connection* con = driver->connect("tcp://centerbeam.proxy.rlwy.net:11239", "root",
-                                                   "lTfeKOSlLMYPoYSyCQXLVBXKugsnOAHk");
-            con->setSchema("railway");
-            pool.push(con);
+            threads.emplace_back([this, &poolMtx]() {
+                sql::mysql::MySQL_Driver* driver = sql::mysql::get_mysql_driver_instance();
+                sql::Connection* con = driver->connect("tcp://centerbeam.proxy.rlwy.net:11239",
+                                                       "root", "lTfeKOSlLMYPoYSyCQXLVBXKugsnOAHk");
+                con->setSchema("railway");
+                std::unique_lock<std::mutex> lock(poolMtx);
+                pool.push(con);
+            });
         }
+        for (auto& t : threads)
+            t.join();
     }
 
     sql::Connection* get()
@@ -86,12 +91,39 @@ void handle_request(const http::request<http::string_body>& req,
             pstmt->setString(4, "S");
 
             pstmt->executeUpdate();
+
+            // Retrieve the generated user ID
+            sql::Statement* stmt = con->createStatement();
+            sql::ResultSet* Res = stmt->executeQuery("SELECT LAST_INSERT_ID()");
+
+            int id = -1;
+            if (Res->next()) {
+                id = Res->getInt(1);
+            }
+
+            // Prepare the JSON response with the generated user ID
+            json::object Response;
+            Response["id"] = id;
+
+            delete Res;
             delete pstmt;
             dbPool->release(con);  // Release the connection back to the pool
+
+            // Send the id back to the client
+            http::response<http::string_body> res{http::status::ok, req.version()};
+            res.set(http::field::content_type, "application/json");
+            res.body() = boost::json::serialize(Response);
+            res.prepare_payload();
+            http::write(socket, res);
         } catch (sql::SQLException& e) {
             std::cerr << "Error: " << e.what() << "(Error code: " << e.getErrorCode() << ")"
                       << std::endl;
         }
+
+
+
+
+
     } else if (req.target() == "/get-departments") {
         boost::json::array departments;
         try {
@@ -208,20 +240,22 @@ void handle_request(const http::request<http::string_body>& req,
         try {
             sql::Connection* con = dbPool->get();
             sql::PreparedStatement* pstmt(
-                con->prepareStatement("SELECT encrypted_password FROM users WHERE email = ?"));
+                con->prepareStatement("SELECT id, username, encrypted_password FROM users WHERE email = ?"));
             pstmt->setString(1, (std::string)login["email"].as_string());
             sql::ResultSet* res = pstmt->executeQuery();
             if (!res->next()) {
                 response["status"] = false;
                 response["error"] = "email not found";
             } else {
+                response["id"] = res->getInt("id");
+                response["username"] = (std::string)res->getString("username");
                 if (!BCrypt::validatePassword((std::string)login["password"].as_string(),
                                               res->getString("encrypted_password"))) {
                     response["status"] = false;
                     response["error"] = "incorrect password";
                 }
             }
-            
+
             // Send the response back
             http::response<http::string_body> http_response(http::status::ok, req.version());
             http_response.set(http::field::content_type, "application/json");
@@ -289,6 +323,15 @@ void handle_request(const http::request<http::string_body>& req,
 int main()
 {
     std::cout << "Server starting..." << std::endl;
+
+    // The MySQL connector library has a one-time internal setup that happens the  first time get_mysql_driver_instance() is called and a call using threading caused conflict and crash
+    // Alowing MySQL connector library to initialize propery
+    try {
+        sql::mysql::MySQL_Driver* driver = sql::mysql::get_mysql_driver_instance();
+        (void)driver; // function cast as void just for initializing, not using
+    } catch (...) {
+        // Ignore
+    }
 
     try {
         std::cout << "Connecting to DB pool..." << std::endl;
