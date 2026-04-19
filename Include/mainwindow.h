@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "./include/User.h"
+#include "User.h"
 #include <QMainWindow>
 #include <QPixmap>
 #include <QResizeEvent>
@@ -44,6 +44,7 @@ class MainWindow : public QMainWindow
     void RegisterPage();
     void HomePage();
     void LeaderboardPage(int);
+    void Logout();
 
 
    private slots:

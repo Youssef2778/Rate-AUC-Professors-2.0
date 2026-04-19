@@ -17,10 +17,10 @@ find_package(Boost REQUIRED COMPONENTS json)
 # set(CMAKE_CXX_CLANG_TIDY clang-tidy)
 
 set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
+        ./src/main.cpp
+        ./src/mainwindow.cpp
+        ./Include/mainwindow.h
+        ./src/mainwindow.ui
 
 )
 
@@ -56,6 +56,7 @@ target_link_libraries(server PRIVATE Boost::json)
 target_link_libraries(server PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(server PRIVATE mysqlcppconn)
 target_link_libraries(server PRIVATE bcrypt)
+target_include_directories(Rate_AUC PRIVATE Include)
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

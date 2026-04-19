@@ -94,3 +94,5 @@ flaws.txt
 .vs/Rate-AUC-Professors-2.0.slnx/v18/.wsuo
 .vs/Rate-AUC-Professors-2.0.slnx/v18/Browse.VC.db
 .vs/slnx.sqlite
+.clang-format
+.clang-tidy
