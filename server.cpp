@@ -120,10 +120,6 @@ void handle_request(const http::request<http::string_body>& req,
                       << std::endl;
         }
 
-
-
-
-
     } else if (req.target() == "/get-departments") {
         boost::json::array departments;
         try {

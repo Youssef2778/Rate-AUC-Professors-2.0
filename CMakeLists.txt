@@ -21,7 +21,6 @@ set(PROJECT_SOURCES
         ./src/mainwindow.cpp
         ./Include/mainwindow.h
         ./src/mainwindow.ui
-
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -57,6 +56,7 @@ target_link_libraries(server PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(server PRIVATE mysqlcppconn)
 target_link_libraries(server PRIVATE bcrypt)
 target_include_directories(Rate_AUC PRIVATE Include)
+
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
