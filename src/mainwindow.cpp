@@ -41,7 +41,6 @@ MainWindow::~MainWindow()
 void MainWindow::professorPage() {
     ui->stackedWidget->setCurrentIndex(4);
     ui->scrollArea->setWidgetResizable(true);
-    CenterWidget(4, ui->scrollArea);
 }
 
 void MainWindow::LoginPage()
