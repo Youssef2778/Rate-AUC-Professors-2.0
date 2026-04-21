@@ -103,7 +103,7 @@ QLabel#email_notFound_error, #password_incorrect_error{color: red}</string>
                  <string/>
                 </property>
                 <property name="pixmap">
-                 <pixmap resource="resources.qrc">:/images/auc_logo.png</pixmap>
+                 <pixmap resource="../resources.qrc">:/images/auc_logo.png</pixmap>
                 </property>
                 <property name="scaledContents">
                  <bool>false</bool>
@@ -291,7 +291,7 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
               <string/>
              </property>
              <property name="pixmap">
-              <pixmap resource="resources.qrc">:/images/auc_logo.png</pixmap>
+              <pixmap resource="../resources.qrc">:/images/auc_logo.png</pixmap>
              </property>
              <property name="scaledContents">
               <bool>false</bool>
@@ -784,7 +784,7 @@ QComboBox QAbstractItemView::item:selected {
                 <string/>
                </property>
                <property name="pixmap">
-                <pixmap resource="resources.qrc">:/images/Glass_AUC.png</pixmap>
+                <pixmap resource="../resources.qrc">:/images/Glass_AUC.png</pixmap>
                </property>
                <property name="scaledContents">
                 <bool>true</bool>
@@ -907,7 +907,7 @@ QComboBox QAbstractItemView::item:selected {
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="resources.qrc">
+                <iconset resource="../resources.qrc">
                  <normaloff>:/icons/MG.svg</normaloff>:/icons/MG.svg</iconset>
                </property>
                <property name="iconSize">
@@ -955,8 +955,7 @@ QComboBox QAbstractItemView::item:selected {
   </widget>
  </widget>
  <resources>
-  <include location="resources.qrc"/>
-  <include location="resources.qrc"/>
+  <include location="../resources.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -124,7 +124,8 @@ void handle_request(const http::request<http::string_body>& req,
 
 
 
-    } else if (req.target() == "/get-departments") {
+    }
+    else if (req.target() == "/get-departments") {
         boost::json::array departments;
         try {
             sql::Connection* con = dbPool->get();
@@ -151,51 +152,50 @@ void handle_request(const http::request<http::string_body>& req,
             res.prepare_payload();
             http::write(socket, res);
         }
-        else if (req.target().starts_with("/get-leaderboard")) {
-                boost::json::array leaderboard;
+    else if (req.target().starts_with("/get-leaderboard")) {
+            boost::json::array leaderboard;
 
-                std::string target = std::string(req.target());
-                std::string CourseID;
-                // Extract the course ID from the query parameter
-                size_t pos = target.find("?CourseId=");
-                if (pos != std::string::npos)
-                    CourseID = target.substr(pos + 10);
+            std::string target = std::string(req.target());
+            std::string CourseID;
+            // Extract the course ID from the query parameter
+            size_t pos = target.find("?CourseId=");
+            if (pos != std::string::npos)
+                CourseID = target.substr(pos + 10);
 
-                try {
-                    sql::Connection* con = dbPool->get();
+            try {
+                sql::Connection* con = dbPool->get();
 
-                    // Updated to match your exact table and column names!
-                    sql::PreparedStatement* pstmt(
-                        con->prepareStatement("SELECT professor_id, score FROM professor_course WHERE course_id = ? ORDER BY score DESC"));
+                // Updated to match your exact table and column names!
+                sql::PreparedStatement* pstmt(
+                    con->prepareStatement("SELECT professor_id, score FROM professor_course WHERE course_id = ? ORDER BY score DESC"));
 
-                    pstmt->setString(1, CourseID);
-                    sql::ResultSet* res = pstmt->executeQuery();
+                pstmt->setString(1, CourseID);
+                sql::ResultSet* res = pstmt->executeQuery();
 
-                    while (res->next()) {
-                        boost::json::object row;
+                while (res->next()) {
+                    boost::json::object row;
 
-                        // We convert the professor_id integer into a string so the frontend can display it in the "Name" column for now.
-                        row["prof_name"] = std::to_string(res->getInt("professor_id"));
-                        row["score"] = res->getInt("score");
+                    // We convert the professor_id integer into a string so the frontend can display it in the "Name" column for now.
+                    row["prof_name"] = std::to_string(res->getInt("professor_id"));
+                    row["score"] = res->getInt("score");
 
-                        leaderboard.push_back(row);
-                    }
-                    delete res;
-                    delete pstmt;
-                    dbPool->release(con);
+                    leaderboard.push_back(row);
                 }
-                catch (sql::SQLException& e) {
-                    std::cerr << "Error: " << e.what() << " (Error code: " << e.getErrorCode() << ")" << std::endl;
-                }
-
-                // Send the response back to the client
-                http::response<http::string_body> res{ http::status::ok, req.version() };
-                res.set(http::field::content_type, "application/json");
-                res.body() = boost::json::serialize(leaderboard);
-                res.prepare_payload();
-                http::write(socket, res);
+                delete res;
+                delete pstmt;
+                dbPool->release(con);
+            }
+            catch (sql::SQLException& e) {
+                std::cerr << "Error: " << e.what() << " (Error code: " << e.getErrorCode() << ")" << std::endl;
             }
 
+            // Send the response back to the client
+            http::response<http::string_body> res{ http::status::ok, req.version() };
+            res.set(http::field::content_type, "application/json");
+            res.body() = boost::json::serialize(leaderboard);
+            res.prepare_payload();
+            http::write(socket, res);
+        }
     else if (req.target().starts_with("/get-courses")) {
         boost::json::array courses;
 
@@ -232,7 +232,8 @@ void handle_request(const http::request<http::string_body>& req,
         res.body() = boost::json::serialize(courses);
         res.prepare_payload();
         http::write(socket, res);
-    } else if (req.target() == "/login") {
+    }
+    else if (req.target() == "/login") {
         auto parsed = json::parse(req.body());
         json::object login = parsed.as_object();
         json::object response;
@@ -316,8 +317,55 @@ void handle_request(const http::request<http::string_body>& req,
         res.body() = boost::json::serialize(professors);
         res.prepare_payload();
         http::write(socket, res);
+        }
     }
+    else if (req.target().starts_with("/get-comments")) {
+        boost::json::array Comments;
+        std::string target = std::string(req.target());
+        std::string Course_ID;
+        std::string Prof_ID;
+        // Extract the course ID and professor ID from the query parameters
+        size_t pos = target.find("?CourseId=");
+        if (pos != std::string::npos)
+            Course_ID = target.substr(pos + 10);  // 10 = length of "?CourseId="
+        pos = Course_ID.find("&ProfId=");
+        if (pos != std::string::npos) {
+            Prof_ID = Course_ID.substr(pos + 8);  // 8 = length of "&ProfId="
+            Course_ID = Course_ID.substr(0, pos);
+        }
+        try {
+            sql::Connection* con = dbPool->get();
+            sql::PreparedStatement* pstmt(
+                con->prepareStatement("SELECT usr.name, cmnt.user_id, cmnt.id, cmnt.content, cmnt.timestamp FROM comments cmnt JOIN users usr ON cmnt.user_id = usr.id WHERE cmnt.course_id = ? AND cmnt.professor_id = ? "
+                    "ORDER BY cmnt.timestamp DESC"));
+            pstmt->setString(1, Course_ID);
+            pstmt->setString(2, Prof_ID);
+            sql::ResultSet* res = pstmt->executeQuery();
+            while (res->next()) {
+                boost::json::object row;
+                row["username"] = (std::string)res->getString("name");
+                row["user_id"] = (std::string)res->getString("user_id");
+                row["id"] = (std::string)res->getString("id");
+                row["content"] = (std::string)res->getString("content");
+                row["timestamp"] = (std::string)res->getString("timestamp");
+                Comments.push_back(row);
+            }
+            delete res;
+            delete pstmt;
+            dbPool->release(con);
+        }
+        catch (sql::SQLException& e) {
+            std::cerr << "Error: " << e.what() << " (Error code: " << e.getErrorCode() << ")"
+                << std::endl;
+        }
 
+        // Send the response back
+        http::response<http::string_body> res{ http::status::ok, req.version() };
+        res.set(http::field::content_type, "application/json");
+        res.body() = boost::json::serialize(Comments);
+        res.prepare_payload();
+        http::write(socket, res);
+    }
 }
 
 int main()

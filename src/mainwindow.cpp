@@ -219,6 +219,42 @@ void MainWindow::LeaderboardPage(int CourseID)
     }
 }
 
+void MainWindow::Professor_Page(int CourseID, int ProfID)
+{
+    ui->stackedWidget->setCurrentIndex(4);
+    CenterWidget(4, ui->widget_4);
+    try {
+        
+		// Send GET /get-comments?CourseId=CourseID&ProfId=ProfID
+        http::request<http::string_body> request(http::verb::get,
+            "/get-comments?CourseId=" + std::to_string(CourseID) + "&ProfId=" + std::to_string(ProfID), 11);
+        request.set(http::field::host, "127.0.0.1");
+        request.prepare_payload();
+        http::write(socket, request);
+
+        // Read the response
+        beast::flat_buffer buffer;
+        http::response<http::string_body> response;
+        http::read(socket, buffer, response);
+
+        // Parse the JSON array
+        auto parsed = boost::json::parse(response.body());
+        boost::json::array& comments = parsed.as_array();
+
+		// clear comments vector before populating it with the new comments
+		Comments.clear();
+        for (auto& entry : comments) {
+            boost::json::object& comment = entry.as_object();
+            Comments.push_back(Comment{(int)comment["id"].as_int64(), (int)comment["user_id"].as_int64(), (std::string)comment["username"].as_string(),
+									   (std::string)comment["content"].as_string(), (std::string)comment["timestamp"].as_string() });
+        }
+    }
+    catch (std::exception& e) {
+        std::cout << "Failed: " << e.what() << std::endl;
+    }
+    DisplayComments();
+}
+
 void MainWindow::Logout()
 {
     // Clear the user session
@@ -487,4 +523,73 @@ void MainWindow::on_pushButton_clicked()
     std::string CourseName = ui->CourseCB->currentText().toStdString();
     int CourseID = Courses[CourseName]; // Get the course ID using the mapping stored
     LeaderboardPage(CourseID);
+}
+
+QWidget* CreateComment(const Comment& comment)
+{
+    QWidget* card = new QWidget();
+    card->setObjectName("commentCard");
+    card->setStyleSheet(
+        "QWidget#commentCard {"
+        "   background-color: rgba(255, 255, 255, 0.12);"
+        "   border: 1px solid rgba(255, 255, 255, 0.25);"
+        "   border-radius: 16px;"
+        "}"
+    );
+
+    QGraphicsDropShadowEffect* shadow = new QGraphicsDropShadowEffect();
+    shadow->setBlurRadius(20);
+    shadow->setColor(QColor(0, 0, 0, 60));
+    shadow->setOffset(0, 4);
+    card->setGraphicsEffect(shadow);
+
+    QVBoxLayout* mainLayout = new QVBoxLayout(card);
+    mainLayout->setContentsMargins(20, 16, 20, 16);
+    mainLayout->setSpacing(10);
+
+    QLabel* usernameLabel = new QLabel(QString::fromStdString(comment.name));
+    usernameLabel->setStyleSheet(
+        "font-family: 'Segoe UI';"
+        "font-size: 16px;"
+        "font-weight: bold;"
+        "color: rgba(255, 255, 255, 0.95);"
+        "background: transparent;"
+        "border: none;"
+    );
+
+    QLabel* contentLabel = new QLabel(QString::fromStdString(comment.Content));
+    contentLabel->setWordWrap(true);
+    contentLabel->setStyleSheet(
+        "font-family: 'Segoe UI';"
+        "font-size: 15px;"
+        "color: rgba(255, 255, 255, 0.85);"
+        "background: transparent;"
+        "border: none;"
+    );
+
+    QHBoxLayout* bottomLayout = new QHBoxLayout();
+    bottomLayout->addStretch();
+
+    QLabel* datetimeLabel = new QLabel(QString::fromStdString(comment.PrintTime()));
+    datetimeLabel->setStyleSheet(
+        "font-family: 'Segoe UI';"
+        "font-size: 12px;"
+        "color: rgba(255, 255, 255, 0.45);"
+        "background: transparent;"
+        "border: none;"
+    );
+    bottomLayout->addWidget(datetimeLabel);
+
+    mainLayout->addWidget(usernameLabel);
+    mainLayout->addWidget(contentLabel);
+    mainLayout->addLayout(bottomLayout);
+
+    return card;
+}
+
+void MainWindow::DisplayComments() {
+	for (Comment comment : Comments) {
+        QWidget* cmnt = CreateComment(comment);
+        ui->commentsLayout->addWidget(cmnt);
+    }
 }
