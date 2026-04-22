@@ -15,7 +15,7 @@ class User
     {
         Username = username;
         Email = email;
-        cout << "Created user with username: " << Username << ", email: " << Email << ", and ID: " << ID << endl;
+        cout << "Session initiated with username: " << Username << ", email: " << Email << ", and ID: " << ID << endl;
     }
 
     string GetUsername()

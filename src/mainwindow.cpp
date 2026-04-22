@@ -38,7 +38,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::professorPage() {
+void MainWindow::professorPage(std::string Name, int CourseID) {
     ui->stackedWidget->setCurrentIndex(4);
     ui->scrollArea->setWidgetResizable(true);
 }
@@ -173,7 +173,6 @@ void MainWindow::LeaderboardPage(int CourseID)
 
         int row = 0;
         std::cout << "Before loop" << std::endl;
-        QLabel* name;
         for (auto& entry : professors) {
             std::cout << entry << std::endl;
             boost::json::object& prof = entry.as_object();
@@ -188,15 +187,15 @@ void MainWindow::LeaderboardPage(int CourseID)
             // Text Data
             QTableWidgetItem* rank = new QTableWidgetItem(QString::number(row + 1));
 
-            name = new QLabel;
-            name->setTextInteractionFlags(Qt::TextBrowserInteraction);
-            name->setOpenExternalLinks(false);
-            QString name_text = "<a href=#>" + QString::fromStdString(Name) + "</a>";
-            name->setText(name_text);
-
-            QObject::connect(name, &QLabel::linkActivated, this, [this](const QString& link) {
-                std::cout << "Link activated!";
-                professorPage();
+            QPushButton* name = new QPushButton(QString::fromStdString(Name));
+            name->setFlat(true);
+            name->setCursor(Qt::PointingHandCursor);
+            name->setStyleSheet(
+                "QPushButton { color: white; text-decoration: underline; background: transparent; border: none; }"
+                "QPushButton:hover { color: rgba(255, 255, 255, 0.6); }"
+            );
+            QObject::connect(name, &QPushButton::clicked, this, [this, Name, CourseID]() {
+                professorPage(Name, CourseID);
             });
 
             QTableWidgetItem* score =
@@ -327,6 +326,7 @@ void MainWindow::on_checkBox_6_stateChanged(int arg1)
     }
 }
 
+// Function executed when the user moves back to the login page from the register page.
 void MainWindow::on_register_label_6_linkActivated(const QString& link)
 {
     LoginPage();

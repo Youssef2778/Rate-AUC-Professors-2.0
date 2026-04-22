@@ -45,7 +45,7 @@ class MainWindow : public QMainWindow
     void HomePage();
     void LeaderboardPage(int);
     void Logout();
-    void professorPage();
+    void professorPage(std::string, int);
 
 
    private slots:
