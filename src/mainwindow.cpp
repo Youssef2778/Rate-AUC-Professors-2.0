@@ -13,6 +13,11 @@
 #include "ui_mainwindow.h" //removed "./" because ui_mainwindow.h is generated in build\Rate_AUC_autogen\include\ and not the build directory
 #include "bcrypt/BCrypt.hpp"
 
+// Homepage index = 3
+// Login = 0
+// Register = 1
+// leaderboard = 2
+
 namespace beast = boost::beast;
 namespace http = beast::http;
 
@@ -21,7 +26,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
     // Initialize the user pointer to nullptr at the start of the application
     user = nullptr;
-
+    
     LoginPage();
 
     // Attempt to establish a persistent connection in the background once the app launches
@@ -31,6 +36,11 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::professorPage() {
+    ui->stackedWidget->setCurrentIndex(4);
+    ui->scrollArea->setWidgetResizable(true);
 }
 
 void MainWindow::LoginPage()
@@ -59,6 +69,7 @@ void MainWindow::RegisterPage()
     CenterWidget(1, ui->widget_2);
 }
 
+// Loads the homepage when called.
 void MainWindow::HomePage()
 {
     ui->stackedWidget->setCurrentIndex(3);
@@ -98,6 +109,8 @@ void MainWindow::LeaderboardPage(int CourseID)
 {
     // Load the leaderboard page
     ui->stackedWidget->setCurrentIndex(2);
+
+    std::cout << "current index: " << ui->stackedWidget->currentIndex();
     CenterWidget(2, ui->tableWidget);
     // // 1. Initialize the table structure
     ui->tableWidget->setColumnCount(5);
@@ -160,7 +173,7 @@ void MainWindow::LeaderboardPage(int CourseID)
 
         int row = 0;
         std::cout << "Before loop" << std::endl;
-
+        QLabel* name;
         for (auto& entry : professors) {
             std::cout << entry << std::endl;
             boost::json::object& prof = entry.as_object();
@@ -174,20 +187,32 @@ void MainWindow::LeaderboardPage(int CourseID)
 
             // Text Data
             QTableWidgetItem* rank = new QTableWidgetItem(QString::number(row + 1));
-            QTableWidgetItem* name = new QTableWidgetItem(QString::fromStdString(Name));
+
+            name = new QLabel;
+            name->setTextInteractionFlags(Qt::TextBrowserInteraction);
+            name->setOpenExternalLinks(false);
+            QString name_text = "<a href=#>" + QString::fromStdString(Name) + "</a>";
+            name->setText(name_text);
+
+            QObject::connect(name, &QLabel::linkActivated, this, [this](const QString& link) {
+                std::cout << "Link activated!";
+                professorPage();
+            });
+
             QTableWidgetItem* score =
                 new QTableWidgetItem(QString::fromStdString(Score));  // ✅ FIX
 
             // Inject it into Column 5 of the current row
 
+
             // 2. Now that they have names, we can center them
             rank->setTextAlignment(Qt::AlignCenter);
-            name->setTextAlignment(Qt::AlignCenter);
+            // name->setTextAlignment(Qt::AlignCenter);
             score->setTextAlignment(Qt::AlignCenter);
 
             // 3. Finally, put the finished items into the table
             ui->tableWidget->setItem(row, 0, rank);
-            ui->tableWidget->setItem(row, 1, name);
+            ui->tableWidget->setCellWidget(row, 1, name);
             ui->tableWidget->setItem(row, 2, score);
 
             // Change the buttons to text or standard symbols
