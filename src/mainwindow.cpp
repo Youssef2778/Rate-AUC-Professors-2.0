@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "User.h"
+#include "Comment.h"
 #include <QProgressBar>
 #include <boost/asio.hpp>
 #include <boost/beast/core.hpp>
@@ -36,11 +37,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-void MainWindow::professorPage(std::string Name, int CourseID) {
-    ui->stackedWidget->setCurrentIndex(4);
-    ui->scrollArea->setWidgetResizable(true);
 }
 
 void MainWindow::LoginPage()
@@ -177,7 +173,7 @@ void MainWindow::LeaderboardPage(int CourseID)
             std::cout << entry << std::endl;
             boost::json::object& prof = entry.as_object();
             std::string Name = (std::string)prof["name"].as_string();
-            std::string ID = (std::string)prof["id"].as_string();
+            int ID = (int)prof["id"].as_int64();
             std::string Score = (std::string)prof["score"].as_string();
             Profs[Name] = ID;  // Store the mapping of professor name to ID
 
@@ -194,8 +190,8 @@ void MainWindow::LeaderboardPage(int CourseID)
                 "QPushButton { color: white; text-decoration: underline; background: transparent; border: none; }"
                 "QPushButton:hover { color: rgba(255, 255, 255, 0.6); }"
             );
-            QObject::connect(name, &QPushButton::clicked, this, [this, Name, CourseID]() {
-                professorPage(Name, CourseID);
+            QObject::connect(name, &QPushButton::clicked, this, [this, ID, CourseID]() {
+                professorPage(ID, CourseID);
             });
 
             QTableWidgetItem* score =
@@ -243,13 +239,13 @@ void MainWindow::LeaderboardPage(int CourseID)
     }
 }
 
-void MainWindow::Professor_Page(int CourseID, int ProfID)
-{
+void MainWindow::professorPage(int ProfID, int CourseID) {
     ui->stackedWidget->setCurrentIndex(4);
-    CenterWidget(4, ui->widget_4);
+    ui->scrollArea->setWidgetResizable(true);
+
     try {
-        
-		// Send GET /get-comments?CourseId=CourseID&ProfId=ProfID
+
+        // Send GET /get-comments?CourseId=CourseID&ProfId=ProfID
         http::request<http::string_body> request(http::verb::get,
             "/get-comments?CourseId=" + std::to_string(CourseID) + "&ProfId=" + std::to_string(ProfID), 11);
         request.set(http::field::host, "127.0.0.1");
@@ -265,18 +261,22 @@ void MainWindow::Professor_Page(int CourseID, int ProfID)
         auto parsed = boost::json::parse(response.body());
         boost::json::array& comments = parsed.as_array();
 
-		// clear comments vector before populating it with the new comments
-		Comments.clear();
+        // clear comments before populating it with the new comments
+        Comments.clear();
+        ClearLayout(ui->widget_7->layout());
+
         for (auto& entry : comments) {
             boost::json::object& comment = entry.as_object();
-            Comments.push_back(Comment{(int)comment["id"].as_int64(), (int)comment["user_id"].as_int64(), (std::string)comment["username"].as_string(),
-									   (std::string)comment["content"].as_string(), (std::string)comment["timestamp"].as_string() });
+            Comments.push_back(Comment{ (int)comment["id"].as_int64(), (int)comment["user_id"].as_int64(), (std::string)comment["username"].as_string(),
+                                       (std::string)comment["content"].as_string(), (std::string)comment["timestamp"].as_string() });
         }
     }
     catch (std::exception& e) {
         std::cout << "Failed: " << e.what() << std::endl;
     }
+	cout << "Comments for ProfID " << ProfID << " and CourseID " << CourseID << " loaded: " << Comments.size() << endl;
     DisplayComments();
+	cout << "Comments displayed" << endl;
 }
 
 void MainWindow::Logout()
@@ -550,7 +550,7 @@ void MainWindow::on_pushButton_clicked()
     LeaderboardPage(CourseID);
 }
 
-QWidget* CreateComment(const Comment& comment)
+void MainWindow::CreateComment(Comment comment)
 {
     QWidget* card = new QWidget();
     card->setObjectName("commentCard");
@@ -559,6 +559,8 @@ QWidget* CreateComment(const Comment& comment)
         "   background-color: rgba(255, 255, 255, 0.12);"
         "   border: 1px solid rgba(255, 255, 255, 0.25);"
         "   border-radius: 16px;"
+        "   margin: 7px 4px;"
+		"   padding: 3px;"
         "}"
     );
 
@@ -609,12 +611,24 @@ QWidget* CreateComment(const Comment& comment)
     mainLayout->addWidget(contentLabel);
     mainLayout->addLayout(bottomLayout);
 
-    return card;
+    ui->widget_7->layout()->addWidget(card);
 }
 
 void MainWindow::DisplayComments() {
 	for (Comment comment : Comments) {
-        QWidget* cmnt = CreateComment(comment);
-        ui->commentsLayout->addWidget(cmnt);
+        CreateComment(comment);
+    }
+}
+
+void MainWindow::ClearLayout(QLayout* layout) {
+    if (!layout) return;
+
+    QLayoutItem* item;
+    while ((item = layout->takeAt(0)) != nullptr) {
+        if (item->layout()) {
+            ClearLayout(item->layout()); // recursive cleanup
+        }
+        delete item->widget();
+        delete item;
     }
 }

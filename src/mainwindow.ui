@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1537</width>
-    <height>1827</height>
+    <width>1521</width>
+    <height>1641</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -839,6 +839,22 @@ QComboBox QAbstractItemView::item:selected {
               </widget>
              </item>
              <item>
+              <spacer name="horizontalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Policy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
               <widget class="QComboBox" name="CourseCB">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1019,8 +1035,8 @@ font-size: 15px;
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1511</width>
-             <height>1761</height>
+             <width>1485</width>
+             <height>1682</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_6">

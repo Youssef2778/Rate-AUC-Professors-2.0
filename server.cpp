@@ -195,7 +195,7 @@ void handle_request(const http::request<http::string_body>& req,
             res.body() = boost::json::serialize(leaderboard);
             res.prepare_payload();
             http::write(socket, res);
-        }
+    }
     else if (req.target().starts_with("/get-courses")) {
         boost::json::array courses;
 
@@ -297,7 +297,7 @@ void handle_request(const http::request<http::string_body>& req,
 
             while (res->next()) {
                 boost::json::object row;
-                row["id"] = (std::string)res->getString("professor_id");
+                row["id"] = (int)res->getInt("professor_id");
                 row["name"] = (std::string)res->getString("name");
                 row["score"] = std::to_string(res->getInt("score"));
                 std::cout << row["id"] << row["score"] << row["name"] << std::endl;
@@ -317,7 +317,6 @@ void handle_request(const http::request<http::string_body>& req,
         res.body() = boost::json::serialize(professors);
         res.prepare_payload();
         http::write(socket, res);
-        }
     }
     else if (req.target().starts_with("/get-comments")) {
         boost::json::array Comments;
@@ -336,16 +335,16 @@ void handle_request(const http::request<http::string_body>& req,
         try {
             sql::Connection* con = dbPool->get();
             sql::PreparedStatement* pstmt(
-                con->prepareStatement("SELECT usr.name, cmnt.user_id, cmnt.id, cmnt.content, cmnt.timestamp FROM comments cmnt JOIN users usr ON cmnt.user_id = usr.id WHERE cmnt.course_id = ? AND cmnt.professor_id = ? "
+                con->prepareStatement("SELECT usr.username, cmnt.user_id, cmnt.id, cmnt.content, cmnt.timestamp FROM comments cmnt JOIN users usr ON cmnt.user_id = usr.id WHERE cmnt.course_id = ? AND cmnt.professor_id = ? "
                     "ORDER BY cmnt.timestamp DESC"));
             pstmt->setString(1, Course_ID);
             pstmt->setString(2, Prof_ID);
             sql::ResultSet* res = pstmt->executeQuery();
             while (res->next()) {
                 boost::json::object row;
-                row["username"] = (std::string)res->getString("name");
-                row["user_id"] = (std::string)res->getString("user_id");
-                row["id"] = (std::string)res->getString("id");
+                row["username"] = (std::string)res->getString("username");
+                row["user_id"] = (int)res->getInt("user_id");
+                row["id"] = (int)res->getInt("id");
                 row["content"] = (std::string)res->getString("content");
                 row["timestamp"] = (std::string)res->getString("timestamp");
                 Comments.push_back(row);

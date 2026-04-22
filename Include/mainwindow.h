@@ -2,9 +2,13 @@
 #define MAINWINDOW_H
 
 #include "User.h"
+#include "Comment.h"
 #include <QMainWindow>
 #include <QPixmap>
 #include <QResizeEvent>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QGraphicsDropShadowEffect>
 #include <boost/asio.hpp>
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
@@ -30,7 +34,7 @@ class MainWindow : public QMainWindow
     // Map department_name to id
     std::unordered_map<std::string, int> Deps;
     std::unordered_map<std::string, int> Courses;
-    std::unordered_map<std::string, std::string> Profs;
+    std::unordered_map<std::string, int> Profs;
 	std::vector<Comment> Comments;
 
 
@@ -46,8 +50,13 @@ class MainWindow : public QMainWindow
     void RegisterPage();
     void HomePage();
     void LeaderboardPage(int);
+    void professorPage(int, int);
     void Logout();
-    void professorPage(std::string, int);
+	void DisplayComments();
+	void CreateComment(Comment comment);
+    void ClearLayout(QLayout* layout);
+
+
 
 
    private slots:
