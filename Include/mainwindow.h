@@ -28,10 +28,10 @@ class MainWindow : public QMainWindow
    public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    Ui::MainWindow *ui;
 
    private:
     // Map department_name to id
+    Ui::MainWindow *ui;
     std::unordered_map<std::string, int> Deps;
     std::unordered_map<std::string, int> Courses;
     std::unordered_map<std::string, int> Profs;
