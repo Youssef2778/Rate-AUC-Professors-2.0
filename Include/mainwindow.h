@@ -31,6 +31,8 @@ class MainWindow : public QMainWindow
     std::unordered_map<std::string, int> Deps;
     std::unordered_map<std::string, int> Courses;
     std::unordered_map<std::string, std::string> Profs;
+	std::vector<Comment> Comments;
+
 
     User *user;
 
