@@ -20,7 +20,9 @@
    <enum>Qt::LeftToRight</enum>
   </property>
   <property name="styleSheet">
-   <string notr="true"/>
+   <string notr="true">QMainWindow {
+background-color: #006FB8;
+}</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -941,9 +943,9 @@ QComboBox QAbstractItemView::item:selected {
        <property name="styleSheet">
         <string notr="true">
 
-QWidget#widget_6
+QWidget#page_2, #widget_6, #scrollAreaWidgetContents
 {
-   border-image: url(:/images/Background.jpg);
+   background-color: #006FB8;
 }
 
 QWidget#widget, #widget_4, #widget_5, #widget_7 {
@@ -957,10 +959,15 @@ QWidget#widget, #widget_4, #widget_5, #widget_7 {
 	background-color: #1C398E;
 }
 
-QLabel#professorName {
+QWidget#widget_5 {
+	background-color: #162556;
+}
+
+QLabel#professorName, #studentCommentsLabel {
 	font-family: &quot;Arial&quot;, sans-serif;
 	font-size: 30px;
 	font-weight: bold;
+	color: white;
 }
 
 QLabel#courseName {
@@ -969,10 +976,11 @@ QLabel#courseName {
 	color: #BEDBFF;
 }
 
-QLabel#addYourComment, #selectFlair {
+QLabel#addYourComment, #selectFlair, #aiLabel, #label_4{
 	font-family: &quot;Arial&quot;, sans-serif;
 	font-size: 17px;
 	font-weight: bold;
+	color: white;
 }
 
 QLineEdit#commentLineEdit {
@@ -994,6 +1002,10 @@ QPushButton:hover {
 
 QPushButton:pressed {
    background-color: #1c5980;
+}
+
+QLabel#label_6 {
+font-size: 15px;
 }</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -1006,9 +1018,9 @@ QPushButton:pressed {
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>0</y>
+             <y>-722</y>
              <width>1592</width>
-             <height>1662</height>
+             <height>1710</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -1016,7 +1028,7 @@ QPushButton:pressed {
              <widget class="QWidget" name="widget_6" native="true">
               <property name="minimumSize">
                <size>
-                <width>5</width>
+                <width>20</width>
                 <height>0</height>
                </size>
               </property>
@@ -1115,7 +1127,7 @@ QPushButton:pressed {
                  </layout>
                 </widget>
                </item>
-               <item>
+               <item alignment="Qt::AlignHCenter">
                 <widget class="QWidget" name="widget_5" native="true">
                  <property name="minimumSize">
                   <size>
@@ -1123,9 +1135,32 @@ QPushButton:pressed {
                    <height>402</height>
                   </size>
                  </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_8" stretch="4,7">
+                  <item alignment="Qt::AlignLeft">
+                   <widget class="QLabel" name="aiLabel">
+                    <property name="text">
+                     <string>AI Summary of Student Feedback</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_5">
+                    <property name="text">
+                     <string>&lt;insert AI response here&gt;</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
                 </widget>
                </item>
-               <item>
+               <item alignment="Qt::AlignHCenter">
+                <widget class="QLabel" name="studentCommentsLabel">
+                 <property name="text">
+                  <string>Student Comments: </string>
+                 </property>
+                </widget>
+               </item>
+               <item alignment="Qt::AlignHCenter">
                 <widget class="QWidget" name="widget_7" native="true">
                  <property name="minimumSize">
                   <size>
@@ -1133,6 +1168,39 @@ QPushButton:pressed {
                    <height>402</height>
                   </size>
                  </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>1502</width>
+                   <height>1002</height>
+                  </size>
+                 </property>
+                 <layout class="QVBoxLayout" name="verticalLayout_9">
+                  <item>
+                   <layout class="QHBoxLayout" name="horizontalLayout_2">
+                    <item>
+                     <widget class="QLabel" name="label_4">
+                      <property name="text">
+                       <string>Ali Abo Hamar</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="pushButton_7">
+                      <property name="text">
+                       <string>PushButton</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_6">
+                    <property name="text">
+                     <string>3m el nas kolha</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
                 </widget>
                </item>
               </layout>
