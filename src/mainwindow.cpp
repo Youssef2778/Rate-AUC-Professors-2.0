@@ -101,7 +101,7 @@ void MainWindow::HomePage()
     }
 }
 
-void MainWindow::LeaderboardPage(int CourseID)
+void MainWindow::LeaderboardPage(std::string CourseName)
 {
     // Load the leaderboard page
     ui->stackedWidget->setCurrentIndex(2);
@@ -145,7 +145,7 @@ void MainWindow::LeaderboardPage(int CourseID)
     try {
         // Send GET /get-professors
         http::request<http::string_body> request(
-            http::verb::get, "/get-professors?Id=" + std::to_string(CourseID), 11);
+            http::verb::get, "/get-professors?Id=" + std::to_string(Courses[CourseName]), 11);
         request.set(http::field::host, "127.0.0.1");
         request.prepare_payload();
         http::write(socket, request);
@@ -190,8 +190,8 @@ void MainWindow::LeaderboardPage(int CourseID)
                 "QPushButton { color: white; text-decoration: underline; background: transparent; border: none; }"
                 "QPushButton:hover { color: rgba(255, 255, 255, 0.6); }"
             );
-            QObject::connect(name, &QPushButton::clicked, this, [this, ID, CourseID]() {
-                professorPage(ID, CourseID);
+            QObject::connect(name, &QPushButton::clicked, this, [this, Name, CourseName]() {
+                professorPage(Name, CourseName);
             });
 
             QTableWidgetItem* score =
@@ -239,15 +239,20 @@ void MainWindow::LeaderboardPage(int CourseID)
     }
 }
 
-void MainWindow::professorPage(int ProfID, int CourseID) {
+void MainWindow::professorPage(std::string ProfName, std::string CourseName) {
     ui->stackedWidget->setCurrentIndex(4);
     ui->scrollArea->setWidgetResizable(true);
 
+	ui->professorName->setText("Professor " + QString::fromStdString(ProfName));
+	ui->courseName->setText("Course " + QString::fromStdString(CourseName));
+
+
+	// Request the comments for this professor-course from the server
     try {
 
         // Send GET /get-comments?CourseId=CourseID&ProfId=ProfID
         http::request<http::string_body> request(http::verb::get,
-            "/get-comments?CourseId=" + std::to_string(CourseID) + "&ProfId=" + std::to_string(ProfID), 11);
+            "/get-comments?CourseId=" + std::to_string(Courses[CourseName]) + "&ProfId=" + std::to_string(Profs[ProfName]), 11);
         request.set(http::field::host, "127.0.0.1");
         request.prepare_payload();
         http::write(socket, request);
@@ -274,7 +279,7 @@ void MainWindow::professorPage(int ProfID, int CourseID) {
     catch (std::exception& e) {
         std::cout << "Failed: " << e.what() << std::endl;
     }
-	cout << "Comments for ProfID " << ProfID << " and CourseID " << CourseID << " loaded: " << Comments.size() << endl;
+	cout << "Comments for Professor " << ProfName << " and Course " << CourseName << " loaded: " << Comments.size() << endl;
     DisplayComments();
 	cout << "Comments displayed" << endl;
 }
@@ -546,8 +551,7 @@ void MainWindow::on_pushButton_clicked()
 {
     //Pass the selected course_id
     std::string CourseName = ui->CourseCB->currentText().toStdString();
-    int CourseID = Courses[CourseName]; // Get the course ID using the mapping stored
-    LeaderboardPage(CourseID);
+    LeaderboardPage(CourseName);
 }
 
 void MainWindow::CreateComment(Comment comment)
@@ -630,5 +634,54 @@ void MainWindow::ClearLayout(QLayout* layout) {
         }
         delete item->widget();
         delete item;
+    }
+}
+
+void MainWindow::on_postComment_clicked() {
+	std::string ProfName = ui->professorName->text().toStdString().substr(10); // Remove "Professor " prefix
+	std::string CourseName = ui->courseName->text().toStdString().substr(7); // Remove "Course " prefix
+    std::string content = ui->commentLineEdit->text().toStdString();
+    if (content.empty()) return; // Don't post empty comments
+    try {
+        // Let's now form the JSON to send the data to the server.
+        boost::json::object comment;
+		int UserID = user->GetID();
+
+		comment["user_id"] = UserID;
+		comment["content"] = content;
+        comment["prof_id"] = Profs[ProfName];
+        comment["course_id"] = Courses[CourseName];
+
+        // Preparing the request...
+        boost::beast::http::request<boost::beast::http::string_body> request(
+            boost::beast::http::verb::post, "/comment", 11);
+        request.set(boost::beast::http::field::host, "127.0.0.1");
+        request.set(boost::beast::http::field::content_type, "application/json");
+        request.body() = boost::json::serialize(comment);
+        request.prepare_payload();
+
+        // Let's send it!
+        boost::beast::http::write(socket, request);
+
+		// Retrieve the generated comment ID & timestamp
+        boost::beast::flat_buffer buf;
+        boost::beast::http::response<boost::beast::http::string_body> server_response;
+        boost::beast::http::read(socket, buf, server_response);
+        auto parsed_response = boost::json::parse(server_response.body());
+        boost::json::object response = parsed_response.as_object();
+
+		std::string timestamp = (std::string)response["timestamp"].as_string();
+		int commentID = (int)response["id"].as_int64();
+
+		// Create comment object
+        Comment commentObj{ commentID, UserID, content, timestamp };
+		Comments.push_back(commentObj); 
+
+		// Display the new comment
+		CreateComment(commentObj);
+
+    }
+    catch (std::exception& e) {
+        std::cout << "Connection failed: " << e.what() << std::endl;
     }
 }

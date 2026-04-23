@@ -49,8 +49,8 @@ class MainWindow : public QMainWindow
     void LoginPage();
     void RegisterPage();
     void HomePage();
-    void LeaderboardPage(int);
-    void professorPage(int, int);
+    void LeaderboardPage(std::string);
+    void professorPage(std::string, std::string);
     void Logout();
 	void DisplayComments();
 	void CreateComment(Comment comment);
@@ -71,6 +71,7 @@ class MainWindow : public QMainWindow
     void on_pushButton_4_clicked();
     void on_DepartmentCB_currentIndexChanged(int index);
     void on_pushButton_clicked();
+    void on_postComment_clicked();
 };
 
 #endif  // MAINWINDOW_H

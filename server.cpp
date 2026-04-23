@@ -365,6 +365,45 @@ void handle_request(const http::request<http::string_body>& req,
         res.prepare_payload();
         http::write(socket, res);
     }
+    else if (req.target() == "/comment") {
+        auto parsed = json::parse(req.body());
+        json::object comment = parsed.as_object();
+        boost::json::object Response;
+        try {
+            sql::Connection* con = dbPool->get();
+            sql::PreparedStatement* pstmt(
+                con->prepareStatement("INSERT INTO comments (professor_id, course_id, user_id, content) VALUES (?, ?, ?, ?)"));
+            pstmt->setInt(1, comment["professor_id"].as_int64());
+            pstmt->setInt(2, comment["course_id"].as_int64());
+            pstmt->setInt(3, comment["user_id"].as_int64());
+            pstmt->setString(4, comment["content"].as_string());
+            pstmt->executeUpdate();
+            
+			// Retrieve the generated comment ID and timestamp
+            sql::Statement* stmt = con->createStatement();
+            sql::ResultSet* Res = stmt->executeQuery("SELECT LAST_INSERT_ID(), NOW()");
+			while (Res->next()) {
+                Response["id"] = (int)Res->getInt(1);
+                Response["timestamp"] = (std::string)Res->getString(2);
+            }
+
+			delete stmt;
+            delete Res;
+            delete pstmt;
+            dbPool->release(con);
+        }
+        catch (sql::SQLException& e) {
+            std::cerr << "Error: " << e.what() << " (Error code: " << e.getErrorCode() << ")"
+                << std::endl;
+        }
+
+        // Send the response back
+        http::response<http::string_body> res{ http::status::ok, req.version() };
+        res.set(http::field::content_type, "application/json");
+        res.body() = boost::json::serialize(Response);
+        res.prepare_payload();
+        http::write(socket, res);
+    }
 }
 
 int main()
