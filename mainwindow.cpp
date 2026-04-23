@@ -372,19 +372,19 @@ void MainWindow::on_pushButton_clicked()
     ui->tableWidget->verticalHeader()->setVisible(false);
     ui->tableWidget->setShowGrid(false);
 
-    // 1. FORCE the table to have 6 columns and set their names
+            // 1. FORCE the table to have 6 columns and set their names
     ui->tableWidget->setColumnCount(6);
     ui->tableWidget->setHorizontalHeaderLabels({"Rank", "Name", "Score", "up", "down", "Approval"});
 
-    // 2. Stop Qt from auto-stretching the final column
+            // 2. Stop Qt from auto-stretching the final column
     ui->tableWidget->horizontalHeader()->setStretchLastSection(false);
     ui->tableWidget->horizontalHeader()->setMinimumSectionSize(30);
 
-    // 3. Let Name and Score stretch to fill the middle space
+            // 3. Let Name and Score stretch to fill the middle space
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
 
-    // 4. Set Fixed Widths (Widened the buttons to 70px so they aren't squished!)
+            // 4. Set Fixed Widths (Widened the buttons to 70px so they aren't squished!)
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
     ui->tableWidget->setColumnWidth(0, 60);  // Rank
 
@@ -394,10 +394,10 @@ void MainWindow::on_pushButton_clicked()
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(4, QHeaderView::Fixed);
     ui->tableWidget->setColumnWidth(4, 70);  // Downvote Button (Widened!)
 
-    // ui->tableWidget->horizontalHeader()->setSectionResizeMode(5, QHeaderView::Fixed);
-    // ui->tableWidget->setColumnWidth(5, 120); // Progress Bar
+            // ui->tableWidget->horizontalHeader()->setSectionResizeMode(5, QHeaderView::Fixed);
+            // ui->tableWidget->setColumnWidth(5, 120); // Progress Bar
 
-    // the desin of the leaderboard was coassisted by AI in order to get the right color pallets and design down
+            // the desin of the leaderboard was coassisted by AI in order to get the right color pallets and design down
     try {
         // Send GET /get-professors
         http::request<http::string_body> request(http::verb::get, "/get-professors?Id=" + std::to_string(CourseID), 11);
@@ -406,13 +406,13 @@ void MainWindow::on_pushButton_clicked()
         http::write(socket, request);
         std::cout << "Send req" << std::endl;
 
-        // Read the response
+                // Read the response
         beast::flat_buffer buffer;
         http::response<http::string_body> response;
         http::read(socket, buffer, response);
         std::cout << "Read Response" << std::endl;
 
-        // Parse the JSON array
+                // Parse the JSON array
         auto parsed = boost::json::parse(response.body());
         boost::json::array& professors = parsed.as_array();
         std::cout << "Parsed" << std::endl;
@@ -420,9 +420,9 @@ void MainWindow::on_pushButton_clicked()
         int Max;
         bool first = true;
 
-        ui->tableWidget->setRowCount(professors.size()); 
+        ui->tableWidget->setRowCount(professors.size());
 
-        int row = 0; 
+        int row = 0;
         std::cout << "Before loop" << std::endl;
 
         for (auto& entry : professors) {
@@ -434,45 +434,63 @@ void MainWindow::on_pushButton_clicked()
             std::string Score = (std::string)prof["score"].as_string();
             Profs[Name] = ID; // Store the mapping of professor name to ID
 
-            // populate the the table
-            // 2. Loop to create the 6 professor "cards"
+                    // populate the the table
+                    // 2. Loop to create the 6 professor "cards"
 
-            // Text Data
+                    // Text Data
             QTableWidgetItem *rank = new QTableWidgetItem(QString::number(row + 1));
             QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(Name));
             QTableWidgetItem *score = new QTableWidgetItem(QString::fromStdString(Score)); // ✅ FIX
 
 
-            // Inject it into Column 5 of the current row
+                    // Inject it into Column 5 of the current row
 
-            // 2. Now that they have names, we can center them
+                    // 2. Now that they have names, we can center them
             rank->setTextAlignment(Qt::AlignCenter);
             name->setTextAlignment(Qt::AlignCenter);
             score->setTextAlignment(Qt::AlignCenter);
 
-            // 3. Finally, put the finished items into the table
+                    // 3. Finally, put the finished items into the table
             ui->tableWidget->setItem(row, 0, rank);
             ui->tableWidget->setItem(row, 1, name);
             ui->tableWidget->setItem(row, 2, score);
 
-            // Change the buttons to text or standard symbols
+                    // Change the buttons to text or standard symbols
             QPushButton *up = new QPushButton;
             up->setIcon(QIcon("://images/up.png")); // <--- Paste your path here
             up->setIconSize(QSize(24, 24));
+
             QPushButton *down = new QPushButton;
             down->setIcon(QIcon("://images/down.png")); // <--- Paste your path here
             down->setIconSize(QSize(24, 24));
 
-            // Button Styling
+                    // ✅ NEW: Connect the Upvote button using a lambda function
+                    // We capture 'this', 'ID', 'up', and 'down' so the lambda knows which professor and buttons it's dealing with
+            connect(up, &QPushButton::clicked, this, [this, ID, up, down]() {
+                handleUpvote(ID);
+                up->setEnabled(false);    // Optional: Prevent spamming clicks
+                down->setEnabled(false); // Optional: Disable downvote if they upvoted
+                up->setStyleSheet("background-color: #1d8e9e; color: white; border-radius: 5px;"); // Highlight button
+            });
+
+                    // ✅ NEW: Connect the Downvote button using a lambda function
+            connect(down, &QPushButton::clicked, this, [this, ID, up, down]() {
+                handleDownvote(ID);
+                up->setEnabled(false);   // Optional: Prevent spamming clicks
+                down->setEnabled(false); // Optional: Disable upvote if they downvoted
+                down->setStyleSheet("background-color: #e04b4b; color: white; border-radius: 5px;"); // Highlight button
+            });
+
+                    // Button Styling
             QString btnStyle = "QPushButton { background-color: #0b2239; color: white; border-radius: 5px; border: 1px solid #1d8e9e; font-family: 'Segoe UI Emoji'; }";
             up->setStyleSheet(btnStyle);
             down->setStyleSheet(btnStyle);
 
-            // Put buttons in the correct columns
+                    // Put buttons in the correct columns
             ui->tableWidget->setCellWidget(row, 3, up);
             ui->tableWidget->setCellWidget(row, 4, down);
 
-            // Match the row height to the design
+                    // Match the row height to the design
             ui->tableWidget->setRowHeight(row, 60);
 
             row++; // ✅ FIX: move to next row

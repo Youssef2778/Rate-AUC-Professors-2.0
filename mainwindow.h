@@ -49,6 +49,9 @@ class MainWindow : public QMainWindow
     void on_pushButton_4_clicked();
     void on_DepartmentCB_currentIndexChanged(int index);
     void on_pushButton_clicked();
+    // ✅ NEW: Added declarations for the upvote and downvote handlers
+    void handleUpvote(std::string profID);
+    void handleDownvote(std::string profID);
 };
 
 #endif  // MAINWINDOW_H
