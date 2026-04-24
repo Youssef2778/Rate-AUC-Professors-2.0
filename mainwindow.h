@@ -25,7 +25,7 @@ class MainWindow : public QMainWindow
     std::unordered_map<std::string, int> Courses;
     std::unordered_map<std::string, std::string> Profs;
 
-
+int m_currentUserId;
     int m_currentCourseId; // To remember which course we are viewing
 
 

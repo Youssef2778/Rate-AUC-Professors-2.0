@@ -277,8 +277,10 @@ void MainWindow::on_pushButton_4_clicked()
     boost::json::object json_response = parsed_response.as_object();
     bool logged_in = (bool)json_response["status"].as_bool();
     if (logged_in) {
+        this->m_currentUserId = (int)json_response["user_id"].as_int64();
         ui->stackedWidget->setCurrentIndex(3);
         CenterWidget(3, ui->widget_3);
+
 
         // Request the departments from the server
         try {
@@ -447,8 +449,11 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::handleUpvote(const std::string& profID, int courseID) {
     try {
         boost::json::object voteData;
-        voteData["professor_id"] = profID;
+        // FIX 1 & 2: Correct spelling AND convert the string to an integer!
+        voteData["professor_id"] = std::stoi(profID);
         voteData["course_id"] = courseID;
+        voteData["user_id"] = this->m_currentUserId;
+        voteData["vote"] = 1; // 1 means Upvote
 
         http::request<http::string_body> request(http::verb::post, "/upvote", 11);
         request.set(http::field::content_type, "application/json");
@@ -562,8 +567,11 @@ void MainWindow::refreshList() {
 void MainWindow::handleDownvote(const std::string& profID, int courseID) {
     try {
         boost::json::object voteData;
-        voteData["professor_id"] = profID;
+        // FIX 2: Convert the string to an integer!
+        voteData["professor_id"] = std::stoi(profID);
         voteData["course_id"] = courseID;
+        voteData["user_id"] = this->m_currentUserId;
+        voteData["vote"] = -1; // -1 means Downvote
 
         http::request<http::string_body> request(http::verb::post, "/downvote", 11);
         request.set(http::field::content_type, "application/json");
@@ -581,7 +589,7 @@ void MainWindow::handleDownvote(const std::string& profID, int courseID) {
                 // 3. Check if successful and REFRESH
         if (response.result() == http::status::ok) {
             std::cout << "Downvote success! Refreshing..." << std::endl;
-            this->refreshList(); // <--- THIS IS THE MISSING LINK
+            this->refreshList();
         }
     } catch (std::exception& e) {
         std::cout << "Downvote failed: " << e.what() << std::endl;
