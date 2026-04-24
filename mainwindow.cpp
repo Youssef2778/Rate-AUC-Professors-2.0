@@ -464,23 +464,20 @@ void MainWindow::on_pushButton_clicked()
             down->setIcon(QIcon("://images/down.png")); // <--- Paste your path here
             down->setIconSize(QSize(24, 24));
 
-                    // ✅ NEW: Connect the Upvote button using a lambda function
-                    // We capture 'this', 'ID', 'up', and 'down' so the lambda knows which professor and buttons it's dealing with
-            connect(up, &QPushButton::clicked, this, [this, ID, up, down]() {
-                handleUpvote(ID);
-                up->setEnabled(false);    // Optional: Prevent spamming clicks
-                down->setEnabled(false); // Optional: Disable downvote if they upvoted
-                up->setStyleSheet("background-color: #1d8e9e; color: white; border-radius: 5px;"); // Highlight button
+                    /// We now capture 'CourseID' alongside 'this', 'ID', 'up', and 'down'
+            connect(up, &QPushButton::clicked, this, [this, ID, CourseID, up, down]() {
+                handleUpvote(ID, CourseID); // Pass both to the network function
+                up->setEnabled(false);
+                down->setEnabled(false);
+                up->setStyleSheet("background-color: #1d8e9e; color: white; border-radius: 5px;");
             });
 
-                    // ✅ NEW: Connect the Downvote button using a lambda function
-            connect(down, &QPushButton::clicked, this, [this, ID, up, down]() {
-                handleDownvote(ID);
-                up->setEnabled(false);   // Optional: Prevent spamming clicks
-                down->setEnabled(false); // Optional: Disable upvote if they downvoted
-                down->setStyleSheet("background-color: #e04b4b; color: white; border-radius: 5px;"); // Highlight button
+            connect(down, &QPushButton::clicked, this, [this, ID, CourseID, up, down]() {
+                handleDownvote(ID, CourseID); // Pass both to the network function
+                up->setEnabled(false);
+                down->setEnabled(false);
+                down->setStyleSheet("background-color: #e04b4b; color: white; border-radius: 5px;");
             });
-
                     // Button Styling
             QString btnStyle = "QPushButton { background-color: #0b2239; color: white; border-radius: 5px; border: 1px solid #1d8e9e; font-family: 'Segoe UI Emoji'; }";
             up->setStyleSheet(btnStyle);
@@ -498,5 +495,50 @@ void MainWindow::on_pushButton_clicked()
     }
     catch (std::exception& e) {
         std::cout << "Failed: " << e.what() << std::endl;
+    }
+}
+void MainWindow::handleUpvote(const std::string& profID, int courseID) {
+    try {
+        boost::json::object voteData;
+        voteData["professor_id"] = profID;
+        voteData["course_id"] = courseID;
+
+        http::request<http::string_body> request(http::verb::post, "/upvote", 11);
+        request.set(http::field::host, "127.0.0.1");
+        request.set(http::field::content_type, "application/json");
+        request.body() = boost::json::serialize(voteData);
+        request.prepare_payload();
+
+        http::write(socket, request); // Note: See my previous warning about blocking the UI thread here!
+
+        // Read the empty response to clear the socket buffer
+        beast::flat_buffer buffer;
+        http::response<http::string_body> response;
+        http::read(socket, buffer, response);
+    } catch (std::exception& e) {
+        std::cout << "Upvote failed: " << e.what() << std::endl;
+    }
+}
+
+void MainWindow::handleDownvote(const std::string& profID, int courseID) {
+    try {
+        boost::json::object voteData;
+        voteData["professor_id"] = profID;
+        voteData["course_id"] = courseID;
+
+        http::request<http::string_body> request(http::verb::post, "/downvote", 11);
+        request.set(http::field::host, "127.0.0.1");
+        request.set(http::field::content_type, "application/json");
+        request.body() = boost::json::serialize(voteData);
+        request.prepare_payload();
+
+        http::write(socket, request);
+
+        // Read the empty response to clear the socket buffer
+        beast::flat_buffer buffer;
+        http::response<http::string_body> response;
+        http::read(socket, buffer, response);
+    } catch (std::exception& e) {
+        std::cout << "Downvote failed: " << e.what() << std::endl;
     }
 }

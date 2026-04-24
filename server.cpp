@@ -130,7 +130,7 @@ void handle_request(const http::request<http::string_body>& req,
 
                     // Updated to match your exact table and column names!
                     sql::PreparedStatement* pstmt(
-                        con->prepareStatement("SELECT professor_id, score FROM professor_course WHERE course_id = ? ORDER BY score DESC"));
+                        con->prepareStatement("SELECT professor_id, score FROM course_professor WHERE course_id = ? ORDER BY score DESC"));
 
                     pstmt->setString(1, CourseID);
                     sql::ResultSet* res = pstmt->executeQuery();
@@ -236,6 +236,48 @@ void handle_request(const http::request<http::string_body>& req,
                       << std::endl;
         }
     }
+
+else if (req.target() == "/upvote" || req.target() == "/downvote") {
+    auto parsed = json::parse(req.body());
+    json::object obj = parsed.as_object();
+
+    std::string profID = obj["professor_id"].is_string()
+                             ? std::string(obj["professor_id"].as_string())
+                             : std::to_string(obj["professor_id"].as_int64());
+
+    int courseID = obj["course_id"].is_int64()
+                       ? obj["course_id"].as_int64()
+                       : std::stoi(std::string(obj["course_id"].as_string()));
+
+    // Determine if we are adding or subtracting
+    std::string query = (req.target() == "/upvote")
+                            ? "UPDATE course_professor SET score = score + 1 WHERE professor_id = ? AND course_id = ?"
+                            : "UPDATE course_professor SET score = score - 1 WHERE professor_id = ? AND course_id = ?";
+
+    try {
+        sql::Connection* con = dbPool->get();
+        sql::PreparedStatement* pstmt(con->prepareStatement(query));
+
+        pstmt->setString(1, profID);
+        pstmt->setInt(2, courseID);
+
+        pstmt->executeUpdate();
+
+        delete pstmt;
+        dbPool->release(con);
+
+        // Send success response
+        http::response<http::string_body> res{http::status::ok, req.version()};
+        res.prepare_payload();
+        http::write(socket, res);
+
+    } catch (sql::SQLException& e) {
+        std::cerr << "Vote Error: " << e.what() << " (Code: " << e.getErrorCode() << ")" << std::endl;
+        http::response<http::string_body> res{http::status::internal_server_error, req.version()};
+        res.prepare_payload();
+        http::write(socket, res);
+    }
+    }
     else if (req.target().starts_with("/get-professors")) {
         boost::json::array professors;
         std::cout << "Handling" << std::endl;
@@ -280,7 +322,7 @@ void handle_request(const http::request<http::string_body>& req,
         http::write(socket, res);
     }
 
-}
+ }
 
 int main()
 {
