@@ -31,7 +31,7 @@ background-color: #006FB8;
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>16777214</height>
+        <height>16777215</height>
        </size>
       </property>
       <property name="currentIndex">
@@ -956,6 +956,12 @@ QComboBox QAbstractItemView::item:selected {
        </widget>
       </widget>
       <widget class="QWidget" name="page_2">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="styleSheet">
         <string notr="true">/* MADE BY AI */
 
@@ -1134,6 +1140,12 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
            <layout class="QVBoxLayout" name="verticalLayout_6">
             <item alignment="Qt::AlignmentFlag::AlignHCenter">
              <widget class="QWidget" name="widget_6" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="minimumSize">
                <size>
                 <width>1500</width>
@@ -1271,13 +1283,28 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                </item>
                <item alignment="Qt::AlignmentFlag::AlignHCenter">
                 <widget class="QWidget" name="widget_5" native="true">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="minimumSize">
                   <size>
-                   <width>504</width>
-                   <height>204</height>
+                   <width>600</width>
+                   <height>100</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>600</width>
+                   <height>16777215</height>
                   </size>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_8" stretch="4,7">
+                  <property name="sizeConstraint">
+                   <enum>QLayout::SizeConstraint::SetFixedSize</enum>
+                  </property>
                   <item alignment="Qt::AlignmentFlag::AlignHCenter">
                    <widget class="QLabel" name="aiLabel">
                     <property name="text">
@@ -1288,15 +1315,21 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                   <item>
                    <widget class="QLabel" name="ai_summary">
                     <property name="sizePolicy">
-                     <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                     <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
                       <horstretch>0</horstretch>
                       <verstretch>0</verstretch>
                      </sizepolicy>
                     </property>
                     <property name="minimumSize">
                      <size>
-                      <width>0</width>
-                      <height>200</height>
+                      <width>600</width>
+                      <height>100</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>600</width>
+                      <height>16777215</height>
                      </size>
                     </property>
                     <property name="text">
@@ -1319,19 +1352,29 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                </item>
                <item alignment="Qt::AlignmentFlag::AlignHCenter">
                 <widget class="QWidget" name="widget_7" native="true">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="minimumSize">
                   <size>
-                   <width>504</width>
-                   <height>404</height>
+                   <width>600</width>
+                   <height>100</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
-                   <width>1504</width>
-                   <height>1004</height>
+                   <width>600</width>
+                   <height>16777215</height>
                   </size>
                  </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_9"/>
+                 <layout class="QVBoxLayout" name="verticalLayout_9">
+                  <property name="sizeConstraint">
+                   <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+                  </property>
+                 </layout>
                 </widget>
                </item>
               </layout>
@@ -1361,7 +1404,6 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
   </widget>
  </widget>
  <resources>
-  <include location="../resources.qrc"/>
   <include location="../resources.qrc"/>
  </resources>
  <connections/>

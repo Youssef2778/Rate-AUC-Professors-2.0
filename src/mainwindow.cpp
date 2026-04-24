@@ -242,9 +242,10 @@ void MainWindow::LeaderboardPage(std::string CourseName)
 void MainWindow::professorPage(std::string ProfName, std::string CourseName) {
     ui->stackedWidget->setCurrentIndex(4);
     ui->scrollArea->setWidgetResizable(true);
+    ui->widget_7->setMaximumHeight(QWIDGETSIZE_MAX);
 
-	ui->professorName->setText("Professor " + QString::fromStdString(ProfName));
-	ui->courseName->setText("Course " + QString::fromStdString(CourseName));
+	ui->professorName->setText("Dr. " + QString::fromStdString(ProfName));
+	ui->courseName->setText(QString::fromStdString(CourseName));
 
 
 	// Request the comments for this professor-course from the server
@@ -272,8 +273,8 @@ void MainWindow::professorPage(std::string ProfName, std::string CourseName) {
 
         for (auto& entry : comments) {
             boost::json::object& comment = entry.as_object();
-            Comments.push_back(Comment{ (int)comment["id"].as_int64(), (int)comment["user_id"].as_int64(), (std::string)comment["username"].as_string(),
-                                       (std::string)comment["content"].as_string(), (std::string)comment["timestamp"].as_string() });
+            Comments.push_back(Comment( (int)comment["id"].as_int64(), (int)comment["user_id"].as_int64(), (std::string)comment["username"].as_string(),
+                                       (std::string)comment["content"].as_string(), (std::string)comment["timestamp"].as_string() ));
         }
     }
     catch (std::exception& e) {
@@ -558,6 +559,9 @@ void MainWindow::CreateComment(Comment comment)
 {
     QWidget* card = new QWidget();
     card->setObjectName("commentCard");
+    card->setMinimumHeight(100);
+    card->setMinimumWidth(600);
+    card->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     card->setStyleSheet(
         "QWidget#commentCard {"
         "   background-color: rgba(255, 255, 255, 0.12);"
@@ -590,6 +594,7 @@ void MainWindow::CreateComment(Comment comment)
 
     QLabel* contentLabel = new QLabel(QString::fromStdString(comment.Content));
     contentLabel->setWordWrap(true);
+    contentLabel->setMinimumHeight(40);
     contentLabel->setStyleSheet(
         "font-family: 'Segoe UI';"
         "font-size: 15px;"
@@ -615,7 +620,10 @@ void MainWindow::CreateComment(Comment comment)
     mainLayout->addWidget(contentLabel);
     mainLayout->addLayout(bottomLayout);
 
-    ui->widget_7->layout()->addWidget(card);
+	// Add card to the top of the comments section
+	QBoxLayout* layout = qobject_cast<QBoxLayout*>(ui->widget_7->layout()); // cast as QBoxLayout to use insertWidget
+    if (layout)
+        layout->insertWidget(0, card);
 }
 
 void MainWindow::DisplayComments() {
@@ -638,8 +646,8 @@ void MainWindow::ClearLayout(QLayout* layout) {
 }
 
 void MainWindow::on_postComment_clicked() {
-	std::string ProfName = ui->professorName->text().toStdString().substr(10); // Remove "Professor " prefix
-	std::string CourseName = ui->courseName->text().toStdString().substr(7); // Remove "Course " prefix
+	std::string ProfName = ui->professorName->text().toStdString().substr(4); // Remove "Dr.  " prefix
+    std::string CourseName = ui->courseName->text().toStdString();
     std::string content = ui->commentLineEdit->text().toStdString();
     if (content.empty()) return; // Don't post empty comments
     try {
@@ -663,6 +671,7 @@ void MainWindow::on_postComment_clicked() {
         // Let's send it!
         boost::beast::http::write(socket, request);
 
+
 		// Retrieve the generated comment ID & timestamp
         boost::beast::flat_buffer buf;
         boost::beast::http::response<boost::beast::http::string_body> server_response;
@@ -673,9 +682,13 @@ void MainWindow::on_postComment_clicked() {
 		std::string timestamp = (std::string)response["timestamp"].as_string();
 		int commentID = (int)response["id"].as_int64();
 
+		cout << "Comment posted with ID: " << commentID << " at " << timestamp << endl;
+
 		// Create comment object
-        Comment commentObj{ commentID, UserID, content, timestamp };
+        Comment commentObj(commentID, UserID, user->GetUsername(), content, timestamp);
 		Comments.push_back(commentObj); 
+        
+
 
 		// Display the new comment
 		CreateComment(commentObj);
@@ -684,4 +697,5 @@ void MainWindow::on_postComment_clicked() {
     catch (std::exception& e) {
         std::cout << "Connection failed: " << e.what() << std::endl;
     }
+	ui->commentLineEdit->clear(); // Clear the input field after posting
 }

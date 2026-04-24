@@ -336,7 +336,7 @@ void handle_request(const http::request<http::string_body>& req,
             sql::Connection* con = dbPool->get();
             sql::PreparedStatement* pstmt(
                 con->prepareStatement("SELECT usr.username, cmnt.user_id, cmnt.id, cmnt.content, cmnt.timestamp FROM comments cmnt JOIN users usr ON cmnt.user_id = usr.id WHERE cmnt.course_id = ? AND cmnt.professor_id = ? "
-                    "ORDER BY cmnt.timestamp DESC"));
+                    "ORDER BY cmnt.timestamp ASC"));
             pstmt->setString(1, Course_ID);
             pstmt->setString(2, Prof_ID);
             sql::ResultSet* res = pstmt->executeQuery();
@@ -373,11 +373,13 @@ void handle_request(const http::request<http::string_body>& req,
             sql::Connection* con = dbPool->get();
             sql::PreparedStatement* pstmt(
                 con->prepareStatement("INSERT INTO comments (professor_id, course_id, user_id, content) VALUES (?, ?, ?, ?)"));
-            pstmt->setInt(1, comment["professor_id"].as_int64());
+            pstmt->setInt(1, comment["prof_id"].as_int64());
             pstmt->setInt(2, comment["course_id"].as_int64());
             pstmt->setInt(3, comment["user_id"].as_int64());
-            pstmt->setString(4, comment["content"].as_string());
+            pstmt->setString(4, (std::string)comment["content"].as_string());
             pstmt->executeUpdate();
+
+            
             
 			// Retrieve the generated comment ID and timestamp
             sql::Statement* stmt = con->createStatement();
