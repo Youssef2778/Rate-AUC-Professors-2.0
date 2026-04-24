@@ -362,8 +362,20 @@ void MainWindow::on_pushButton_clicked()
     std::string CourseName = ui->CourseCB->currentText().toStdString();
     this->m_currentCourseId = Courses[CourseName];
 
+    // Move to page first so the layout knows it's visible
     ui->stackedWidget->setCurrentIndex(2);
-    // Don't build the table manually here, let refreshList do it!
+    this->showMaximized();
+
+            // 1. Ensure the container layout is actually used
+    if (ui->stackedWidget->widget(2)->layout() == nullptr) {
+        QVBoxLayout *layout = new QVBoxLayout(ui->stackedWidget->widget(2));
+        layout->addWidget(ui->tableWidget);
+        ui->stackedWidget->widget(2)->setLayout(layout);
+    }
+
+            // 2. Force the headers to stretch
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
     this->refreshList();
 }
 void MainWindow::handleUpvote(const std::string& profID, int courseID) {
@@ -483,4 +495,15 @@ void MainWindow::handleDownvote(const std::string& profID, int courseID) {
     } catch (std::exception& e) {
         std::cout << "Downvote failed: " << e.what() << std::endl;
     }
+}
+void MainWindow::on_backButton_clicked()
+{
+    // 1. Go back to the Course Selection page (Index 3 based on your earlier code)
+    ui->stackedWidget->setCurrentIndex(3);
+
+            // 2. Shrink the window back to its "Normal" size
+    this->showNormal();
+
+    // 3. Optional: Center the widget again if it looks off
+    CenterWidget(3, ui->widget_3);
 }
