@@ -359,23 +359,11 @@ void MainWindow::on_DepartmentCB_currentIndexChanged(int index)
 }
 void MainWindow::on_pushButton_clicked()
 {
-    // 1. Get the ID from the dropdown mapping
     std::string CourseName = ui->CourseCB->currentText().toStdString();
-
-    // SAVE it to the member variable so refreshList() can use it later!
     this->m_currentCourseId = Courses[CourseName];
 
-            // 2. Move to the leaderboard page
     ui->stackedWidget->setCurrentIndex(2);
-    CenterWidget(2, ui->tableWidget);
-
-            // 3. Set up the table structure once
-    ui->tableWidget->setColumnCount(6);
-    ui->tableWidget->setHorizontalHeaderLabels({"Rank", "Name", "Score", "Up", "Down", "Approval"});
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
-
-            // 4. Trigger the refresh!
+    // Don't build the table manually here, let refreshList do it!
     this->refreshList();
 }
 void MainWindow::handleUpvote(const std::string& profID, int courseID) {
@@ -475,17 +463,23 @@ void MainWindow::handleDownvote(const std::string& profID, int courseID) {
         voteData["course_id"] = courseID;
 
         http::request<http::string_body> request(http::verb::post, "/downvote", 11);
-        request.set(http::field::host, "127.0.0.1");
         request.set(http::field::content_type, "application/json");
         request.body() = boost::json::serialize(voteData);
         request.prepare_payload();
 
+                // 1. Send the vote
         http::write(socket, request);
 
-        // Read the empty response to clear the socket buffer
+                // 2. Read the response (Must do this to clear the socket!)
         beast::flat_buffer buffer;
         http::response<http::string_body> response;
         http::read(socket, buffer, response);
+
+                // 3. Check if successful and REFRESH
+        if (response.result() == http::status::ok) {
+            std::cout << "Downvote success! Refreshing..." << std::endl;
+            this->refreshList(); // <--- THIS IS THE MISSING LINK
+        }
     } catch (std::exception& e) {
         std::cout << "Downvote failed: " << e.what() << std::endl;
     }
