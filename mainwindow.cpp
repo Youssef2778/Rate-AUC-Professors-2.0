@@ -359,143 +359,24 @@ void MainWindow::on_DepartmentCB_currentIndexChanged(int index)
 }
 void MainWindow::on_pushButton_clicked()
 {
-    //Pass the selected course_id
+    // 1. Get the ID from the dropdown mapping
     std::string CourseName = ui->CourseCB->currentText().toStdString();
-    int CourseID = Courses[CourseName]; // Get the course ID using the mapping stored
-    //Load the leaderboard page
+
+    // SAVE it to the member variable so refreshList() can use it later!
+    this->m_currentCourseId = Courses[CourseName];
+
+            // 2. Move to the leaderboard page
     ui->stackedWidget->setCurrentIndex(2);
     CenterWidget(2, ui->tableWidget);
-    // // 1. Initialize the table structure
-    ui->tableWidget->setColumnCount(5);
-    ui->tableWidget->setRowCount(6);
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->tableWidget->verticalHeader()->setVisible(false);
-    ui->tableWidget->setShowGrid(false);
 
-            // 1. FORCE the table to have 6 columns and set their names
+            // 3. Set up the table structure once
     ui->tableWidget->setColumnCount(6);
-    ui->tableWidget->setHorizontalHeaderLabels({"Rank", "Name", "Score", "up", "down", "Approval"});
-
-            // 2. Stop Qt from auto-stretching the final column
-    ui->tableWidget->horizontalHeader()->setStretchLastSection(false);
-    ui->tableWidget->horizontalHeader()->setMinimumSectionSize(30);
-
-            // 3. Let Name and Score stretch to fill the middle space
+    ui->tableWidget->setHorizontalHeaderLabels({"Rank", "Name", "Score", "Up", "Down", "Approval"});
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(2, QHeaderView::Stretch);
 
-            // 4. Set Fixed Widths (Widened the buttons to 70px so they aren't squished!)
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
-    ui->tableWidget->setColumnWidth(0, 60);  // Rank
-
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Fixed);
-    ui->tableWidget->setColumnWidth(3, 70);  // Upvote Button (Widened!)
-
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(4, QHeaderView::Fixed);
-    ui->tableWidget->setColumnWidth(4, 70);  // Downvote Button (Widened!)
-
-            // ui->tableWidget->horizontalHeader()->setSectionResizeMode(5, QHeaderView::Fixed);
-            // ui->tableWidget->setColumnWidth(5, 120); // Progress Bar
-
-            // the desin of the leaderboard was coassisted by AI in order to get the right color pallets and design down
-    try {
-        // Send GET /get-professors
-        http::request<http::string_body> request(http::verb::get, "/get-professors?Id=" + std::to_string(CourseID), 11);
-        request.set(http::field::host, "127.0.0.1");
-        request.prepare_payload();
-        http::write(socket, request);
-        std::cout << "Send req" << std::endl;
-
-                // Read the response
-        beast::flat_buffer buffer;
-        http::response<http::string_body> response;
-        http::read(socket, buffer, response);
-        std::cout << "Read Response" << std::endl;
-
-                // Parse the JSON array
-        auto parsed = boost::json::parse(response.body());
-        boost::json::array& professors = parsed.as_array();
-        std::cout << "Parsed" << std::endl;
-
-        int Max;
-        bool first = true;
-
-        ui->tableWidget->setRowCount(professors.size());
-
-        int row = 0;
-        std::cout << "Before loop" << std::endl;
-
-        for (auto& entry : professors) {
-
-            std::cout << entry << std::endl;
-            boost::json::object& prof = entry.as_object();
-            std::string Name = (std::string)prof["name"].as_string();
-            std::string ID = (std::string)prof["id"].as_string();
-            std::string Score = (std::string)prof["score"].as_string();
-            Profs[Name] = ID; // Store the mapping of professor name to ID
-
-                    // populate the the table
-                    // 2. Loop to create the 6 professor "cards"
-
-                    // Text Data
-            QTableWidgetItem *rank = new QTableWidgetItem(QString::number(row + 1));
-            QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(Name));
-            QTableWidgetItem *score = new QTableWidgetItem(QString::fromStdString(Score)); // ✅ FIX
-
-
-                    // Inject it into Column 5 of the current row
-
-                    // 2. Now that they have names, we can center them
-            rank->setTextAlignment(Qt::AlignCenter);
-            name->setTextAlignment(Qt::AlignCenter);
-            score->setTextAlignment(Qt::AlignCenter);
-
-                    // 3. Finally, put the finished items into the table
-            ui->tableWidget->setItem(row, 0, rank);
-            ui->tableWidget->setItem(row, 1, name);
-            ui->tableWidget->setItem(row, 2, score);
-
-                    // Change the buttons to text or standard symbols
-            QPushButton *up = new QPushButton;
-            up->setIcon(QIcon("://images/up.png")); // <--- Paste your path here
-            up->setIconSize(QSize(24, 24));
-
-            QPushButton *down = new QPushButton;
-            down->setIcon(QIcon("://images/down.png")); // <--- Paste your path here
-            down->setIconSize(QSize(24, 24));
-
-                    /// We now capture 'CourseID' alongside 'this', 'ID', 'up', and 'down'
-            connect(up, &QPushButton::clicked, this, [this, ID, CourseID, up, down]() {
-                handleUpvote(ID, CourseID); // Pass both to the network function
-                up->setEnabled(false);
-                down->setEnabled(false);
-                up->setStyleSheet("background-color: #1d8e9e; color: white; border-radius: 5px;");
-            });
-
-            connect(down, &QPushButton::clicked, this, [this, ID, CourseID, up, down]() {
-                handleDownvote(ID, CourseID); // Pass both to the network function
-                up->setEnabled(false);
-                down->setEnabled(false);
-                down->setStyleSheet("background-color: #e04b4b; color: white; border-radius: 5px;");
-            });
-                    // Button Styling
-            QString btnStyle = "QPushButton { background-color: #0b2239; color: white; border-radius: 5px; border: 1px solid #1d8e9e; font-family: 'Segoe UI Emoji'; }";
-            up->setStyleSheet(btnStyle);
-            down->setStyleSheet(btnStyle);
-
-                    // Put buttons in the correct columns
-            ui->tableWidget->setCellWidget(row, 3, up);
-            ui->tableWidget->setCellWidget(row, 4, down);
-
-                    // Match the row height to the design
-            ui->tableWidget->setRowHeight(row, 60);
-
-            row++; // ✅ FIX: move to next row
-        }
-    }
-    catch (std::exception& e) {
-        std::cout << "Failed: " << e.what() << std::endl;
-    }
+            // 4. Trigger the refresh!
+    this->refreshList();
 }
 void MainWindow::handleUpvote(const std::string& profID, int courseID) {
     try {
@@ -504,22 +385,89 @@ void MainWindow::handleUpvote(const std::string& profID, int courseID) {
         voteData["course_id"] = courseID;
 
         http::request<http::string_body> request(http::verb::post, "/upvote", 11);
-        request.set(http::field::host, "127.0.0.1");
         request.set(http::field::content_type, "application/json");
         request.body() = boost::json::serialize(voteData);
         request.prepare_payload();
 
-        http::write(socket, request); // Note: See my previous warning about blocking the UI thread here!
+        http::write(socket, request);
 
-        // Read the empty response to clear the socket buffer
+                // Read response to keep the socket clean
         beast::flat_buffer buffer;
         http::response<http::string_body> response;
         http::read(socket, buffer, response);
+
+        if (response.result() == http::status::ok) {
+            std::cout << "Upvote success!" << std::endl;
+            // REFRESH the screen immediately
+            this->refreshList();
+        }
     } catch (std::exception& e) {
         std::cout << "Upvote failed: " << e.what() << std::endl;
     }
 }
+void MainWindow::refreshList() {
+    try {
+        // 1. Ask for professors using the SAVED ID
+        std::string target = "/get-professors?Id=" + std::to_string(m_currentCourseId);
+        http::request<http::string_body> req{http::verb::get, target, 11};
+        req.set(http::field::host, "127.0.0.1");
+        http::write(socket, req);
 
+                // 2. Read the response
+        beast::flat_buffer buffer;
+        http::response<http::string_body> res;
+        http::read(socket, buffer, res);
+
+                // 3. Parse and Clear Table
+        auto professors = boost::json::parse(res.body()).as_array();
+        ui->tableWidget->setRowCount(0); // Clear old rows
+
+        int row = 0;
+        for (auto& entry : professors) {
+            auto& prof = entry.as_object();
+            ui->tableWidget->insertRow(row);
+
+                    // Data Extraction
+            std::string nameStr = prof.at("name").as_string().c_str();
+            std::string idStr = prof.at("id").as_string().c_str();
+            std::string scoreStr = prof.at("score").as_string().c_str();
+
+                    // Create Items
+            QTableWidgetItem *rank = new QTableWidgetItem(QString::number(row + 1));
+            QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(nameStr));
+            QTableWidgetItem *score = new QTableWidgetItem(QString::fromStdString(scoreStr));
+
+            rank->setTextAlignment(Qt::AlignCenter);
+            name->setTextAlignment(Qt::AlignCenter);
+            score->setTextAlignment(Qt::AlignCenter);
+
+            ui->tableWidget->setItem(row, 0, rank);
+            ui->tableWidget->setItem(row, 1, name);
+            ui->tableWidget->setItem(row, 2, score);
+
+                    // 4. Create Buttons
+            QPushButton *up = new QPushButton("▲");
+            QPushButton *down = new QPushButton("▼");
+
+            // Re-capture the current Course ID and Prof ID for the lambda
+            int currentCID = this->m_currentCourseId;
+            connect(up, &QPushButton::clicked, this, [this, idStr, currentCID]() {
+                handleUpvote(idStr, currentCID);
+            });
+
+            connect(down, &QPushButton::clicked, this, [this, idStr, currentCID]() {
+                handleDownvote(idStr, currentCID);
+            });
+
+            ui->tableWidget->setCellWidget(row, 3, up);
+            ui->tableWidget->setCellWidget(row, 4, down);
+            ui->tableWidget->setRowHeight(row, 60);
+            row++;
+        }
+    } catch (std::exception& e) {
+        std::cerr << "Refresh failed: " << e.what() << std::endl;
+    }
+}
 void MainWindow::handleDownvote(const std::string& profID, int courseID) {
     try {
         boost::json::object voteData;

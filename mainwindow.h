@@ -26,6 +26,14 @@ class MainWindow : public QMainWindow
     std::unordered_map<std::string, std::string> Profs;
 
 
+    int m_currentCourseId; // To remember which course we are viewing
+
+
+    // We'll use a unique_ptr so we can reconnect if needed
+    std::unique_ptr<boost::asio::ip::tcp::socket> m_socket;
+
+            // A function we can call anytime to refresh the list
+    void refreshList();
     // For persistent connection to be established once at startup
     boost::asio::io_context io;
     boost::asio::ip::tcp::socket socket{io};
