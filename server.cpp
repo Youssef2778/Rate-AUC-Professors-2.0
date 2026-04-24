@@ -237,46 +237,100 @@ void handle_request(const http::request<http::string_body>& req,
         }
     }
 
-else if (req.target() == "/upvote" || req.target() == "/downvote") {
-    auto parsed = json::parse(req.body());
-    json::object obj = parsed.as_object();
+    else if (req.target().starts_with("/upvote")) { // <-- FIX 1: starts_with prevents the skip!
+        std::cout << "\n--- STARTING UPVOTE ROUTE ---" << std::endl;
+        sql::Connection* con = nullptr;
 
-    std::string profID = obj["professor_id"].is_string()
-                             ? std::string(obj["professor_id"].as_string())
-                             : std::to_string(obj["professor_id"].as_int64());
+        try {
+            std::cout << "[Step 1] Parsing JSON from frontend..." << std::endl;
+            auto parsed = boost::json::parse(req.body());
+            boost::json::object json_obj = parsed.as_object();
 
-    int courseID = obj["course_id"].is_int64()
-                       ? obj["course_id"].as_int64()
-                       : std::stoi(std::string(obj["course_id"].as_string()));
+                    // FIX 2: Safely extract IDs whether Qt sent them as strings OR integers
+            int prof_id = 0;
+            if (json_obj.at("professor_id").is_string()) {
+                prof_id = std::stoi(json_obj.at("professor_id").as_string().c_str());
+            } else {
+                prof_id = json_obj.at("professor_id").as_int64();
+            }
 
-    // Determine if we are adding or subtracting
-    std::string query = (req.target() == "/upvote")
-                            ? "UPDATE course_professor SET score = score + 1 WHERE professor_id = ? AND course_id = ?"
-                            : "UPDATE course_professor SET score = score - 1 WHERE professor_id = ? AND course_id = ?";
+            int course_id = 0;
+            if (json_obj.at("course_id").is_string()) {
+                course_id = std::stoi(json_obj.at("course_id").as_string().c_str());
+            } else {
+                course_id = json_obj.at("course_id").as_int64();
+            }
 
-    try {
-        sql::Connection* con = dbPool->get();
-        sql::PreparedStatement* pstmt(con->prepareStatement(query));
+            std::cout << "[Step 1 Done] Parsed Course: " << course_id << ", Prof: " << prof_id << std::endl;
 
-        pstmt->setString(1, profID);
-        pstmt->setInt(2, courseID);
+            std::cout << "[Step 2] Getting Connection from Pool..." << std::endl;
+            con = dbPool->get();
+            std::cout << "[Step 2 Done] DB Connected!" << std::endl;
 
-        pstmt->executeUpdate();
+            std::cout << "[Step 3] Executing SQL..." << std::endl;
+            sql::PreparedStatement* pstmt = con->prepareStatement(
+                "UPDATE course_professor SET score = score + 1 WHERE course_id = ? AND professor_id = ?"
+                );
+            pstmt->setInt(1, course_id);
+            pstmt->setInt(2, prof_id);
+            int rows = pstmt->executeUpdate();
 
-        delete pstmt;
-        dbPool->release(con);
+            delete pstmt;
+            dbPool->release(con);
+            std::cout << "[Step 3 Done] Rows updated: " << rows << std::endl;
 
-        // Send success response
-        http::response<http::string_body> res{http::status::ok, req.version()};
-        res.prepare_payload();
-        http::write(socket, res);
+            std::cout << "[Step 4] Sending OK back to Qt..." << std::endl;
+            http::response<http::string_body> res{http::status::ok, req.version()};
+            res.prepare_payload();
+            http::write(socket, res);
+            std::cout << "--- UPVOTE COMPLETE ---\n" << std::endl;
 
-    } catch (sql::SQLException& e) {
-        std::cerr << "Vote Error: " << e.what() << " (Code: " << e.getErrorCode() << ")" << std::endl;
-        http::response<http::string_body> res{http::status::internal_server_error, req.version()};
-        res.prepare_payload();
-        http::write(socket, res);
+        } catch (sql::SQLException& e) {
+            std::cout << "\n[CRASH IN SQL] " << e.what() << std::endl;
+            if (con) dbPool->release(con);
+            http::response<http::string_body> res{http::status::internal_server_error, req.version()};
+            res.prepare_payload();
+            http::write(socket, res);
+        } catch (std::exception& e) {
+            std::cout << "\n[CRASH IN JSON/C++] " << e.what() << std::endl;
+            if (con) dbPool->release(con);
+            http::response<http::string_body> res{http::status::bad_request, req.version()};
+            res.prepare_payload();
+            http::write(socket, res);
+        }
     }
+
+    else if (req.target() == "/downvote" && req.method() == http::verb::post) {
+        try {
+            std::cout << "\n--- DOWNVOTE REQUEST RECEIVED ---" << std::endl;
+
+            auto parsed = boost::json::parse(req.body());
+            boost::json::object json_obj = parsed.as_object();
+
+            std::string prof_id_str = json_obj["professor_id"].as_string().c_str();
+            int prof_id = std::stoi(prof_id_str);
+            int course_id = json_obj["course_id"].as_int64();
+
+             sql::Connection* con = dbPool->get();
+            sql::PreparedStatement* pstmt = con->prepareStatement(
+                "UPDATE course_professor SET score = score - 1 WHERE course_id = ? AND professor_id = ?"
+                );
+            pstmt->setInt(1, course_id);
+            pstmt->setInt(2, prof_id);
+
+            int rows = pstmt->executeUpdate();
+            std::cout << "SUCCESS! Downvote Rows updated in DB: " << rows << std::endl;
+            delete pstmt;
+
+            http::response<http::string_body> res{http::status::ok, req.version()};
+            res.prepare_payload();
+            http::write(socket, res);
+
+        } catch (sql::SQLException& e) { // SQL catch MUST be first!
+            std::cout << "SQL Error: " << e.what() << std::endl;
+        } catch (std::exception& e) {
+            std::cout << "JSON/Parsing Error: " << e.what() << std::endl;
+        }
     }
     else if (req.target().starts_with("/get-professors")) {
         boost::json::array professors;
