@@ -362,19 +362,85 @@ void MainWindow::on_pushButton_clicked()
     std::string CourseName = ui->CourseCB->currentText().toStdString();
     this->m_currentCourseId = Courses[CourseName];
 
-    // Move to page first so the layout knows it's visible
     ui->stackedWidget->setCurrentIndex(2);
     this->showMaximized();
 
-            // 1. Ensure the container layout is actually used
-    if (ui->stackedWidget->widget(2)->layout() == nullptr) {
-        QVBoxLayout *layout = new QVBoxLayout(ui->stackedWidget->widget(2));
-        layout->addWidget(ui->tableWidget);
-        ui->stackedWidget->widget(2)->setLayout(layout);
+            // ==========================================
+            // 1. LAYOUT & BACK BUTTON FIX
+            // ==========================================
+    QWidget* page = ui->stackedWidget->widget(2);
+    if (page->layout()) {
+        delete page->layout();
     }
 
-            // 2. Force the headers to stretch
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    QVBoxLayout *mainLayout = new QVBoxLayout(page);
+
+    // Add some padding around the edges of the screen so it breathes
+    mainLayout->setContentsMargins(20, 20, 20, 20);
+    mainLayout->setSpacing(15); // Adds a gap between the top bar and the table
+
+    QHBoxLayout *topBarLayout = new QHBoxLayout();
+    topBarLayout->addStretch(); // Pushes the button to the right
+
+            // Style the Back Button so it looks good!
+    ui->backButton->setText("⬅ Back to Courses");
+    ui->backButton->setCursor(Qt::PointingHandCursor);
+    ui->backButton->setStyleSheet(
+        "QPushButton { "
+        "background-color: #1d8e9e; "
+        "color: white; "
+        "border-radius: 5px; "
+        "font-size: 16px; "
+        "font-weight: bold; "
+        "padding: 8px 20px; "
+        "} "
+        "QPushButton:hover { background-color: #0b2239; border: 2px solid #1d8e9e; }"
+        );
+
+    topBarLayout->addWidget(ui->backButton);
+
+    mainLayout->addLayout(topBarLayout);
+    mainLayout->addWidget(ui->tableWidget);
+
+    page->setLayout(mainLayout);
+
+    // ==========================================
+    // 2. TABLE COLUMN SIZES FIX (BALANCED)
+    // ==========================================
+    QHeaderView* header = ui->tableWidget->horizontalHeader();
+
+            // Stop the last column from forcing a stretch
+    header->setStretchLastSection(false);
+
+            // Rank: Set to a fixed, wider size so it takes up more visual space
+    header->setSectionResizeMode(0, QHeaderView::Fixed);
+    ui->tableWidget->setColumnWidth(0, 150); // 150 pixels wide
+
+    // Name: Still stretches, but now has less space to steal
+    header->setSectionResizeMode(1, QHeaderView::Stretch);
+
+    // Score: Set to a fixed, wider size
+    header->setSectionResizeMode(2, QHeaderView::Fixed);
+    ui->tableWidget->setColumnWidth(2, 150); // 150 pixels wide
+
+            // Up & Down Buttons: Locked to 80 pixels
+    header->setSectionResizeMode(3, QHeaderView::Fixed);
+    ui->tableWidget->setColumnWidth(3, 80);
+
+    header->setSectionResizeMode(4, QHeaderView::Fixed);
+    ui->tableWidget->setColumnWidth(4, 80);
+
+            // Style the Header row
+    header->setStyleSheet(
+        "QHeaderView::section { "
+        "font-size: 18px; "
+        "font-weight: bold; "
+        "background-color: #061524; "
+        "color: white; "
+        "border: none; "
+        "border-bottom: 2px solid #1d8e9e; "
+        "}"
+        );
 
     this->refreshList();
 }
@@ -432,10 +498,21 @@ void MainWindow::refreshList() {
             std::string idStr = prof.at("id").as_string().c_str();
             std::string scoreStr = prof.at("score").as_string().c_str();
 
-                    // Create Items
+
+            // Create Items
             QTableWidgetItem *rank = new QTableWidgetItem(QString::number(row + 1));
             QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(nameStr));
             QTableWidgetItem *score = new QTableWidgetItem(QString::fromStdString(scoreStr));
+
+            // --- ADD THIS TO MAKE THE FONT BIGGER ---
+            QFont tableFont;
+            tableFont.setPointSize(16); // Nice, big, readable font
+            tableFont.setBold(true);
+
+            rank->setFont(tableFont);
+            name->setFont(tableFont);
+            score->setFont(tableFont);
+            // ----------------------------------------
 
             rank->setTextAlignment(Qt::AlignCenter);
             name->setTextAlignment(Qt::AlignCenter);
@@ -453,7 +530,16 @@ void MainWindow::refreshList() {
             // Make the icons look good
             up->setIconSize(QSize(32, 32));
             down->setIconSize(QSize(32, 32));
+            QString btnStyle = "QPushButton { "
+                "background-color: #0b2239; "
+                "border: 1px solid #1d8e9e; "
+                "border-radius: 8px; "
+                "} "
+                "QPushButton:hover { background-color: #1d8e9e; } "
+                "QPushButton:pressed { background-color: #091a2b; }";
 
+            up->setStyleSheet(btnStyle);
+            down->setStyleSheet(btnStyle);
             // Re-capture the current Course ID and Prof ID for the lambda
             int currentCID = this->m_currentCourseId;
             connect(up, &QPushButton::clicked, this, [this, idStr, currentCID]() {
@@ -503,7 +589,7 @@ void MainWindow::handleDownvote(const std::string& profID, int courseID) {
 }
 
 
-void MainWindow::on_backbutton_clicked()
+void MainWindow::on_backButton_clicked()
 {
     // 1. Go back to the Course Selection page (Index 3 based on your earlier code)
     ui->stackedWidget->setCurrentIndex(3);

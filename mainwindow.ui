@@ -572,11 +572,6 @@ QHeaderView::section {
           <string>down</string>
          </property>
         </column>
-        <column>
-         <property name="text">
-          <string>bar</string>
-         </property>
-        </column>
         <item row="0" column="0">
          <property name="text">
           <string/>
@@ -653,7 +648,7 @@ QHeaderView::section {
          </property>
         </item>
        </widget>
-       <widget class="QPushButton" name="backbutton">
+       <widget class="QPushButton" name="backButton">
         <property name="geometry">
          <rect>
           <x>1540</x>
@@ -676,7 +671,7 @@ QHeaderView::section {
 );</string>
         </property>
         <property name="text">
-         <string>backbutton</string>
+         <string>backButton</string>
         </property>
        </widget>
       </widget>
