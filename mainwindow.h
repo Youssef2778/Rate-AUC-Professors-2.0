@@ -60,7 +60,7 @@ class MainWindow : public QMainWindow
     // ✅ NEW: Added declarations for the upvote and downvote handlers
     void handleUpvote(const std::string& profID, int courseID);
     void handleDownvote(const std::string& profID, int courseID);
-    void on_backButton_clicked();
+    void on_backbutton_clicked();
 };
 
 #endif  // MAINWINDOW_H

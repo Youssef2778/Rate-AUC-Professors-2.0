@@ -444,10 +444,15 @@ void MainWindow::refreshList() {
             ui->tableWidget->setItem(row, 0, rank);
             ui->tableWidget->setItem(row, 1, name);
             ui->tableWidget->setItem(row, 2, score);
+            QPushButton *up = new QPushButton;
+            QPushButton *down = new QPushButton;
 
-                    // 4. Create Buttons
-            QPushButton *up = new QPushButton("▲");
-            QPushButton *down = new QPushButton("▼");
+            up->setIcon(QIcon(":/images/up.png"));   // Use your exact resource path
+            down->setIcon(QIcon(":/images/down.png")); // Use your exact resource path
+
+            // Make the icons look good
+            up->setIconSize(QSize(32, 32));
+            down->setIconSize(QSize(32, 32));
 
             // Re-capture the current Course ID and Prof ID for the lambda
             int currentCID = this->m_currentCourseId;
@@ -496,7 +501,9 @@ void MainWindow::handleDownvote(const std::string& profID, int courseID) {
         std::cout << "Downvote failed: " << e.what() << std::endl;
     }
 }
-void MainWindow::on_backButton_clicked()
+
+
+void MainWindow::on_backbutton_clicked()
 {
     // 1. Go back to the Course Selection page (Index 3 based on your earlier code)
     ui->stackedWidget->setCurrentIndex(3);
@@ -504,6 +511,7 @@ void MainWindow::on_backButton_clicked()
             // 2. Shrink the window back to its "Normal" size
     this->showNormal();
 
-    // 3. Optional: Center the widget again if it looks off
+            // 3. Optional: Center the widget again if it looks off
     CenterWidget(3, ui->widget_3);
 }
+

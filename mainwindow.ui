@@ -653,11 +653,11 @@ QHeaderView::section {
          </property>
         </item>
        </widget>
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="backbutton">
         <property name="geometry">
          <rect>
-          <x>870</x>
-          <y>80</y>
+          <x>1540</x>
+          <y>0</y>
           <width>80</width>
           <height>22</height>
          </rect>
