@@ -1,5 +1,6 @@
 #include "mainwindow.h"
-
+#include "User.h"
+#include "Comment.h"
 #include <QProgressBar>
 #include <boost/asio.hpp>
 #include <boost/beast/core.hpp>
@@ -13,19 +14,21 @@
 #include "ui_mainwindow.h" //removed "./" because ui_mainwindow.h is generated in build\Rate_AUC_autogen\include\ and not the build directory
 #include "bcrypt/BCrypt.hpp"
 
+// Homepage index = 3
+// Login = 0
+// Register = 1
+// leaderboard = 2
+
 namespace beast = boost::beast;
 namespace http = beast::http;
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->stackedWidget->setCurrentIndex(0);
-
-    // Hiding error messages
-    ui->email_notFound_error->hide();
-    ui->password_incorrect_error->hide();
-
-    CenterWidget(0, ui->widget_1);
+    // Initialize the user pointer to nullptr at the start of the application
+    user = nullptr;
+    
+    LoginPage();
 
     // Attempt to establish a persistent connection in the background once the app launches
     std::thread(&MainWindow::EstablishConnection, this).detach();
@@ -34,6 +37,124 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::LoginPage()
+{
+    ui->stackedWidget->setCurrentIndex(0);
+
+    // Hiding error messages
+    ui->email_notFound_error->hide();
+    ui->password_incorrect_error->hide();
+
+    CenterWidget(0, ui->widget_1);
+}
+
+void MainWindow::RegisterPage()
+{
+    ui->stackedWidget->setCurrentIndex(1);
+
+    // Hiding the error messages.
+    ui->empty_email_error->hide();
+    ui->empty_username_error->hide();
+    ui->auc_email_error->hide();
+    ui->empty_pass_error->hide();
+    ui->empty_confPass_error->hide();
+    ui->unequal_pass_error->hide();
+
+    CenterWidget(1, ui->widget_2);
+}
+
+// Loads the homepage when called.
+void MainWindow::HomePage()
+{
+    ui->stackedWidget->setCurrentIndex(3);
+    CenterWidget(3, ui->widget_3);
+
+    // Request the departments from the server
+    try {
+        // Send GET /get-departments
+        http::request<http::string_body> request(http::verb::get, "/get-departments", 11);
+        request.set(http::field::host, "127.0.0.1");
+        request.prepare_payload();
+        http::write(socket, request);
+
+        // Read the response
+        beast::flat_buffer buffer;
+        http::response<http::string_body> response;
+        http::read(socket, buffer, response);
+
+        // Parse the JSON array
+        auto parsed = boost::json::parse(response.body());
+        boost::json::array& departments = parsed.as_array();
+
+        for (auto& entry : departments) {
+            boost::json::object& dept = entry.as_object();
+            std::string name = (std::string)dept["department_name"].as_string();
+            int ID = (int)dept["id"].as_int64();
+            Deps[name] = ID;  // Store the mapping of department name to ID
+            // populate the QComboBox
+            ui->DepartmentCB->addItem(QString::fromStdString(name));
+        }
+    } catch (std::exception& e) {
+        std::cout << "Failed: " << e.what() << std::endl;
+    }
+}
+
+
+void MainWindow::professorPage(std::string ProfName, std::string CourseName) {
+    ui->stackedWidget->setCurrentIndex(4);
+    ui->scrollArea->setWidgetResizable(true);
+    ui->widget_7->setMaximumHeight(QWIDGETSIZE_MAX);
+
+	ui->professorName->setText("Dr. " + QString::fromStdString(ProfName));
+	ui->courseName->setText(QString::fromStdString(CourseName));
+
+
+	// Request the comments for this professor-course from the server
+    try {
+
+        // Send GET /get-comments?CourseId=CourseID&ProfId=ProfID
+        http::request<http::string_body> request(http::verb::get,
+            "/get-comments?CourseId=" + std::to_string(Courses[CourseName]) + "&ProfId=" + std::to_string(Profs[ProfName]), 11);
+        request.set(http::field::host, "127.0.0.1");
+        request.prepare_payload();
+        http::write(socket, request);
+
+        // Read the response
+        beast::flat_buffer buffer;
+        http::response<http::string_body> response;
+        http::read(socket, buffer, response);
+
+        // Parse the JSON array
+        auto parsed = boost::json::parse(response.body());
+        boost::json::array& comments = parsed.as_array();
+
+        // clear comments before populating it with the new comments
+        Comments.clear();
+        ClearLayout(ui->widget_7->layout());
+
+        for (auto& entry : comments) {
+            boost::json::object& comment = entry.as_object();
+            Comments.push_back(Comment( (int)comment["id"].as_int64(), (int)comment["user_id"].as_int64(), (std::string)comment["username"].as_string(),
+                                       (std::string)comment["content"].as_string(), (std::string)comment["timestamp"].as_string() ));
+        }
+    }
+    catch (std::exception& e) {
+        std::cout << "Failed: " << e.what() << std::endl;
+    }
+	cout << "Comments for Professor " << ProfName << " and Course " << CourseName << " loaded: " << Comments.size() << endl;
+    DisplayComments();
+	cout << "Comments displayed" << endl;
+}
+
+void MainWindow::Logout()
+{
+    // Clear the user session
+    delete user;
+    user = nullptr;
+    // Return to the login page
+    LoginPage();
 }
 
 void MainWindow::EstablishConnection()
@@ -95,31 +216,7 @@ void MainWindow::on_checkBox_4_stateChanged(int arg1)
 // Function executed when the user moves to the register page.
 void MainWindow::on_register_label_4_linkActivated(const QString& link)
 {
-    ui->stackedWidget->setCurrentIndex(1);
-
-    // Hiding the error messages.
-    ui->empty_email_error->hide();
-    ui->empty_username_error->hide();
-    ui->auc_email_error->hide();
-    ui->empty_pass_error->hide();
-    ui->empty_confPass_error->hide();
-    ui->unequal_pass_error->hide();
-
-    // Assume you have a widget inside the stacked page
-    QWidget* page = ui->stackedWidget->widget(1);  // second page
-    QVBoxLayout* vLayout = new QVBoxLayout(page);
-
-    // Create a horizontal layout for centering
-    QHBoxLayout* hLayout = new QHBoxLayout();
-    hLayout->addStretch();             // left spacer
-    hLayout->addWidget(ui->widget_2);  // your target widget
-    hLayout->addStretch();             // right spacer
-
-    vLayout->addStretch();  // top spacer
-    vLayout->addLayout(hLayout);
-    vLayout->addStretch();  // bottom spacer
-
-    page->setLayout(vLayout);
+    RegisterPage();
 }
 
 // "Hide Password" Mechanism of the Register Page
@@ -134,9 +231,10 @@ void MainWindow::on_checkBox_6_stateChanged(int arg1)
     }
 }
 
+// Function executed when the user moves back to the login page from the register page.
 void MainWindow::on_register_label_6_linkActivated(const QString& link)
 {
-    ui->stackedWidget->setCurrentIndex(0);
+    LoginPage();
 }
 
 // Function called when the "Register" Button in the Register page is clicked.
@@ -215,37 +313,19 @@ void MainWindow::on_pushButton_6_clicked()
         // Let's send it!
         boost::beast::http::write(socket, request);
 
-        // Send user to *student* homepage
-        ui->stackedWidget->setCurrentIndex(3);
+        // Retrieve the generated user ID
+        boost::beast::flat_buffer buf;
+        boost::beast::http::response<boost::beast::http::string_body> server_response;
+        boost::beast::http::read(socket, buf, server_response);
+        auto parsed_response = boost::json::parse(server_response.body());
+        boost::json::object response = parsed_response.as_object();
+        
+        // Create user for this session
+        user = new User((std::string)registration["username"].as_string(), (std::string)registration["email"].as_string(),
+                              (int)response["id"].as_int64());
 
-        // Request the departments from the server
-        try {
-            // Send GET /get-departments
-            http::request<http::string_body> request(http::verb::get, "/get-departments", 11);
-            request.set(http::field::host, "127.0.0.1");
-            request.prepare_payload();
-            http::write(socket, request);
-
-            // Read the response
-            beast::flat_buffer buffer;
-            http::response<http::string_body> response;
-            http::read(socket, buffer, response);
-
-            // Parse the JSON array
-            auto parsed = boost::json::parse(response.body());
-            boost::json::array& departments = parsed.as_array();
-
-            for (auto& entry : departments) {
-                boost::json::object& dept = entry.as_object();
-                std::string name = (std::string)dept["department_name"].as_string();
-                int ID = (int)dept["id"].as_int64();
-                Deps[name] = ID;  // Store the mapping of department name to ID
-                // populate the QComboBox
-                ui->DepartmentCB->addItem(QString::fromStdString(name));
-            }
-        } catch (std::exception& e) {
-            std::cout << "Failed: " << e.what() << std::endl;
-        }
+        // Send user to homepage
+        HomePage();
     } catch (std::exception& e) {
         std::cout << "Connection failed: " << e.what() << std::endl;
     }
@@ -276,41 +356,13 @@ void MainWindow::on_pushButton_4_clicked()
     auto parsed_response = boost::json::parse(server_response.body());
     boost::json::object json_response = parsed_response.as_object();
     bool logged_in = (bool)json_response["status"].as_bool();
+
+
     if (logged_in) {
-        this->m_currentUserId = (int)json_response["user_id"].as_int64();
-        ui->stackedWidget->setCurrentIndex(3);
-        CenterWidget(3, ui->widget_3);
-
-
-        // Request the departments from the server
-        try {
-            // Send GET /get-departments
-            http::request<http::string_body> request(http::verb::get, "/get-departments", 11);
-            request.set(http::field::host, "127.0.0.1");
-            request.prepare_payload();
-            http::write(socket, request);
-
-            // Read the response
-            beast::flat_buffer buffer;
-            http::response<http::string_body> response;
-            http::read(socket, buffer, response);
-
-            // Parse the JSON array
-            auto parsed = boost::json::parse(response.body());
-            boost::json::array& departments = parsed.as_array();
-
-            for (auto& entry : departments) {
-                boost::json::object& dept = entry.as_object();
-                std::string name = (std::string)dept["department_name"].as_string();
-                int ID = (int)dept["id"].as_int64();
-                Deps[name] = ID;  // Store the mapping of department name to ID
-                // populate the QComboBox
-                ui->DepartmentCB->addItem(QString::fromStdString(name));
-            }
-        } catch (std::exception& e) {
-            std::cout << "Failed: " << e.what() << std::endl;
-        }
-
+        // Create a user for this session
+        user = new User((std::string)json_response["username"].as_string(), (std::string)login["email"].as_string(),
+                              (int)json_response["id"].as_int64());
+        HomePage();
     } else {
         std::string error = (std::string)json_response["error"].as_string();
         if (error == "email not found")
@@ -444,15 +496,15 @@ void MainWindow::on_pushButton_clicked()
         "}"
         );
 
-    this->refreshList();
+    this->refreshList(CourseName);
 }
-void MainWindow::handleUpvote(const std::string& profID, int courseID) {
+void MainWindow::handleUpvote(const std::string& profID, int courseID, std::string CourseName) {
     try {
         boost::json::object voteData;
         // FIX 1 & 2: Correct spelling AND convert the string to an integer!
         voteData["professor_id"] = std::stoi(profID);
         voteData["course_id"] = courseID;
-        voteData["user_id"] = this->m_currentUserId;
+        voteData["user_id"] = user->GetID();
         voteData["vote"] = 1; // 1 means Upvote
 
         http::request<http::string_body> request(http::verb::post, "/upvote", 11);
@@ -462,7 +514,7 @@ void MainWindow::handleUpvote(const std::string& profID, int courseID) {
 
         http::write(socket, request);
 
-                // Read response to keep the socket clean
+        // Read response to keep the socket clean
         beast::flat_buffer buffer;
         http::response<http::string_body> response;
         http::read(socket, buffer, response);
@@ -470,13 +522,13 @@ void MainWindow::handleUpvote(const std::string& profID, int courseID) {
         if (response.result() == http::status::ok) {
             std::cout << "Upvote success!" << std::endl;
             // REFRESH the screen immediately
-            this->refreshList();
+            this->refreshList(CourseName);
         }
     } catch (std::exception& e) {
         std::cout << "Upvote failed: " << e.what() << std::endl;
     }
 }
-void MainWindow::refreshList() {
+void MainWindow::refreshList(std::string CourseName) {
     try {
         // 1. Ask for professors using the SAVED ID
         std::string target = "/get-professors?Id=" + std::to_string(m_currentCourseId);
@@ -498,15 +550,25 @@ void MainWindow::refreshList() {
             auto& prof = entry.as_object();
             ui->tableWidget->insertRow(row);
 
-                    // Data Extraction
-            std::string nameStr = prof.at("name").as_string().c_str();
-            std::string idStr = prof.at("id").as_string().c_str();
-            std::string scoreStr = prof.at("score").as_string().c_str();
-
+            // Data Extraction
+            std::string nameStr = (std::string) prof.at("name").as_string();
+            std::string idStr = std::to_string(prof.at("id").as_int64());
+            std::string scoreStr = (std::string) prof.at("score").as_string();
+            Profs[nameStr] = atoi(idStr.c_str());  // Store the mapping of professor name to ID
 
             // Create Items
             QTableWidgetItem *rank = new QTableWidgetItem(QString::number(row + 1));
-            QTableWidgetItem *name = new QTableWidgetItem(QString::fromStdString(nameStr));
+            QPushButton* name = new QPushButton(QString::fromStdString(nameStr));
+            name->setFlat(true);
+            name->setCursor(Qt::PointingHandCursor);
+            name->setStyleSheet(
+                "QPushButton { color: white; text-decoration: underline; background: transparent; border: none; }"
+                "QPushButton:hover { color: rgba(255, 255, 255, 0.6); }"
+            );
+            QObject::connect(name, &QPushButton::clicked, this, [this, nameStr, CourseName]() {
+                professorPage(nameStr, CourseName);
+            });
+
             QTableWidgetItem *score = new QTableWidgetItem(QString::fromStdString(scoreStr));
 
             // --- ADD THIS TO MAKE THE FONT BIGGER ---
@@ -520,11 +582,11 @@ void MainWindow::refreshList() {
             // ----------------------------------------
 
             rank->setTextAlignment(Qt::AlignCenter);
-            name->setTextAlignment(Qt::AlignCenter);
+            // name->setTextAlignment(Qt::AlignCenter);
             score->setTextAlignment(Qt::AlignCenter);
 
             ui->tableWidget->setItem(row, 0, rank);
-            ui->tableWidget->setItem(row, 1, name);
+            ui->tableWidget->setCellWidget(row, 1, name);
             ui->tableWidget->setItem(row, 2, score);
             QPushButton *up = new QPushButton;
             QPushButton *down = new QPushButton;
@@ -547,12 +609,12 @@ void MainWindow::refreshList() {
             down->setStyleSheet(btnStyle);
             // Re-capture the current Course ID and Prof ID for the lambda
             int currentCID = this->m_currentCourseId;
-            connect(up, &QPushButton::clicked, this, [this, idStr, currentCID]() {
-                handleUpvote(idStr, currentCID);
+            connect(up, &QPushButton::clicked, this, [this, idStr, currentCID, CourseName]() {
+                handleUpvote(idStr, currentCID, CourseName);
             });
 
-            connect(down, &QPushButton::clicked, this, [this, idStr, currentCID]() {
-                handleDownvote(idStr, currentCID);
+            connect(down, &QPushButton::clicked, this, [this, idStr, currentCID, CourseName]() {
+                handleDownvote(idStr, currentCID, CourseName);
             });
 
             ui->tableWidget->setCellWidget(row, 3, up);
@@ -564,13 +626,13 @@ void MainWindow::refreshList() {
         std::cerr << "Refresh failed: " << e.what() << std::endl;
     }
 }
-void MainWindow::handleDownvote(const std::string& profID, int courseID) {
+void MainWindow::handleDownvote(const std::string& profID, int courseID, std::string CourseName) {
     try {
         boost::json::object voteData;
         // FIX 2: Convert the string to an integer!
         voteData["professor_id"] = std::stoi(profID);
         voteData["course_id"] = courseID;
-        voteData["user_id"] = this->m_currentUserId;
+        voteData["user_id"] = user->GetID();
         voteData["vote"] = -1; // -1 means Downvote
 
         http::request<http::string_body> request(http::verb::post, "/downvote", 11);
@@ -589,7 +651,7 @@ void MainWindow::handleDownvote(const std::string& profID, int courseID) {
                 // 3. Check if successful and REFRESH
         if (response.result() == http::status::ok) {
             std::cout << "Downvote success! Refreshing..." << std::endl;
-            this->refreshList();
+            this->refreshList(CourseName);
         }
     } catch (std::exception& e) {
         std::cout << "Downvote failed: " << e.what() << std::endl;
@@ -609,3 +671,149 @@ void MainWindow::on_backButton_clicked()
     CenterWidget(3, ui->widget_3);
 }
 
+
+
+void MainWindow::CreateComment(Comment comment)
+{
+    QWidget* card = new QWidget();
+    card->setObjectName("commentCard");
+    card->setMinimumHeight(100);
+    card->setMinimumWidth(600);
+    card->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    card->setStyleSheet(
+        "QWidget#commentCard {"
+        "   background-color: rgba(255, 255, 255, 0.12);"
+        "   border: 1px solid rgba(255, 255, 255, 0.25);"
+        "   border-radius: 16px;"
+        "   margin: 7px 4px;"
+		"   padding: 3px;"
+        "}"
+    );
+
+    QGraphicsDropShadowEffect* shadow = new QGraphicsDropShadowEffect();
+    shadow->setBlurRadius(20);
+    shadow->setColor(QColor(0, 0, 0, 60));
+    shadow->setOffset(0, 4);
+    card->setGraphicsEffect(shadow);
+
+    QVBoxLayout* mainLayout = new QVBoxLayout(card);
+    mainLayout->setContentsMargins(20, 16, 20, 16);
+    mainLayout->setSpacing(10);
+
+    QLabel* usernameLabel = new QLabel(QString::fromStdString(comment.name));
+    usernameLabel->setStyleSheet(
+        "font-family: 'Segoe UI';"
+        "font-size: 16px;"
+        "font-weight: bold;"
+        "color: rgba(255, 255, 255, 0.95);"
+        "background: transparent;"
+        "border: none;"
+    );
+
+    QLabel* contentLabel = new QLabel(QString::fromStdString(comment.Content));
+    contentLabel->setWordWrap(true);
+    contentLabel->setMinimumHeight(40);
+    contentLabel->setStyleSheet(
+        "font-family: 'Segoe UI';"
+        "font-size: 15px;"
+        "color: rgba(255, 255, 255, 0.85);"
+        "background: transparent;"
+        "border: none;"
+    );
+
+    QHBoxLayout* bottomLayout = new QHBoxLayout();
+    bottomLayout->addStretch();
+
+    QLabel* datetimeLabel = new QLabel(QString::fromStdString(comment.PrintTime()));
+    datetimeLabel->setStyleSheet(
+        "font-family: 'Segoe UI';"
+        "font-size: 12px;"
+        "color: rgba(255, 255, 255, 0.45);"
+        "background: transparent;"
+        "border: none;"
+    );
+    bottomLayout->addWidget(datetimeLabel);
+
+    mainLayout->addWidget(usernameLabel);
+    mainLayout->addWidget(contentLabel);
+    mainLayout->addLayout(bottomLayout);
+
+	// Add card to the top of the comments section
+	QBoxLayout* layout = qobject_cast<QBoxLayout*>(ui->widget_7->layout()); // cast as QBoxLayout to use insertWidget
+    if (layout)
+        layout->insertWidget(0, card);
+}
+
+void MainWindow::DisplayComments() {
+	for (Comment comment : Comments) {
+        CreateComment(comment);
+    }
+}
+
+void MainWindow::ClearLayout(QLayout* layout) {
+    if (!layout) return;
+
+    QLayoutItem* item;
+    while ((item = layout->takeAt(0)) != nullptr) {
+        if (item->layout()) {
+            ClearLayout(item->layout()); // recursive cleanup
+        }
+        delete item->widget();
+        delete item;
+    }
+}
+
+void MainWindow::on_postComment_clicked() {
+	std::string ProfName = ui->professorName->text().toStdString().substr(4); // Remove "Dr.  " prefix
+    std::string CourseName = ui->courseName->text().toStdString();
+    std::string content = ui->commentLineEdit->text().toStdString();
+    if (content.empty()) return; // Don't post empty comments
+    try {
+        // Let's now form the JSON to send the data to the server.
+        boost::json::object comment;
+		int UserID = user->GetID();
+
+		comment["user_id"] = UserID;
+		comment["content"] = content;
+        comment["prof_id"] = Profs[ProfName];
+        comment["course_id"] = Courses[CourseName];
+
+        // Preparing the request...
+        boost::beast::http::request<boost::beast::http::string_body> request(
+            boost::beast::http::verb::post, "/comment", 11);
+        request.set(boost::beast::http::field::host, "127.0.0.1");
+        request.set(boost::beast::http::field::content_type, "application/json");
+        request.body() = boost::json::serialize(comment);
+        request.prepare_payload();
+
+        // Let's send it!
+        boost::beast::http::write(socket, request);
+
+
+		// Retrieve the generated comment ID & timestamp
+        boost::beast::flat_buffer buf;
+        boost::beast::http::response<boost::beast::http::string_body> server_response;
+        boost::beast::http::read(socket, buf, server_response);
+        auto parsed_response = boost::json::parse(server_response.body());
+        boost::json::object response = parsed_response.as_object();
+
+		std::string timestamp = (std::string)response["timestamp"].as_string();
+		int commentID = (int)response["id"].as_int64();
+
+		cout << "Comment posted with ID: " << commentID << " at " << timestamp << endl;
+
+		// Create comment object
+        Comment commentObj(commentID, UserID, user->GetUsername(), content, timestamp);
+		Comments.push_back(commentObj); 
+        
+
+
+		// Display the new comment
+		CreateComment(commentObj);
+
+    }
+    catch (std::exception& e) {
+        std::cout << "Connection failed: " << e.what() << std::endl;
+    }
+	ui->commentLineEdit->clear(); // Clear the input field after posting
+}

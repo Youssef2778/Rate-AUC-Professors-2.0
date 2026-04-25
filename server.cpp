@@ -1,4 +1,7 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
+#include <thread>
+#include <exception>
 #include <cppconn/prepared_statement.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
@@ -32,15 +35,21 @@ class MySQLConnectionPool
 
    public:
     // Establishing the connections at startup and storing them in the pool
-    MySQLConnectionPool(int size)
-    {
-        sql::mysql::MySQL_Driver* driver = sql::mysql::get_mysql_driver_instance();
+    MySQLConnectionPool(int size) {
+        std::vector<std::thread> threads;
+        std::mutex poolMtx;
         for (int i = 0; i < size; i++) {
-            sql::Connection* con = driver->connect("tcp://centerbeam.proxy.rlwy.net:11239", "root",
-                                                   "lTfeKOSlLMYPoYSyCQXLVBXKugsnOAHk");
-            con->setSchema("railway");
-            pool.push(con);
+            threads.emplace_back([this, &poolMtx]() {
+                sql::mysql::MySQL_Driver* driver = sql::mysql::get_mysql_driver_instance();
+                sql::Connection* con = driver->connect("tcp://centerbeam.proxy.rlwy.net:11239",
+                                                       "root", "lTfeKOSlLMYPoYSyCQXLVBXKugsnOAHk");
+                con->setSchema("railway");
+                std::unique_lock<std::mutex> lock(poolMtx);
+                pool.push(con);
+            });
         }
+        for (auto& t : threads)
+            t.join();
     }
 
     sql::Connection* get()
@@ -82,13 +91,41 @@ void handle_request(const http::request<http::string_body>& req,
             pstmt->setString(4, "S");
 
             pstmt->executeUpdate();
+
+            // Retrieve the generated user ID
+            sql::Statement* stmt = con->createStatement();
+            sql::ResultSet* Res = stmt->executeQuery("SELECT LAST_INSERT_ID()");
+
+            int id = -1;
+            if (Res->next()) {
+                id = Res->getInt(1);
+            }
+
+            // Prepare the JSON response with the generated user ID
+            json::object Response;
+            Response["id"] = id;
+
+            delete Res;
             delete pstmt;
             dbPool->release(con);  // Release the connection back to the pool
+
+            // Send the id back to the client
+            http::response<http::string_body> res{http::status::ok, req.version()};
+            res.set(http::field::content_type, "application/json");
+            res.body() = boost::json::serialize(Response);
+            res.prepare_payload();
+            http::write(socket, res);
         } catch (sql::SQLException& e) {
             std::cerr << "Error: " << e.what() << "(Error code: " << e.getErrorCode() << ")"
                       << std::endl;
         }
-    } else if (req.target() == "/get-departments") {
+
+
+
+
+
+    }
+    else if (req.target() == "/get-departments") {
         boost::json::array departments;
         try {
             sql::Connection* con = dbPool->get();
@@ -115,51 +152,50 @@ void handle_request(const http::request<http::string_body>& req,
             res.prepare_payload();
             http::write(socket, res);
         }
-        else if (req.target().starts_with("/get-leaderboard")) {
-                boost::json::array leaderboard;
+    else if (req.target().starts_with("/get-leaderboard")) {
+            boost::json::array leaderboard;
 
-                std::string target = std::string(req.target());
-                std::string CourseID;
-                // Extract the course ID from the query parameter
-                size_t pos = target.find("?CourseId=");
-                if (pos != std::string::npos)
-                    CourseID = target.substr(pos + 10);
+            std::string target = std::string(req.target());
+            std::string CourseID;
+            // Extract the course ID from the query parameter
+            size_t pos = target.find("?CourseId=");
+            if (pos != std::string::npos)
+                CourseID = target.substr(pos + 10);
 
-                try {
-                    sql::Connection* con = dbPool->get();
+            try {
+                sql::Connection* con = dbPool->get();
 
-                    // Updated to match your exact table and column names!
-                    sql::PreparedStatement* pstmt(
-                        con->prepareStatement("SELECT professor_id, score FROM course_professor WHERE course_id = ? ORDER BY score DESC"));
+                // Updated to match your exact table and column names!
+                sql::PreparedStatement* pstmt(
+                    con->prepareStatement("SELECT professor_id, score FROM course_professor WHERE course_id = ? ORDER BY score DESC"));
 
-                    pstmt->setString(1, CourseID);
-                    sql::ResultSet* res = pstmt->executeQuery();
+                pstmt->setString(1, CourseID);
+                sql::ResultSet* res = pstmt->executeQuery();
 
-                    while (res->next()) {
-                        boost::json::object row;
+                while (res->next()) {
+                    boost::json::object row;
 
-                        // We convert the professor_id integer into a string so the frontend can display it in the "Name" column for now.
-                        row["prof_name"] = std::to_string(res->getInt("professor_id"));
-                        row["score"] = res->getInt("score");
+                    // We convert the professor_id integer into a string so the frontend can display it in the "Name" column for now.
+                    row["prof_name"] = std::to_string(res->getInt("professor_id"));
+                    row["score"] = res->getInt("score");
 
-                        leaderboard.push_back(row);
-                    }
-                    delete res;
-                    delete pstmt;
-                    dbPool->release(con);
+                    leaderboard.push_back(row);
                 }
-                catch (sql::SQLException& e) {
-                    std::cerr << "Error: " << e.what() << " (Error code: " << e.getErrorCode() << ")" << std::endl;
-                }
-
-                // Send the response back to the client
-                http::response<http::string_body> res{ http::status::ok, req.version() };
-                res.set(http::field::content_type, "application/json");
-                res.body() = boost::json::serialize(leaderboard);
-                res.prepare_payload();
-                http::write(socket, res);
+                delete res;
+                delete pstmt;
+                dbPool->release(con);
+            }
+            catch (sql::SQLException& e) {
+                std::cerr << "Error: " << e.what() << " (Error code: " << e.getErrorCode() << ")" << std::endl;
             }
 
+            // Send the response back to the client
+            http::response<http::string_body> res{ http::status::ok, req.version() };
+            res.set(http::field::content_type, "application/json");
+            res.body() = boost::json::serialize(leaderboard);
+            res.prepare_payload();
+            http::write(socket, res);
+    }
     else if (req.target().starts_with("/get-courses")) {
         boost::json::array courses;
 
@@ -197,49 +233,47 @@ void handle_request(const http::request<http::string_body>& req,
         res.prepare_payload();
         http::write(socket, res);
     } else if (req.target() == "/login") {
-                auto parsed = json::parse(req.body());
-                json::object login = parsed.as_object();
-                json::object response;
-                response["status"] = true;
-                try {
-                    sql::Connection* con = dbPool->get();
-
-                    // CHANGE 1: Select 'id' alongside 'encrypted_password'
-                    sql::PreparedStatement* pstmt(
-                        con->prepareStatement("SELECT id, encrypted_password FROM users WHERE email = ?"));
-                    pstmt->setString(1, (std::string)login["email"].as_string());
-                    sql::ResultSet* res = pstmt->executeQuery();
-
-                    if (!res->next()) {
-                        response["status"] = false;
-                        response["error"] = "email not found";
-                    } else {
-                        if (!BCrypt::validatePassword((std::string)login["password"].as_string(),
-                                                      res->getString("encrypted_password"))) {
-                            response["status"] = false;
-                            response["error"] = "incorrect password";
-                        } else {
-                            // CHANGE 2: If password is correct, attach the user's ID to the JSON!
-                            response["user_id"] = res->getInt("id");
-                        }
-                    }
-
-                    // Send the response back
-                    http::response<http::string_body> http_response(http::status::ok, req.version());
-                    http_response.set(http::field::content_type, "application/json");
-                    http_response.body() = boost::json::serialize(response);
-                    http_response.prepare_payload();
-                    http::write(socket, http_response);
-
-                    delete res;
-                    delete pstmt;
-                    dbPool->release(con);
-
-                } catch (sql::SQLException& e) {
-                    std::cerr << "Error: " << e.what() << " (Error code: " << e.getErrorCode() << ")"
-                              << std::endl;
+        auto parsed = json::parse(req.body());
+        json::object login = parsed.as_object();
+        json::object response;
+        response["status"] = true;
+        try {
+            sql::Connection* con = dbPool->get();
+            sql::PreparedStatement* pstmt(
+                con->prepareStatement("SELECT id, username, encrypted_password FROM users WHERE email = ?"));
+            pstmt->setString(1, (std::string)login["email"].as_string());
+            sql::ResultSet* res = pstmt->executeQuery();
+            if (!res->next()) {
+                response["status"] = false;
+                response["error"] = "email not found";
+            } else {
+                response["id"] = res->getInt("id");
+                response["username"] = (std::string)res->getString("username");
+                if (!BCrypt::validatePassword((std::string)login["password"].as_string(),
+                                              res->getString("encrypted_password"))) {
+                    response["status"] = false;
+                    response["error"] = "incorrect password";
                 }
             }
+
+            // Send the response back
+            http::response<http::string_body> http_response(http::status::ok, req.version());
+            http_response.set(http::field::content_type, "application/json");
+            http_response.body() = boost::json::serialize(response);
+            http_response.prepare_payload();
+            http::write(socket, http_response);
+            delete res;
+            delete pstmt;
+            dbPool->release(con);
+
+            // In this case, we are sending a "report" to the user. The GUI will vary according to
+            // the report's contents.
+
+        } catch (sql::SQLException& e) {
+            std::cerr << "Error: " << e.what() << " (Error code: " << e.getErrorCode() << ")"
+                      << std::endl;
+        }
+    }
 
     else if (req.target().starts_with("/upvote")) {
         std::cout << "\n--- STARTING UPVOTE ROUTE ---" << std::endl;
@@ -372,7 +406,7 @@ void handle_request(const http::request<http::string_body>& req,
 
             while (res->next()) {
                 boost::json::object row;
-                row["id"] = (std::string)res->getString("professor_id");
+                row["id"] = (int)res->getInt("professor_id");
                 row["name"] = (std::string)res->getString("name");
                 row["score"] = std::to_string(res->getInt("score"));
                 std::cout << row["id"] << row["score"] << row["name"] << std::endl;
@@ -393,12 +427,108 @@ void handle_request(const http::request<http::string_body>& req,
         res.prepare_payload();
         http::write(socket, res);
     }
+    else if (req.target().starts_with("/get-comments")) {
+        boost::json::array Comments;
+        std::string target = std::string(req.target());
+        std::string Course_ID;
+        std::string Prof_ID;
+        // Extract the course ID and professor ID from the query parameters
+        size_t pos = target.find("?CourseId=");
+        if (pos != std::string::npos)
+            Course_ID = target.substr(pos + 10);  // 10 = length of "?CourseId="
+        pos = Course_ID.find("&ProfId=");
+        if (pos != std::string::npos) {
+            Prof_ID = Course_ID.substr(pos + 8);  // 8 = length of "&ProfId="
+            Course_ID = Course_ID.substr(0, pos);
+        }
+        try {
+            sql::Connection* con = dbPool->get();
+            sql::PreparedStatement* pstmt(
+                con->prepareStatement("SELECT usr.username, cmnt.user_id, cmnt.id, cmnt.content, cmnt.timestamp FROM comments cmnt JOIN users usr ON cmnt.user_id = usr.id WHERE cmnt.course_id = ? AND cmnt.professor_id = ? "
+                    "ORDER BY cmnt.timestamp ASC"));
+            pstmt->setString(1, Course_ID);
+            pstmt->setString(2, Prof_ID);
+            sql::ResultSet* res = pstmt->executeQuery();
+            while (res->next()) {
+                boost::json::object row;
+                row["username"] = (std::string)res->getString("username");
+                row["user_id"] = (int)res->getInt("user_id");
+                row["id"] = (int)res->getInt("id");
+                row["content"] = (std::string)res->getString("content");
+                row["timestamp"] = (std::string)res->getString("timestamp");
+                Comments.push_back(row);
+            }
+            delete res;
+            delete pstmt;
+            dbPool->release(con);
+        }
+        catch (sql::SQLException& e) {
+            std::cerr << "Error: " << e.what() << " (Error code: " << e.getErrorCode() << ")"
+                << std::endl;
+        }
 
- }
+        // Send the response back
+        http::response<http::string_body> res{ http::status::ok, req.version() };
+        res.set(http::field::content_type, "application/json");
+        res.body() = boost::json::serialize(Comments);
+        res.prepare_payload();
+        http::write(socket, res);
+    }
+    else if (req.target() == "/comment") {
+        auto parsed = json::parse(req.body());
+        json::object comment = parsed.as_object();
+        boost::json::object Response;
+        try {
+            sql::Connection* con = dbPool->get();
+            sql::PreparedStatement* pstmt(
+                con->prepareStatement("INSERT INTO comments (professor_id, course_id, user_id, content) VALUES (?, ?, ?, ?)"));
+            pstmt->setInt(1, comment["prof_id"].as_int64());
+            pstmt->setInt(2, comment["course_id"].as_int64());
+            pstmt->setInt(3, comment["user_id"].as_int64());
+            pstmt->setString(4, (std::string)comment["content"].as_string());
+            pstmt->executeUpdate();
+
+            
+            
+			// Retrieve the generated comment ID and timestamp
+            sql::Statement* stmt = con->createStatement();
+            sql::ResultSet* Res = stmt->executeQuery("SELECT LAST_INSERT_ID(), NOW()");
+			while (Res->next()) {
+                Response["id"] = (int)Res->getInt(1);
+                Response["timestamp"] = (std::string)Res->getString(2);
+            }
+
+			delete stmt;
+            delete Res;
+            delete pstmt;
+            dbPool->release(con);
+        }
+        catch (sql::SQLException& e) {
+            std::cerr << "Error: " << e.what() << " (Error code: " << e.getErrorCode() << ")"
+                << std::endl;
+        }
+
+        // Send the response back
+        http::response<http::string_body> res{ http::status::ok, req.version() };
+        res.set(http::field::content_type, "application/json");
+        res.body() = boost::json::serialize(Response);
+        res.prepare_payload();
+        http::write(socket, res);
+    }
+}
 
 int main()
 {
     std::cout << "Server starting..." << std::endl;
+
+    // The MySQL connector library has a one-time internal setup that happens the  first time get_mysql_driver_instance() is called and a call using threading caused conflict and crash
+    // Alowing MySQL connector library to initialize propery
+    try {
+        sql::mysql::MySQL_Driver* driver = sql::mysql::get_mysql_driver_instance();
+        (void)driver; // function cast as void just for initializing, not using
+    } catch (...) {
+        // Ignore
+    }
 
     try {
         std::cout << "Connecting to DB pool..." << std::endl;

@@ -26,7 +26,6 @@ CREATE TABLE professors (
     id INT PRIMARY KEY,
     department_id INT,
     score INT DEFAULT 0,
-    FOREIGN KEY (id) REFERENCES users(id),
     FOREIGN KEY (department_id) REFERENCES departments(id)
 );
 
@@ -34,6 +33,33 @@ CREATE TABLE professors (
 CREATE TABLE professor_course (
     course_id INT,
     professor_id INT,
+    FOREIGN KEY (course_id) REFERENCES courses(id),
+    FOREIGN KEY (professor_id) REFERENCES professors(id)
+);
+
+--@block 
+CREATE TABLE comments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    professor_id INT,
+    course_id INT,
+    user_id INT,
+    content TEXT,
+    timestamp TIMESTAMP,
+    FOREIGN KEY (professor_id) REFERENCES professors(id),
+    FOREIGN KEY (course_id) REFERENCES courses(id),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+--@block 
+CREATE TABLE votes (
+    user_id INT NOT NULL,
+    course_id INT NOT NULL,
+    professor_id INT NOT NULL,
+    vote BOOLEAN NOT NULL,
+    
+    PRIMARY KEY (user_id, course_id, professor_id),
+    
+    FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (course_id) REFERENCES courses(id),
     FOREIGN KEY (professor_id) REFERENCES professors(id)
 );

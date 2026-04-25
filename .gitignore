@@ -1,7 +1,10 @@
 # This file is used to ignore files which are generated
 # ----------------------------------------------------------------------------
 build
+Run.bat
 *~
+.vs/
+.qtcreator/
 *.autosave
 *.a
 *.core
@@ -91,3 +94,5 @@ flaws.txt
 .vs/Rate-AUC-Professors-2.0.slnx/v18/.wsuo
 .vs/Rate-AUC-Professors-2.0.slnx/v18/Browse.VC.db
 .vs/slnx.sqlite
+.clang-format
+.clang-tidy
