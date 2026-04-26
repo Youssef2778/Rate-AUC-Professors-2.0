@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
     // Initialize the user pointer to nullptr at the start of the application
     user = nullptr;
-    
+    networkManager = new QNetworkAccessManager(this);
     LoginPage();
 
     // Attempt to establish a persistent connection in the background once the app launches
@@ -107,16 +107,14 @@ void MainWindow::professorPage(std::string ProfName, std::string CourseName) {
     ui->scrollArea->setWidgetResizable(true);
     ui->widget_7->setMaximumHeight(QWIDGETSIZE_MAX);
 
-	ui->professorName->setText("Dr. " + QString::fromStdString(ProfName));
-	ui->courseName->setText(QString::fromStdString(CourseName));
+    ui->professorName->setText("Dr. " + QString::fromStdString(ProfName));
+    ui->courseName->setText(QString::fromStdString(CourseName));
 
-
-	// Request the comments for this professor-course from the server
+    // Request the comments for this professor-course from the server
     try {
-
         // Send GET /get-comments?CourseId=CourseID&ProfId=ProfID
         http::request<http::string_body> request(http::verb::get,
-            "/get-comments?CourseId=" + std::to_string(Courses[CourseName]) + "&ProfId=" + std::to_string(Profs[ProfName]), 11);
+                                                 "/get-comments?CourseId=" + std::to_string(Courses[CourseName]) + "&ProfId=" + std::to_string(Profs[ProfName]), 11);
         request.set(http::field::host, "127.0.0.1");
         request.prepare_payload();
         http::write(socket, request);
@@ -143,9 +141,17 @@ void MainWindow::professorPage(std::string ProfName, std::string CourseName) {
     catch (std::exception& e) {
         std::cout << "Failed: " << e.what() << std::endl;
     }
-	cout << "Comments for Professor " << ProfName << " and Course " << CourseName << " loaded: " << Comments.size() << endl;
+    cout << "Comments for Professor " << ProfName << " and Course " << CourseName << " loaded: " << Comments.size() << endl;
     DisplayComments();
-	cout << "Comments displayed" << endl;
+    cout << "Comments displayed" << endl;
+
+    // ==========================================
+    // ADDED: FETCH AI SUMMARY RIGHT HERE!
+    // ==========================================
+    std::string courseIdStr = std::to_string(Courses[CourseName]);
+    std::string profIdStr = std::to_string(Profs[ProfName]);
+    fetchAiSummary(courseIdStr, profIdStr);
+    // ==========================================
 }
 
 void MainWindow::Logout()
@@ -816,4 +822,42 @@ void MainWindow::on_postComment_clicked() {
         std::cout << "Connection failed: " << e.what() << std::endl;
     }
 	ui->commentLineEdit->clear(); // Clear the input field after posting
+}
+void MainWindow::fetchAiSummary(std::string courseId, std::string profId) {
+    // 1. Update the UI
+    ui->summaryLabel->setText("🤖 Generating AI Summary... Please wait.");
+
+    // Force Qt to update the screen immediately before the server request blocks it
+    QCoreApplication::processEvents();
+
+    try {
+        // 2. Build the HTTP request using your existing Boost setup
+        std::string target = "/get-summary?CourseId=" + courseId + "&ProfId=" + profId;
+        http::request<http::string_body> request(http::verb::get, target, 11);
+        request.set(http::field::host, "127.0.0.1");
+        request.prepare_payload();
+
+        // 3. Send the request down your existing persistent socket!
+        http::write(socket, request);
+
+        // 4. Read the server's response
+        beast::flat_buffer buffer;
+        http::response<http::string_body> response;
+        http::read(socket, buffer, response);
+
+        // 5. Parse the JSON and display it
+        if (response.result() == http::status::ok) {
+            auto parsed = boost::json::parse(response.body());
+            boost::json::object jsonObj = parsed.as_object();
+
+            std::string aiSummary = (std::string)jsonObj["summary"].as_string();
+            ui->summaryLabel->setText(QString::fromStdString(aiSummary));
+        } else {
+            ui->summaryLabel->setText("Failed to load AI summary. (Server error)");
+        }
+    }
+    catch (std::exception& e) {
+        ui->summaryLabel->setText("Failed to connect to AI service.");
+        std::cout << "AI Summary Network Error: " << e.what() << std::endl;
+    }
 }

@@ -13,6 +13,10 @@
 #include <boost/beast/core.hpp>
 #include <boost/beast/http.hpp>
 #include <unordered_map>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -40,6 +44,9 @@ class MainWindow : public QMainWindow
     int m_currentCourseId; // To remember which course we are viewing
 
 
+    // ... your other private variables
+    QNetworkAccessManager *networkManager;
+    void fetchAiSummary(std::string courseId, std::string profId);
     // We'll use a unique_ptr so we can reconnect if needed
     std::unique_ptr<boost::asio::ip::tcp::socket> m_socket;
 

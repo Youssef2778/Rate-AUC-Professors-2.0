@@ -9,12 +9,13 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql)
+# 1. ADDED 'Network' here
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql Network)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql Network)
 find_package(Boost REQUIRED COMPONENTS json)
-# find_program(CLANG_TIDY_EXE NAMES clang-tidy)
-# message(STATUS "clang-tidy: ${CLANG_TIDY_EXE}")
-# set(CMAKE_CXX_CLANG_TIDY clang-tidy)
+
+# 2. ADDED OpenSSL for the server to talk to HuggingFace
+find_package(OpenSSL REQUIRED)
 
 set(PROJECT_SOURCES
         ./src/main.cpp
@@ -29,17 +30,11 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
         resources.qrc
     )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET Rate_AUC APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else()
     if(ANDROID)
         add_library(Rate_AUC SHARED
             ${PROJECT_SOURCES}
         )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
         add_executable(Rate_AUC
             ${PROJECT_SOURCES}
@@ -47,19 +42,21 @@ else()
     endif()
 endif()
 
-target_link_libraries(Rate_AUC PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+# 3. ADDED Qt Network library to the Rate_AUC frontend
+target_link_libraries(Rate_AUC PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network)
 target_link_libraries(Rate_AUC PRIVATE Boost::json)
-target_link_libraries(Rate_AUC PRIVATE bcrypt) 
+target_link_libraries(Rate_AUC PRIVATE bcrypt)
+
 add_executable(server server.cpp)
 target_link_libraries(server PRIVATE Boost::json)
 target_link_libraries(server PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(server PRIVATE mysqlcppconn)
 target_link_libraries(server PRIVATE bcrypt)
+# 4. ADDED OpenSSL libraries to the server
+target_link_libraries(server PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+
 target_include_directories(Rate_AUC PRIVATE Include)
 
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
 if(${QT_VERSION} VERSION_LESS 6.1.0)
   set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Rate_AUC)
 endif()
