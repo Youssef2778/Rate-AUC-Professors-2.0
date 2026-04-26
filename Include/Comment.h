@@ -3,18 +3,18 @@
 #include <string>
 using namespace std;
 
-struct Comment 
+struct Comment
 {
     int ID;
-	int UserID;
-	string name;
+        int UserID;
+        string name;
     string Content;
     string timestamp;
 
-	Comment(int id, int user_id, string name, string content, string timestamp)
+        Comment(int id, int user_id, string name, string content, string timestamp)
         : ID(id), UserID(user_id), name(name), Content(content){
-		this->timestamp = ConvertTimeZone(timestamp);
-	}
+                this->timestamp = ConvertTimeZone(timestamp);
+        }
 
     // This function converts the timestamp from UTC to Cairo's local time zone (UTC+2) and handles day/month/year overflow(written with the help of claude ai)
     string ConvertTimeZone(const string& timestamp) {
