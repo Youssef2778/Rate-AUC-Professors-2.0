@@ -45,9 +45,8 @@ endif()
 # 3. ADDED Qt Network library to the Rate_AUC frontend
 target_link_libraries(Rate_AUC PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network)
 target_link_libraries(Rate_AUC PRIVATE Boost::json)
-target_link_libraries(Rate_AUC PRIVATE bcrypt)
-
-add_executable(server server.cpp)
+target_link_libraries(Rate_AUC PRIVATE bcrypt) 
+add_executable(server server.cpp server.hpp)
 target_link_libraries(server PRIVATE Boost::json)
 target_link_libraries(server PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(server PRIVATE mysqlcppconn)

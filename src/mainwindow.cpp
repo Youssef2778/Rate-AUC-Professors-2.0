@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
     // Initialize the user pointer to nullptr at the start of the application
     user = nullptr;
+    Connected = false;
     networkManager = new QNetworkAccessManager(this);
     LoginPage();
 
@@ -92,7 +93,7 @@ void MainWindow::HomePage()
             boost::json::object& dept = entry.as_object();
             std::string name = (std::string)dept["department_name"].as_string();
             int ID = (int)dept["id"].as_int64();
-            Deps[name] = ID;  // Store the mapping of department name to ID
+            Deps[name] = ID;  // Store the mapping of department ID to name
             // populate the QComboBox
             ui->DepartmentCB->addItem(QString::fromStdString(name));
         }
@@ -102,19 +103,20 @@ void MainWindow::HomePage()
 }
 
 
-void MainWindow::professorPage(std::string ProfName, std::string CourseName) {
+void MainWindow::professorPage() {
     ui->stackedWidget->setCurrentIndex(4);
     ui->scrollArea->setWidgetResizable(true);
     ui->widget_7->setMaximumHeight(QWIDGETSIZE_MAX);
 
-    ui->professorName->setText("Dr. " + QString::fromStdString(ProfName));
-    ui->courseName->setText(QString::fromStdString(CourseName));
+	ui->professorName->setText("Dr. " + QString::fromStdString(Profs[user->GetCurrentProfID()]));
+	ui->courseName->setText(QString::fromStdString(Courses[user->GetCurrentCourseID()]));
+
 
     // Request the comments for this professor-course from the server
     try {
         // Send GET /get-comments?CourseId=CourseID&ProfId=ProfID
         http::request<http::string_body> request(http::verb::get,
-                                                 "/get-comments?CourseId=" + std::to_string(Courses[CourseName]) + "&ProfId=" + std::to_string(Profs[ProfName]), 11);
+            "/get-comments?CourseId=" + std::to_string(user->GetCurrentCourseID()) + "&ProfId=" + std::to_string(user->GetCurrentProfID()), 11);
         request.set(http::field::host, "127.0.0.1");
         request.prepare_payload();
         http::write(socket, request);
@@ -141,17 +143,100 @@ void MainWindow::professorPage(std::string ProfName, std::string CourseName) {
     catch (std::exception& e) {
         std::cout << "Failed: " << e.what() << std::endl;
     }
-    cout << "Comments for Professor " << ProfName << " and Course " << CourseName << " loaded: " << Comments.size() << endl;
+	cout << "Comments for Professor " << Profs[user->GetCurrentProfID()] << " and Course " << Courses[user->GetCurrentCourseID()] << " loaded: " << Comments.size() << endl;
     DisplayComments();
-    cout << "Comments displayed" << endl;
-
-    // ==========================================
+	cout << "Comments displayed" << endl;
+        // ==========================================
     // ADDED: FETCH AI SUMMARY RIGHT HERE!
     // ==========================================
     std::string courseIdStr = std::to_string(Courses[CourseName]);
     std::string profIdStr = std::to_string(Profs[ProfName]);
     fetchAiSummary(courseIdStr, profIdStr);
     // ==========================================
+}
+
+void MainWindow::LeaderboardPage(){
+
+    ui->stackedWidget->setCurrentIndex(2);
+
+            // ==========================================
+            // 1. LAYOUT & BACK BUTTON FIX
+            // ==========================================
+    QWidget* page = ui->stackedWidget->widget(2);
+    if (page->layout()) {
+        delete page->layout();
+    }
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(page);
+
+    // Add some padding around the edges of the screen so it breathes
+    mainLayout->setContentsMargins(20, 20, 20, 20);
+    mainLayout->setSpacing(15); // Adds a gap between the top bar and the table
+
+    QHBoxLayout *topBarLayout = new QHBoxLayout();
+    topBarLayout->addStretch(); // Pushes the button to the right
+
+            // Style the Back Button so it looks good!
+    ui->backButton->setText("⬅ Back to Courses");
+    ui->backButton->setCursor(Qt::PointingHandCursor);
+    ui->backButton->setStyleSheet(
+        "QPushButton { "
+        "background-color: #1d8e9e; "
+        "color: white; "
+        "border-radius: 5px; "
+        "font-size: 16px; "
+        "font-weight: bold; "
+        "padding: 8px 20px; "
+        "} "
+        "QPushButton:hover { background-color: #0b2239; border: 2px solid #1d8e9e; }"
+        );
+
+    topBarLayout->addWidget(ui->backButton);
+
+    mainLayout->addLayout(topBarLayout);
+    mainLayout->addWidget(ui->tableWidget);
+
+    page->setLayout(mainLayout);
+
+    // ==========================================
+    // 2. TABLE COLUMN SIZES FIX (BALANCED)
+    // ==========================================
+    QHeaderView* header = ui->tableWidget->horizontalHeader();
+
+            // Stop the last column from forcing a stretch
+    header->setStretchLastSection(false);
+
+            // Rank: Set to a fixed, wider size so it takes up more visual space
+    header->setSectionResizeMode(0, QHeaderView::Fixed);
+    ui->tableWidget->setColumnWidth(0, 150); // 150 pixels wide
+
+    // Name: Still stretches, but now has less space to steal
+    header->setSectionResizeMode(1, QHeaderView::Stretch);
+
+    // Score: Set to a fixed, wider size
+    header->setSectionResizeMode(2, QHeaderView::Fixed);
+    ui->tableWidget->setColumnWidth(2, 150); // 150 pixels wide
+
+            // Up & Down Buttons: Locked to 80 pixels
+    header->setSectionResizeMode(3, QHeaderView::Fixed);
+    ui->tableWidget->setColumnWidth(3, 80);
+
+    header->setSectionResizeMode(4, QHeaderView::Fixed);
+    ui->tableWidget->setColumnWidth(4, 80);
+
+            // Style the Header row
+    header->setStyleSheet(
+        "QHeaderView::section { "
+        "font-size: 18px; "
+        "font-weight: bold; "
+        "background-color: #061524; "
+        "color: white; "
+        "border: none; "
+        "border-bottom: 2px solid #1d8e9e; "
+        "}"
+        );
+
+    this->refreshList();
 }
 
 void MainWindow::Logout()
@@ -176,6 +261,7 @@ void MainWindow::EstablishConnection()
             std::array<char, 128> buf;
             boost::system::error_code error;
             socket.read_some(boost::asio::buffer(buf), error);
+            Connected = true;
             std::cout << "Connected to the server!"
                       << std::endl;  // Confirm connection if handshake didn't throw an error
             break;                   // Connection successful, exit the loop
@@ -294,9 +380,10 @@ void MainWindow::on_pushButton_6_clicked()
         return;
     } else
         ui->unequal_pass_error->hide();
-
+    
     // Now, let's see what the server thinks about the data!
     try {
+        if (Connected == false) return;
         // Let's now form the JSON to send the data to the server.
         boost::json::object registration;
         registration["username"] = ui->username_register_lineEdit->text().toStdString();
@@ -340,6 +427,7 @@ void MainWindow::on_pushButton_6_clicked()
 // Function that gets called after clicking on the "login" button in the login page.
 void MainWindow::on_pushButton_4_clicked()
 {
+    if (Connected == false) return;
     boost::json::object login;
     login["email"] = ui->email_login_lineEdit->text().toStdString();
     login["password"] = ui->password_login_lineEdit->text().toStdString();
@@ -409,7 +497,7 @@ void MainWindow::on_DepartmentCB_currentIndexChanged(int index)
             boost::json::object& course = entry.as_object();
             std::string name = (std::string)course["course_name"].as_string();
             int ID = (int)course["id"].as_int64();
-            Courses[name] = ID;  // Store the mapping of course name to ID
+            Courses[ID] = name;  // Store the mapping of course ID to name
             // populate the QComboBox
             ui->CourseCB->addItem(QString::fromStdString(name));
         }
@@ -420,89 +508,17 @@ void MainWindow::on_DepartmentCB_currentIndexChanged(int index)
 void MainWindow::on_pushButton_clicked()
 {
     std::string CourseName = ui->CourseCB->currentText().toStdString();
-    this->m_currentCourseId = Courses[CourseName];
+    if (CourseName.empty()) return; // Don't proceed if no course is selected
 
-    ui->stackedWidget->setCurrentIndex(2);
-    this->showMaximized();
-
-            // ==========================================
-            // 1. LAYOUT & BACK BUTTON FIX
-            // ==========================================
-    QWidget* page = ui->stackedWidget->widget(2);
-    if (page->layout()) {
-        delete page->layout();
+    //find the course ID
+    for (const auto& pair : Courses) {
+        if (pair.second == CourseName) {
+            user->SetCurrentCourseID(pair.first);
+            break;
+        }
     }
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(page);
-
-    // Add some padding around the edges of the screen so it breathes
-    mainLayout->setContentsMargins(20, 20, 20, 20);
-    mainLayout->setSpacing(15); // Adds a gap between the top bar and the table
-
-    QHBoxLayout *topBarLayout = new QHBoxLayout();
-    topBarLayout->addStretch(); // Pushes the button to the right
-
-            // Style the Back Button so it looks good!
-    ui->backButton->setText("⬅ Back to Courses");
-    ui->backButton->setCursor(Qt::PointingHandCursor);
-    ui->backButton->setStyleSheet(
-        "QPushButton { "
-        "background-color: #1d8e9e; "
-        "color: white; "
-        "border-radius: 5px; "
-        "font-size: 16px; "
-        "font-weight: bold; "
-        "padding: 8px 20px; "
-        "} "
-        "QPushButton:hover { background-color: #0b2239; border: 2px solid #1d8e9e; }"
-        );
-
-    topBarLayout->addWidget(ui->backButton);
-
-    mainLayout->addLayout(topBarLayout);
-    mainLayout->addWidget(ui->tableWidget);
-
-    page->setLayout(mainLayout);
-
-    // ==========================================
-    // 2. TABLE COLUMN SIZES FIX (BALANCED)
-    // ==========================================
-    QHeaderView* header = ui->tableWidget->horizontalHeader();
-
-            // Stop the last column from forcing a stretch
-    header->setStretchLastSection(false);
-
-            // Rank: Set to a fixed, wider size so it takes up more visual space
-    header->setSectionResizeMode(0, QHeaderView::Fixed);
-    ui->tableWidget->setColumnWidth(0, 150); // 150 pixels wide
-
-    // Name: Still stretches, but now has less space to steal
-    header->setSectionResizeMode(1, QHeaderView::Stretch);
-
-    // Score: Set to a fixed, wider size
-    header->setSectionResizeMode(2, QHeaderView::Fixed);
-    ui->tableWidget->setColumnWidth(2, 150); // 150 pixels wide
-
-            // Up & Down Buttons: Locked to 80 pixels
-    header->setSectionResizeMode(3, QHeaderView::Fixed);
-    ui->tableWidget->setColumnWidth(3, 80);
-
-    header->setSectionResizeMode(4, QHeaderView::Fixed);
-    ui->tableWidget->setColumnWidth(4, 80);
-
-            // Style the Header row
-    header->setStyleSheet(
-        "QHeaderView::section { "
-        "font-size: 18px; "
-        "font-weight: bold; "
-        "background-color: #061524; "
-        "color: white; "
-        "border: none; "
-        "border-bottom: 2px solid #1d8e9e; "
-        "}"
-        );
-
-    this->refreshList(CourseName);
+    LeaderboardPage();
 }
 void MainWindow::handleUpvote(const std::string& profID, int courseID, std::string CourseName) {
     try {
@@ -528,16 +544,16 @@ void MainWindow::handleUpvote(const std::string& profID, int courseID, std::stri
         if (response.result() == http::status::ok) {
             std::cout << "Upvote success!" << std::endl;
             // REFRESH the screen immediately
-            this->refreshList(CourseName);
+            this->refreshList();
         }
     } catch (std::exception& e) {
         std::cout << "Upvote failed: " << e.what() << std::endl;
     }
 }
-void MainWindow::refreshList(std::string CourseName) {
+void MainWindow::refreshList() {
     try {
         // 1. Ask for professors using the SAVED ID
-        std::string target = "/get-professors?Id=" + std::to_string(m_currentCourseId);
+        std::string target = "/get-professors?Id=" + std::to_string(user->GetCurrentCourseID());
         http::request<http::string_body> req{http::verb::get, target, 11};
         req.set(http::field::host, "127.0.0.1");
         http::write(socket, req);
@@ -560,7 +576,7 @@ void MainWindow::refreshList(std::string CourseName) {
             std::string nameStr = (std::string) prof.at("name").as_string();
             std::string idStr = std::to_string(prof.at("id").as_int64());
             std::string scoreStr = (std::string) prof.at("score").as_string();
-            Profs[nameStr] = atoi(idStr.c_str());  // Store the mapping of professor name to ID
+            Profs[atoi(idStr.c_str())] = nameStr;  // Store the mapping of professor name to ID
 
             // Create Items
             QTableWidgetItem *rank = new QTableWidgetItem(QString::number(row + 1));
@@ -571,8 +587,9 @@ void MainWindow::refreshList(std::string CourseName) {
                 "QPushButton { color: white; text-decoration: underline; background: transparent; border: none; }"
                 "QPushButton:hover { color: rgba(255, 255, 255, 0.6); }"
             );
-            QObject::connect(name, &QPushButton::clicked, this, [this, nameStr, CourseName]() {
-                professorPage(nameStr, CourseName);
+            QObject::connect(name, &QPushButton::clicked, this, [this, idStr]() {
+                user->SetCurrentProfID(atoi(idStr.c_str()));
+                professorPage();
             });
 
             QTableWidgetItem *score = new QTableWidgetItem(QString::fromStdString(scoreStr));
@@ -614,13 +631,13 @@ void MainWindow::refreshList(std::string CourseName) {
             up->setStyleSheet(btnStyle);
             down->setStyleSheet(btnStyle);
             // Re-capture the current Course ID and Prof ID for the lambda
-            int currentCID = this->m_currentCourseId;
-            connect(up, &QPushButton::clicked, this, [this, idStr, currentCID, CourseName]() {
-                handleUpvote(idStr, currentCID, CourseName);
+            int currentCID = user->GetCurrentCourseID();
+            connect(up, &QPushButton::clicked, this, [this, idStr, currentCID]() {
+                handleUpvote(idStr, currentCID, Courses[user->GetCurrentCourseID()]);
             });
 
-            connect(down, &QPushButton::clicked, this, [this, idStr, currentCID, CourseName]() {
-                handleDownvote(idStr, currentCID, CourseName);
+            connect(down, &QPushButton::clicked, this, [this, idStr, currentCID]() {
+                handleDownvote(idStr, currentCID, Courses[user->GetCurrentCourseID()]);
             });
 
             ui->tableWidget->setCellWidget(row, 3, up);
@@ -657,7 +674,7 @@ void MainWindow::handleDownvote(const std::string& profID, int courseID, std::st
                 // 3. Check if successful and REFRESH
         if (response.result() == http::status::ok) {
             std::cout << "Downvote success! Refreshing..." << std::endl;
-            this->refreshList(CourseName);
+            this->refreshList();
         }
     } catch (std::exception& e) {
         std::cout << "Downvote failed: " << e.what() << std::endl;
@@ -668,13 +685,7 @@ void MainWindow::handleDownvote(const std::string& profID, int courseID, std::st
 void MainWindow::on_backButton_clicked()
 {
     // 1. Go back to the Course Selection page (Index 3 based on your earlier code)
-    ui->stackedWidget->setCurrentIndex(3);
-
-            // 2. Shrink the window back to its "Normal" size
-    this->showNormal();
-
-            // 3. Optional: Center the widget again if it looks off
-    CenterWidget(3, ui->widget_3);
+    HomePage();
 }
 
 
@@ -781,8 +792,8 @@ void MainWindow::on_postComment_clicked() {
 
 		comment["user_id"] = UserID;
 		comment["content"] = content;
-        comment["prof_id"] = Profs[ProfName];
-        comment["course_id"] = Courses[CourseName];
+        comment["prof_id"] = user->GetCurrentProfID();
+        comment["course_id"] = user->GetCurrentCourseID();
 
         // Preparing the request...
         boost::beast::http::request<boost::beast::http::string_body> request(

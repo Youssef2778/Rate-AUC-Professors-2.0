@@ -35,7 +35,7 @@ background-color: #006FB8;
        </size>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="page_0">
        <property name="styleSheet">
@@ -96,7 +96,7 @@ QLabel#email_notFound_error, #password_incorrect_error{color: red}</string>
            <layout class="QVBoxLayout" name="verticalLayout_11" stretch="0">
             <item>
              <layout class="QVBoxLayout" name="verticalLayout_12">
-              <item>
+              <item alignment="Qt::AlignHCenter">
                <widget class="QLabel" name="label_10">
                 <property name="styleSheet">
                  <string notr="true"/>
@@ -183,7 +183,7 @@ QLabel#email_notFound_error, #password_incorrect_error{color: red}</string>
                 </property>
                </widget>
               </item>
-              <item>
+              <item alignment="Qt::AlignHCenter">
                <widget class="QPushButton" name="pushButton_4">
                 <property name="minimumSize">
                  <size>
@@ -202,13 +202,13 @@ QLabel#email_notFound_error, #password_incorrect_error{color: red}</string>
                 </property>
                </widget>
               </item>
-              <item>
+              <item alignment="Qt::AlignHCenter">
                <widget class="QLabel" name="register_label_4">
                 <property name="text">
                  <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Don't Have An Account? &lt;a href=&quot;register_page.ui&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;Register &lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="textFormat">
-                 <enum>Qt::PlainText</enum>
+                 <enum>Qt::RichText</enum>
                 </property>
                </widget>
               </item>
@@ -284,7 +284,7 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
         <layout class="QVBoxLayout" name="verticalLayout_17" stretch="0">
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_18">
-           <item>
+           <item alignment="Qt::AlignHCenter">
             <widget class="QLabel" name="label_16">
              <property name="styleSheet">
               <string notr="true"/>
@@ -430,7 +430,7 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
              </property>
             </widget>
            </item>
-           <item>
+           <item alignment="Qt::AlignHCenter">
             <widget class="QPushButton" name="pushButton_6">
              <property name="minimumSize">
               <size>
@@ -449,13 +449,13 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
              </property>
             </widget>
            </item>
-           <item>
+           <item alignment="Qt::AlignHCenter">
             <widget class="QLabel" name="register_label_6">
              <property name="text">
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Already Have an Account? &lt;a href=&quot;page1&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#8ab4f8;&quot;&gt;Login &lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="textFormat">
-              <enum>Qt::PlainText</enum>
+              <enum>Qt::RichText</enum>
              </property>
             </widget>
            </item>
@@ -761,7 +761,7 @@ QComboBox QAbstractItemView::item:selected {
              <item>
               <spacer name="horizontalSpacer_2">
                <property name="orientation">
-                <enum>Qt::Vertical</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeType">
                 <enum>QSizePolicy::Fixed</enum>
@@ -817,7 +817,7 @@ QComboBox QAbstractItemView::item:selected {
              <item>
               <spacer name="horizontalSpacer_3">
                <property name="orientation">
-                <enum>Qt::Vertical</enum>
+                <enum>Qt::Horizontal</enum>
                </property>
                <property name="sizeType">
                 <enum>QSizePolicy::Fixed</enum>
@@ -861,6 +861,9 @@ QComboBox QAbstractItemView::item:selected {
              </item>
              <item>
               <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
                <property name="sizeType">
                 <enum>QSizePolicy::Fixed</enum>
                </property>
@@ -902,6 +905,9 @@ QComboBox QAbstractItemView::item:selected {
              </item>
              <item>
               <spacer name="horizontalSpacer_7">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
                <property name="sizeType">
                 <enum>QSizePolicy::Fixed</enum>
                </property>
@@ -1153,7 +1159,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_6">
-            <item>
+            <item alignment="Qt::AlignHCenter">
              <widget class="QWidget" name="widget_6" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
@@ -1174,7 +1180,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                </size>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_2">
-               <item>
+               <item alignment="Qt::AlignHCenter">
                 <widget class="QWidget" name="widget" native="true">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -1195,14 +1201,14 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                   </size>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_3">
-                  <item>
+                  <item alignment="Qt::AlignHCenter">
                    <widget class="QLabel" name="professorName">
                     <property name="text">
                      <string>Dr Youssef Sameh</string>
                     </property>
                    </widget>
                   </item>
-                  <item>
+                  <item alignment="Qt::AlignHCenter">
                    <widget class="QLabel" name="courseName">
                     <property name="text">
                      <string>PY101: Introduction to Python</string>
@@ -1212,7 +1218,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                  </layout>
                 </widget>
                </item>
-               <item>
+               <item alignment="Qt::AlignHCenter">
                 <widget class="QWidget" name="widget_4" native="true">
                  <property name="minimumSize">
                   <size>
@@ -1238,7 +1244,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                     </property>
                    </widget>
                   </item>
-                  <item>
+                  <item alignment="Qt::AlignHCenter">
                    <widget class="QLabel" name="selectFlair">
                     <property name="text">
                      <string>Select a Flair</string>
@@ -1293,7 +1299,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                  </layout>
                 </widget>
                </item>
-               <item>
+               <item alignment="Qt::AlignHCenter">
                 <widget class="QWidget" name="widget_5" native="true">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
@@ -1317,15 +1323,15 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                   <property name="sizeConstraint">
                    <enum>QLayout::SetDefaultConstraint</enum>
                   </property>
-                  <item>
+                  <item alignment="Qt::AlignHCenter">
                    <widget class="QLabel" name="aiLabel">
                     <property name="text">
                      <string>AI Summary of Student Feedback</string>
                     </property>
                    </widget>
                   </item>
-                  <item>
-                   <widget class="QLabel" name="summaryLabel">
+                  <item alignment="Qt::AlignHCenter">
+                   <widget class="QLabel" name="ai_summary">
                     <property name="sizePolicy">
                      <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
                       <horstretch>0</horstretch>
@@ -1355,14 +1361,14 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                  </layout>
                 </widget>
                </item>
-               <item>
+               <item alignment="Qt::AlignHCenter">
                 <widget class="QLabel" name="studentCommentsLabel">
                  <property name="text">
                   <string>Student Comments: </string>
                  </property>
                 </widget>
                </item>
-               <item>
+               <item alignment="Qt::AlignHCenter">
                 <widget class="QWidget" name="widget_7" native="true">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
