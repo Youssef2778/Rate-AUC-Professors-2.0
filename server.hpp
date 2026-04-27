@@ -7,7 +7,9 @@
 #include <cppconn/statement.h>
 #include <mysql_connection.h>
 #include <mysql_driver.h>
-
+#include <boost/asio/ssl.hpp>     // Added for HTTPS
+#include <boost/beast/ssl.hpp>    // Added for HTTPS
+#include <boost/beast/version.hpp> // Added for Beast version
 #include <boost/asio.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/beast/core.hpp>
@@ -15,9 +17,13 @@
 #include <boost/json.hpp>
 #include <mutex>
 #include <queue>
+#include <fstream>
+#include <cstdio>
+#include <memory>
 
 #include "bcrypt/BCrypt.hpp"
 
+namespace ssl = net::ssl;         // Added for HTTPS
 namespace beast = boost::beast;
 namespace http = beast::http;
 namespace net = boost::asio;
@@ -68,6 +74,63 @@ class MySQLConnectionPool
 };
 
 MySQLConnectionPool* dbPool = nullptr;  // Global pointer to the connection pool
+
+std::string generateSummaryFromHuggingFace(const std::string& allComments) {
+    try {
+        const char* apiKeyRaw = std::getenv("GROQ_API_KEY");
+        if (!apiKeyRaw) return "Error: GROQ_API_KEY not set.";
+        std::string apiKey(apiKeyRaw);
+
+        // 1. Prepare JSON (Groq uses the 'messages' format)
+        boost::json::object userMessage;
+        userMessage["role"] = "user";
+        userMessage["content"] = "Summarize these professor reviews into a short 'Overall Vibe' and bullet points for Strengths and Weaknesses:\n\n" + allComments;
+
+        boost::json::array messages;
+        messages.push_back(userMessage);
+
+        boost::json::object payload;
+        payload["model"] = "llama-3.3-70b-versatile"; // A powerful, fast model
+        payload["messages"] = messages;
+
+        std::string json_body = boost::json::serialize(payload);
+
+        // 2. Save to file
+        std::ofstream temp_file("ai_payload.json");
+        temp_file << json_body;
+        temp_file.close();
+
+        // 3. Construct the curl command for Groq
+        std::string cmd = "curl -s -X POST 'https://api.groq.com/openai/v1/chat/completions' "
+                          "-H 'Authorization: Bearer " + apiKey + "' "
+                                     "-H 'Content-Type: application/json' "
+                                     "-d @ai_payload.json";
+
+        // 4. Run it
+        std::string result;
+        FILE* fp = popen(cmd.c_str(), "r");
+        if (!fp) return "System error: could not run curl.";
+
+        char buffer[256];
+        while (fgets(buffer, sizeof(buffer), fp) != nullptr) {
+            result += buffer;
+        }
+        pclose(fp);
+        std::remove("ai_payload.json");
+
+        // 5. Parse Groq's Response
+        auto parsed = boost::json::parse(result);
+        if (parsed.is_object() && parsed.as_object().contains("choices")) {
+            auto choices = parsed.as_object().at("choices").as_array();
+            return boost::json::value_to<std::string>(choices[0].as_object().at("message").as_object().at("content"));
+        }
+
+        return "AI Error: " + result; // Shows raw error if it fails
+
+    } catch (std::exception const& e) {
+        return "Exception: " + std::string(e.what());
+    }
+}
 
 void Register(const http::request<http::string_body>& req, tcp::socket& socket){
     auto parsed = json::parse(req.body());
@@ -464,7 +527,6 @@ void GetComments(const http::request<http::string_body>& req, tcp::socket& socke
     http::write(socket, res);
 }
 
-
 void Comment(const http::request<http::string_body>& req, tcp::socket& socket){
     auto parsed = json::parse(req.body());
     json::object comment = parsed.as_object();
@@ -506,7 +568,6 @@ void Comment(const http::request<http::string_body>& req, tcp::socket& socket){
     res.prepare_payload();
     http::write(socket, res);
 }
-
 
 void handle_request(const http::request<http::string_body>& req,
                     tcp::socket& socket)  // Socket passed to write back response
