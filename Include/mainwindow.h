@@ -33,19 +33,19 @@ class MainWindow : public QMainWindow
     // Map department_name to id
     Ui::MainWindow *ui;
     std::unordered_map<std::string, int> Deps;
-    std::unordered_map<std::string, int> Courses;
-    std::unordered_map<std::string, int> Profs;
+    std::unordered_map<int, std::string> Courses;
+    std::unordered_map<int, std::string> Profs;
 	std::vector<Comment> Comments;
 
-    int m_currentCourseId; // To remember which course we are viewing
 
 
     // We'll use a unique_ptr so we can reconnect if needed
     std::unique_ptr<boost::asio::ip::tcp::socket> m_socket;
 
     // A function we can call anytime to refresh the list
-    void refreshList(std::string);
+    void refreshList();
     User *user;
+    bool Connected;
 
     // For persistent connection to be established once at startup
     boost::asio::io_context io;
@@ -56,8 +56,8 @@ class MainWindow : public QMainWindow
     void LoginPage();
     void RegisterPage();
     void HomePage();
-    void LeaderboardPage(std::string);
-    void professorPage(std::string, std::string);
+    void LeaderboardPage();
+    void professorPage();
     void Logout();
 	void DisplayComments();
 	void CreateComment(Comment comment);

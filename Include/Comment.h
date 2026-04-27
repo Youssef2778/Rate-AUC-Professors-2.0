@@ -3,23 +3,23 @@
 #include <string>
 using namespace std;
 
-struct Comment
+struct Comment 
 {
     int ID;
-        int UserID;
-        string name;
+	int UserID;
+	string name;
     string Content;
     string timestamp;
 
-        Comment(int id, int user_id, string name, string content, string timestamp)
+	Comment(int id, int user_id, string name, string content, string timestamp)
         : ID(id), UserID(user_id), name(name), Content(content){
-                this->timestamp = ConvertTimeZone(timestamp);
-        }
+		this->timestamp = ConvertTimeZone(timestamp);
+	}
 
-    // This function converts the timestamp from UTC to Cairo's local time zone (UTC+2) and handles day/month/year overflow(written with the help of claude ai)
+    // This function converts the timestamp from UTC to Cairo's local time zone (UTC+3) and handles day/month/year overflow(written with the help of claude ai)
     string ConvertTimeZone(const string& timestamp) {
         // The timestamp from the server is in UTC, we need to convert it to local time zone before displaying it.
-        // Cairo's timezone is UTC+2, so we will add 2 hours to the timestamp.
+        // Cairo's timezone is UTC+3, so we will add 2 hours to the timestamp.
         int hrs = stoi(timestamp.substr(11, 2));
         int mins = stoi(timestamp.substr(14, 2));
         int secs = stoi(timestamp.substr(17, 2));
@@ -27,7 +27,7 @@ struct Comment
         int mon = stoi(timestamp.substr(5, 2));
         int year = stoi(timestamp.substr(0, 4));
 
-        hrs += 2; // UTC+2
+        hrs += 3; // UTC+3
 
         // Handle overflow
         if (hrs >= 24) {
@@ -56,21 +56,18 @@ struct Comment
 
     string PrintTime() {
         string Date = timestamp.substr(0, 10);
-        string Time = timestamp.substr(11, 5); // Extracting HH:MM from the timestamp
-        int Hrs = stoi(Time.substr(0, 2));
+        int Hrs = stoi(timestamp.substr(11, 2));
+        string Mins = timestamp.substr(14, 2);
+        string period;
+
         if (Hrs >= 12) {
-            if (Hrs > 12) {
-                Hrs -= 12;
-                // Pad single digit hours
-                string HrsStr = (Hrs < 10 ? "0" : "") + to_string(Hrs);
-                Time.replace(0, 2, HrsStr);
-            }
-            Time += " PM";
+            period = " PM";
+            if (Hrs > 12) Hrs -= 12;
+        } else {
+            period = " AM";
+            if (Hrs == 0) Hrs = 12; // Midnight
         }
-        else {
-            if (Hrs == 0) Time.replace(0, 2, "12"); // Midnight = 12 AM
-            Time += " AM";
-        }
-        return "Posted on " + Date + " at " + Time;
+
+        return "Posted on " + Date + " at " + to_string(Hrs) + ":" + Mins + period;
     }
 };
