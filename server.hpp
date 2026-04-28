@@ -526,15 +526,17 @@ void Comment(const http::request<http::string_body>& req, tcp::socket& socket){
     try {
         sql::Connection* con = dbPool->get();
         sql::PreparedStatement* pstmt(
-            con->prepareStatement("INSERT INTO comments (professor_id, course_id, user_id, content, flair_id) VALUES (?, ?, ?, ?, ?)"));
+            con->prepareStatement("INSERT INTO comments (professor_id, course_id, user_id, content, flair_ids) VALUES (?, ?, ?, ?, ?)"));
         pstmt->setInt(1, comment["prof_id"].as_int64());
         pstmt->setInt(2, comment["course_id"].as_int64());
         pstmt->setInt(3, comment["user_id"].as_int64());
-        pstmt->setInt(4, comment["flair_id"].as_int64());
         pstmt->setString(4, (std::string)comment["content"].as_string());
-        pstmt->executeUpdate();
-
         
+        // flairs should be a JSON array in the request body
+        auto& flairs = comment["flairs"].as_array();
+        pstmt->setString(5, boost::json::serialize(flairs));
+        
+        pstmt->executeUpdate();
         
         // Retrieve the generated comment ID and timestamp
         sql::Statement* stmt = con->createStatement();

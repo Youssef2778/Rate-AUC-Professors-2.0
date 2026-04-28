@@ -17,6 +17,7 @@
 #include <QNetworkReply>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <vector>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -40,7 +41,8 @@ class MainWindow : public QMainWindow
     std::unordered_map<int, std::string> Courses;
     std::unordered_map<int, std::string> Profs;
 	std::vector<Comment> Comments;
-    int selected_flair_id = 0;
+
+    std::vector<int> selected_flairs;
 
 
 
