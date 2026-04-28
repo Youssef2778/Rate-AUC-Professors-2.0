@@ -1066,7 +1066,7 @@ QLineEdit#commentLineEdit:focus, QTextEdit#commentLineEdit:focus {
 }
 
 /* ── Flair buttons ── */
-QPushButton#recommendFlair, #avoidFlair, #mehFlair {
+QPushButton#recommendFlair, #avoidFlair, #mehFlair, #highWorkLoadFlair, #fastPacedFlair, #easyAFlair {
     color: white;
     border: 1.5px solid rgba(0, 0,0 , 0.3);
     border-radius: 10px;
@@ -1081,11 +1081,19 @@ QPushButton#recommendFlair::hover {
 	background-color: rgba(0, 200, 0, 1)
 }
 
+QPushButton#recommendFlair::checked{
+	background-color: rgba(0, 200, 0, 1)
+}
+
 QPushButton#avoidFlair {
     background-color: rgba(200, 0, 0, 0.3);
 }
 
 QPushButton#avoidFlair::hover {
+	background-color: rgba(200, 0, 0, 1)
+}
+
+QPushButton#avoidFlair::checked {
 	background-color: rgba(200, 0, 0, 1)
 }
 
@@ -1098,7 +1106,45 @@ QPushButton#mehFlair::hover {
 	background-color: rgba(135, 206, 235, 1);
 }
 
+QPushButton#mehFlair::checked {
+	background-color: rgba(135, 206, 235, 1);
+}
 
+QPushButton#fastPacedFlair {
+    background-color: rgba(255, 140, 0, 0.3);
+}
+
+QPushButton#fastPacedFlair:hover {
+    background-color: rgba(255, 140, 0, 1);
+}
+
+QPushButton#fastPacedFlair:checked {
+    background-color: rgba(255, 140, 0, 1);
+}
+
+QPushButton#highWorkLoadFlair {
+    background-color: rgba(200, 0, 0, 0.3);
+}
+
+QPushButton#highWorkLoadFlair:hover {
+    background-color: rgba(200, 0, 0, 1);
+}
+
+QPushButton#highWorkLoadFlair:checked {
+    background-color: rgba(200, 0, 0, 1);
+}
+
+QPushButton#easyAFlair {
+    background-color: rgba(0, 180, 0, 0.3);
+}
+
+QPushButton#easyAFlair:hover {
+    background-color: rgba(0, 180, 0, 1);
+}
+
+QPushButton#easyAFlair:checked {
+    background-color: rgba(0, 180, 0, 1);
+}
 
 /* ── Post comment button ── */
 QPushButton#postComment {
@@ -1280,6 +1326,38 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                       <property name="text">
                        <string>Recommend!</string>
                       </property>
+                      <property name="checkable">
+                       <bool>true</bool>
+                      </property>
+                      <property name="checked">
+                       <bool>false</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="easyAFlair">
+                      <property name="text">
+                       <string>Easy A</string>
+                      </property>
+                      <property name="checkable">
+                       <bool>true</bool>
+                      </property>
+                      <property name="checked">
+                       <bool>false</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="highWorkLoadFlair">
+                      <property name="text">
+                       <string>High Workload</string>
+                      </property>
+                      <property name="checkable">
+                       <bool>true</bool>
+                      </property>
+                      <property name="checked">
+                       <bool>false</bool>
+                      </property>
                      </widget>
                     </item>
                     <item>
@@ -1287,12 +1365,37 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                       <property name="text">
                        <string>AVOID!</string>
                       </property>
+                      <property name="checkable">
+                       <bool>true</bool>
+                      </property>
+                      <property name="checked">
+                       <bool>false</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <widget class="QPushButton" name="fastPacedFlair">
+                      <property name="text">
+                       <string>Fast Paced</string>
+                      </property>
+                      <property name="checkable">
+                       <bool>true</bool>
+                      </property>
+                      <property name="checked">
+                       <bool>false</bool>
+                      </property>
                      </widget>
                     </item>
                     <item>
                      <widget class="QPushButton" name="mehFlair">
                       <property name="text">
                        <string>meh</string>
+                      </property>
+                      <property name="checkable">
+                       <bool>true</bool>
+                      </property>
+                      <property name="checked">
+                       <bool>false</bool>
                       </property>
                      </widget>
                     </item>

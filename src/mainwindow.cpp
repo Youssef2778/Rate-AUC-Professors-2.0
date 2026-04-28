@@ -872,3 +872,52 @@ void MainWindow::fetchAiSummary(std::string courseId, std::string profId) {
         std::cout << "AI Summary Network Error: " << e.what() << std::endl;
     }
 }
+
+void MainWindow::on_mehFlair_clicked()
+{
+    if (ui->avoidFlair->isChecked()) ui->avoidFlair->setChecked(false);
+    if (ui->recommendFlair->isChecked()) ui->recommendFlair->setChecked(false);
+}
+
+
+void MainWindow::on_avoidFlair_clicked()
+{
+    if (ui->mehFlair->isChecked()) ui->mehFlair->setChecked(false);
+    if (ui->recommendFlair->isChecked()) ui->recommendFlair->setChecked(false);
+    if (ui->easyAFlair->isChecked()) ui->easyAFlair->setChecked(false);
+    if (ui->highWorkLoadFlair->isChecked()) ui->highWorkLoadFlair->setChecked(false);
+    if (ui->fastPacedFlair->isChecked()) ui->fastPacedFlair->setChecked(false);
+}
+
+void MainWindow::on_recommendFlair_clicked()
+{
+    if (ui->mehFlair->isChecked()) ui->mehFlair->setChecked(false);
+    if (ui->avoidFlair->isChecked()) ui->avoidFlair->setChecked(false);
+    if (ui->easyAFlair->isChecked()) ui->easyAFlair->setChecked(false);
+    if (ui->highWorkLoadFlair->isChecked()) ui->highWorkLoadFlair->setChecked(false);
+    if (ui->fastPacedFlair->isChecked()) ui->fastPacedFlair->setChecked(false);
+}
+
+void MainWindow::on_easyAFlair_clicked() {
+    if (ui->mehFlair->isChecked()) ui->mehFlair->setChecked(false);
+    if (ui->avoidFlair->isChecked()) ui->avoidFlair->setChecked(false);
+    if (ui->recommendFlair->isChecked()) ui->recommendFlair->setChecked(false);
+    if (ui->highWorkLoadFlair->isChecked()) ui->highWorkLoadFlair->setChecked(false);
+    if (ui->fastPacedFlair->isChecked()) ui->fastPacedFlair->setChecked(false);
+}
+
+void MainWindow::on_highWorkLoadFlair_clicked() {
+    if (ui->mehFlair->isChecked()) ui->mehFlair->setChecked(false);
+    if (ui->avoidFlair->isChecked()) ui->avoidFlair->setChecked(false);
+    if (ui->easyAFlair->isChecked()) ui->easyAFlair->setChecked(false);
+    if (ui->recommendFlair->isChecked()) ui->recommendFlair->setChecked(false);
+    if (ui->fastPacedFlair->isChecked()) ui->fastPacedFlair->setChecked(false);
+}
+
+void MainWindow::on_fastPacedFlair_clicked() {
+    if (ui->mehFlair->isChecked()) ui->mehFlair->setChecked(false);
+    if (ui->avoidFlair->isChecked()) ui->avoidFlair->setChecked(false);
+    if (ui->easyAFlair->isChecked()) ui->easyAFlair->setChecked(false);
+    if (ui->highWorkLoadFlair->isChecked()) ui->highWorkLoadFlair->setChecked(false);
+    if (ui->recommendFlair->isChecked()) ui->recommendFlair->setChecked(false);
+}
