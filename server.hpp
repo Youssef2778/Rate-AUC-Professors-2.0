@@ -23,10 +23,10 @@
 
 #include "bcrypt/BCrypt.hpp"
 
-namespace ssl = net::ssl;         // Added for HTTPS
 namespace beast = boost::beast;
 namespace http = beast::http;
 namespace net = boost::asio;
+namespace ssl = net::ssl;         // Added for HTTPS
 namespace json = boost::json;
 using tcp = net::ip::tcp;
 
@@ -77,9 +77,7 @@ MySQLConnectionPool* dbPool = nullptr;  // Global pointer to the connection pool
 
 std::string generateSummaryFromHuggingFace(const std::string& allComments) {
     try {
-        const char* apiKeyRaw = std::getenv("GROQ_API_KEY");
-        if (!apiKeyRaw) return "Error: GROQ_API_KEY not set.";
-        std::string apiKey(apiKeyRaw);
+        std::string apiKey = "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";
 
         // 1. Prepare JSON (Groq uses the 'messages' format)
         boost::json::object userMessage;
@@ -426,7 +424,6 @@ void Downvote(const http::request<http::string_body>& req, tcp::socket& socket){
 
 void GetProfessors(const http::request<http::string_body>& req, tcp::socket& socket){
     boost::json::array professors;
-    std::cout << "Handling" << std::endl;
     std::string target = std::string(req.target());
     std::string CourseID;
     // Extract the course ID from the query parameter
@@ -434,9 +431,7 @@ void GetProfessors(const http::request<http::string_body>& req, tcp::socket& soc
     if (pos != std::string::npos)
         CourseID = target.substr(pos + 4); // 4 = length of "?Id="
     try {
-        std::cout << "before get" << std::endl;
         sql::Connection* con = dbPool->get();
-        std::cout << "after get" << std::endl;
         // Dynamically calculates the score by summing up the votes table!
         sql::PreparedStatement* pstmt(
             con->prepareStatement(
@@ -449,18 +444,15 @@ void GetProfessors(const http::request<http::string_body>& req, tcp::socket& soc
                 "ORDER BY score DESC;"
                 )
             );
-        std::cout << "SQL" << std::endl;
 
         pstmt->setString(1, CourseID);
         sql::ResultSet* res = pstmt->executeQuery();
-        std::cout << "EXEC" << std::endl;
 
         while (res->next()) {
             boost::json::object row;
             row["id"] = (int)res->getInt("professor_id");
             row["name"] = (std::string)res->getString("name");
             row["score"] = std::to_string(res->getInt("score"));
-            std::cout << row["id"] << row["score"] << row["name"] << std::endl;
             professors.push_back(row);
         }
         delete res;
@@ -569,6 +561,61 @@ void Comment(const http::request<http::string_body>& req, tcp::socket& socket){
     http::write(socket, res);
 }
 
+void GetSummary(const http::request<http::string_body>& req, tcp::socket& socket){
+    boost::json::object summaryResponse;
+        std::string target = std::string(req.target());
+        std::string Course_ID;
+        std::string Prof_ID;
+
+        // Parse query params exactly like in /get-comments
+        size_t pos = target.find("?CourseId=");
+        if (pos != std::string::npos)
+            Course_ID = target.substr(pos + 10);
+        pos = Course_ID.find("&ProfId=");
+        if (pos != std::string::npos) {
+            Prof_ID = Course_ID.substr(pos + 8);
+            Course_ID = Course_ID.substr(0, pos);
+        }
+
+        std::string allComments = "";
+        try {
+            sql::Connection* con = dbPool->get();
+            sql::PreparedStatement* pstmt(
+                con->prepareStatement("SELECT content FROM comments WHERE course_id = ? AND professor_id = ?")
+                );
+            pstmt->setString(1, Course_ID);
+            pstmt->setString(2, Prof_ID);
+            sql::ResultSet* res = pstmt->executeQuery();
+
+            // Build one giant string of all comments
+            while (res->next()) {
+                allComments += res->getString("content").asStdString() + "\n";
+            }
+            delete res;
+            delete pstmt;
+            dbPool->release(con);
+
+            if (allComments.empty()) {
+                summaryResponse["summary"] = "Not enough data yet. Be the first to leave a review!";
+            } else {
+                // Call the Hugging Face AI helper function
+                std::string aiSummary = generateSummaryFromHuggingFace(allComments);
+                summaryResponse["summary"] = aiSummary;
+            }
+        }
+        catch (sql::SQLException& e) {
+            std::cerr << "Database Error generating summary: " << e.what() << std::endl;
+            summaryResponse["summary"] = "Could not fetch data for summary.";
+        }
+
+        // Send the AI summary back to the Qt client
+        http::response<http::string_body> res{ http::status::ok, req.version() };
+        res.set(http::field::content_type, "application/json");
+        res.body() = boost::json::serialize(summaryResponse);
+        res.prepare_payload();
+        http::write(socket, res);
+}
+
 void handle_request(const http::request<http::string_body>& req,
                     tcp::socket& socket)  // Socket passed to write back response
 {
@@ -585,5 +632,6 @@ void handle_request(const http::request<http::string_body>& req,
     else if (req.target().starts_with("/get-professors")) {GetProfessors(req, socket);}
     else if (req.target().starts_with("/get-comments")) {GetComments(req, socket);}
     else if (req.target() == "/comment") {Comment(req, socket);}
+    else if (req.target().starts_with("/get-summary")) {GetSummary(req, socket);}
     else std::cout << "Unidentified Request: " << req.target() << std::endl;
 }

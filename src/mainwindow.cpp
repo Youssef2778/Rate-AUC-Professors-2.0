@@ -145,12 +145,12 @@ void MainWindow::professorPage() {
     }
 	cout << "Comments for Professor " << Profs[user->GetCurrentProfID()] << " and Course " << Courses[user->GetCurrentCourseID()] << " loaded: " << Comments.size() << endl;
     DisplayComments();
-	cout << "Comments displayed" << endl;
+	
         // ==========================================
     // ADDED: FETCH AI SUMMARY RIGHT HERE!
     // ==========================================
-    std::string courseIdStr = std::to_string(Courses[CourseName]);
-    std::string profIdStr = std::to_string(Profs[ProfName]);
+    std::string courseIdStr = std::to_string(user->GetCurrentCourseID());
+    std::string profIdStr = std::to_string(user->GetCurrentProfID());
     fetchAiSummary(courseIdStr, profIdStr);
     // ==========================================
 }
@@ -695,8 +695,8 @@ void MainWindow::CreateComment(Comment comment)
     QWidget* card = new QWidget();
     card->setObjectName("commentCard");
     card->setMinimumHeight(100);
-    card->setMinimumWidth(600);
-    card->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    card->setMinimumWidth(482);
+    card->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
     card->setStyleSheet(
         "QWidget#commentCard {"
         "   background-color: rgba(255, 255, 255, 0.12);"

@@ -62,7 +62,6 @@ int main()
             } catch (std::exception& e) {
                 std::cerr << "Thread error: " << e.what() << std::endl;
             }
-            // yayyyy
             std::cout << "Client disconnected." << std::endl;
         });
     }
