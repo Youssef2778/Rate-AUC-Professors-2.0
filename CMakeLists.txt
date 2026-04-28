@@ -9,12 +9,10 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# 1. ADDED 'Network' here
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql Network)
 find_package(Boost REQUIRED COMPONENTS json)
 
-# 2. ADDED OpenSSL for the server to talk to HuggingFace
 find_package(OpenSSL REQUIRED)
 
 set(PROJECT_SOURCES
@@ -22,6 +20,11 @@ set(PROJECT_SOURCES
         ./src/mainwindow.cpp
         ./Include/mainwindow.h
         ./src/mainwindow.ui
+        ./src/loginPage.cpp
+        ./src/registerPage.cpp
+        ./src/professorPage.cpp
+        ./src/leaderboardPage.cpp
+        ./src/homePage.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -42,7 +45,6 @@ else()
     endif()
 endif()
 
-# 3. ADDED Qt Network library to the Rate_AUC frontend
 target_link_libraries(Rate_AUC PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network)
 target_link_libraries(Rate_AUC PRIVATE Boost::json)
 target_link_libraries(Rate_AUC PRIVATE bcrypt) 
@@ -51,7 +53,6 @@ target_link_libraries(server PRIVATE Boost::json)
 target_link_libraries(server PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(server PRIVATE mysqlcppconn)
 target_link_libraries(server PRIVATE bcrypt)
-# 4. ADDED OpenSSL libraries to the server
 target_link_libraries(server PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 
 target_include_directories(Rate_AUC PRIVATE Include)
