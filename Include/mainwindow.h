@@ -40,6 +40,7 @@ class MainWindow : public QMainWindow
     std::unordered_map<int, std::string> Courses;
     std::unordered_map<int, std::string> Profs;
 	std::vector<Comment> Comments;
+    int selected_flair_id = 0;
 
 
 

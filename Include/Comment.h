@@ -10,9 +10,10 @@ struct Comment
 	string name;
     string Content;
     string timestamp;
+    int flairID;
 
-	Comment(int id, int user_id, string name, string content, string timestamp)
-        : ID(id), UserID(user_id), name(name), Content(content){
+	Comment(int id, int user_id, string name, string content, string timestamp, int fID)
+        : ID(id), UserID(user_id), name(name), Content(content), flairID(fID) {
 		this->timestamp = ConvertTimeZone(timestamp);
 	}
 
