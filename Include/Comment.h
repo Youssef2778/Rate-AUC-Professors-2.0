@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <string>
+#include <vector>
 using namespace std;
 
 struct Comment 
@@ -10,9 +11,10 @@ struct Comment
 	string name;
     string Content;
     string timestamp;
+    vector<int> flairs;
 
-	Comment(int id, int user_id, string name, string content, string timestamp)
-        : ID(id), UserID(user_id), name(name), Content(content){
+	Comment(int id, int user_id, string name, string content, string timestamp, vector<int> flairs)
+        : ID(id), UserID(user_id), name(name), Content(content), flairs(flairs) {
 		this->timestamp = ConvertTimeZone(timestamp);
 	}
 

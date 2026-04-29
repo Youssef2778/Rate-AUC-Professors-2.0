@@ -17,6 +17,7 @@
 #include <QNetworkReply>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <vector>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -40,6 +41,8 @@ class MainWindow : public QMainWindow
     std::unordered_map<int, std::string> Courses;
     std::unordered_map<int, std::string> Profs;
 	std::vector<Comment> Comments;
+
+    std::vector<int> selected_flairs;
 
 
 
@@ -90,12 +93,12 @@ class MainWindow : public QMainWindow
     void handleDownvote(const std::string& profID, int courseID, std::string CourseName);
     void on_backButton_clicked();
     void on_postComment_clicked();
-    void on_mehFlair_clicked();
-    void on_avoidFlair_clicked();
-    void on_recommendFlair_clicked();
-    void on_easyAFlair_clicked();
-    void on_highWorkLoadFlair_clicked();
-    void on_fastPacedFlair_clicked();
+    void on_mehFlair_clicked(bool checked);
+    void on_avoidFlair_clicked(bool checked);
+    void on_recommendFlair_clicked(bool checked);
+    void on_easyAFlair_clicked(bool checked);
+    void on_highWorkLoadFlair_clicked(bool checked);
+    void on_fastPacedFlair_clicked(bool checked);
 };
 
 #endif  // MAINWINDOW_H

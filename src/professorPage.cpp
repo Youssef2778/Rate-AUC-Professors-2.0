@@ -17,8 +17,20 @@
 namespace beast = boost::beast;
 namespace http = beast::http;
 
+enum flairID {
+    null,
+    recommend,
+    avoid,
+    meh,
+    easyA,
+    fastPaced,
+    highWorkLoad
+};
+
 
 void MainWindow::professorPage() {
+    
+    selected_flairs.clear(); 
     ui->stackedWidget->setCurrentIndex(4);
     ui->scrollArea->setWidgetResizable(true);
     ui->widget_7->setMaximumHeight(QWIDGETSIZE_MAX);
@@ -26,6 +38,7 @@ void MainWindow::professorPage() {
 	ui->professorName->setText("Dr. " + QString::fromStdString(Profs[user->GetCurrentProfID()]));
 	ui->courseName->setText(QString::fromStdString(Courses[user->GetCurrentCourseID()]));
 
+    
 
     // Request the comments for this professor-course from the server
     try {
@@ -48,11 +61,27 @@ void MainWindow::professorPage() {
         // clear comments before populating it with the new comments
         Comments.clear();
         ClearLayout(ui->widget_7->layout());
+        
+        
+
 
         for (auto& entry : comments) {
             boost::json::object& comment = entry.as_object();
+            vector<int> flairs;
+            auto& flairs_val = comment["flairs"];
+            std::cout << flairs_val.kind() << ": " << flairs_val << std::endl; 
+            if (flairs_val != "") {
+                boost::json::array flairs_arr;
+                flairs_arr = boost::json::parse((std::string)flairs_val.as_string()).as_array();
+                std::cout << "Parsed string flairs into array: " << flairs_arr << std::endl;
+                for (auto& flair : flairs_arr) {
+                    flairs.push_back((int)flair.as_int64());
+                }
+            }
+            
             Comments.push_back(Comment( (int)comment["id"].as_int64(), (int)comment["user_id"].as_int64(), (std::string)comment["username"].as_string(),
-                                       (std::string)comment["content"].as_string(), (std::string)comment["timestamp"].as_string() ));
+                                       (std::string)comment["content"].as_string(), (std::string)comment["timestamp"].as_string(), 
+                                       flairs));
         }
     }
     catch (std::exception& e) {
@@ -76,7 +105,7 @@ void MainWindow::CreateComment(Comment comment)
     QWidget* card = new QWidget();
     card->setObjectName("commentCard");
     card->setMinimumHeight(100);
-    card->setMinimumWidth(482);
+    card->setMinimumWidth(643);
     card->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
     card->setStyleSheet(
         "QWidget#commentCard {"
@@ -98,6 +127,8 @@ void MainWindow::CreateComment(Comment comment)
     mainLayout->setContentsMargins(20, 16, 20, 16);
     mainLayout->setSpacing(10);
 
+    QHBoxLayout* username_flair = new QHBoxLayout;
+
     QLabel* usernameLabel = new QLabel(QString::fromStdString(comment.name));
     usernameLabel->setStyleSheet(
         "font-family: 'Segoe UI';"
@@ -107,6 +138,8 @@ void MainWindow::CreateComment(Comment comment)
         "background: transparent;"
         "border: none;"
     );
+
+    username_flair->addWidget(usernameLabel);
 
     QLabel* contentLabel = new QLabel(QString::fromStdString(comment.Content));
     contentLabel->setWordWrap(true);
@@ -120,7 +153,6 @@ void MainWindow::CreateComment(Comment comment)
     );
 
     QHBoxLayout* bottomLayout = new QHBoxLayout();
-    bottomLayout->addStretch();
 
     QLabel* datetimeLabel = new QLabel(QString::fromStdString(comment.PrintTime()));
     datetimeLabel->setStyleSheet(
@@ -130,9 +162,73 @@ void MainWindow::CreateComment(Comment comment)
         "background: transparent;"
         "border: none;"
     );
+
+    if (comment.flairs.size() > 0) {
+        for (int i = 0; i < comment.flairs.size(); i++) {
+            QPushButton* flair = new QPushButton;
+            flair->setCheckable(false);
+            flair->setStyleSheet(
+                "color: white;"
+                "border: 1.5px solid rgba(0, 0,0 , 0.3);"
+                "border-radius: 7px;"
+                "padding: 2px 8px;"
+                "font-size: 11px;"
+                "font-weight: bold;"
+                "min-height: 18px;"
+            );
+
+            QString current_stylesheet = flair->styleSheet();
+
+            switch(comment.flairs[i]) {
+                case null:
+                    flair->hide();
+                    break;
+                case recommend:
+                    flair->setStyleSheet(
+                        current_stylesheet + "background-color: rgba(0, 200, 0, 1);"
+                    );
+                    flair->setText("recommend");
+                    break;
+                case avoid:
+                    flair->setStyleSheet(
+                        current_stylesheet + "background-color: rgba(200, 0, 0, 1);"
+                    );
+                    flair->setText("avoid");
+                    break;
+                case meh:
+                    flair->setStyleSheet(
+                        current_stylesheet + "background-color: rgba(135, 206, 235, 1);"
+                    );
+                    flair->setText("meh");
+                    break;
+                case easyA:
+                    flair->setStyleSheet(
+                        current_stylesheet + "background-color: rgba(0, 180, 0, 1);"
+                    );
+                    flair->setText("easyA");
+                    break;
+                case fastPaced:
+                    flair->setStyleSheet(
+                        current_stylesheet + "background-color: rgba(255, 140, 0, 1);"
+                    );
+                    flair->setText("fastPaced");
+                    break;
+                case highWorkLoad:
+                    flair->setStyleSheet(
+                        current_stylesheet + "background-color: rgba(200, 0, 0, 1);"
+                    );
+                    flair->setText("highWorkLoad");
+                    break;
+            }
+            bottomLayout->addWidget(flair);
+        }
+    }
+
+    bottomLayout->addStretch();
     bottomLayout->addWidget(datetimeLabel);
 
-    mainLayout->addWidget(usernameLabel);
+
+    mainLayout->addLayout(username_flair);
     mainLayout->addWidget(contentLabel);
     mainLayout->addLayout(bottomLayout);
 
@@ -141,7 +237,6 @@ void MainWindow::CreateComment(Comment comment)
     if (layout)
         layout->insertWidget(0, card);
 }
-
 void MainWindow::DisplayComments() {
 	for (Comment comment : Comments) {
         CreateComment(comment);
@@ -159,10 +254,19 @@ void MainWindow::on_postComment_clicked() {
         boost::json::object comment;
 		int UserID = user->GetID();
 
+        boost::json::array flairs;
+        for (const auto& flair : selected_flairs) {
+            flairs.push_back(flair);
+            std::cout << "Selected flair added to JSON: " << flair << endl;
+        }
+        
+
 		comment["user_id"] = UserID;
 		comment["content"] = content;
         comment["prof_id"] = user->GetCurrentProfID();
         comment["course_id"] = user->GetCurrentCourseID();
+        comment["flairs"] = flairs;
+        
 
         // Preparing the request...
         boost::beast::http::request<boost::beast::http::string_body> request(
@@ -189,7 +293,7 @@ void MainWindow::on_postComment_clicked() {
 		cout << "Comment posted with ID: " << commentID << " at " << timestamp << endl;
 
 		// Create comment object
-        Comment commentObj(commentID, UserID, user->GetUsername(), content, timestamp);
+        Comment commentObj(commentID, UserID, user->GetUsername(), content, timestamp, selected_flairs);
 		Comments.push_back(commentObj); 
         
 
@@ -202,7 +306,15 @@ void MainWindow::on_postComment_clicked() {
         std::cout << "Connection failed: " << e.what() << std::endl;
     }
 	ui->commentLineEdit->clear(); // Clear the input field after posting
+    ui->mehFlair->setChecked(false);
+    ui->avoidFlair->setChecked(false);
+    ui->recommendFlair->setChecked(false);
+    ui->easyAFlair->setChecked(false);
+    ui->highWorkLoadFlair->setChecked(false);
+    ui->fastPacedFlair->setChecked(false);      
+    selected_flairs.clear(); 
 }
+
 void MainWindow::fetchAiSummary(std::string courseId, std::string profId) {
     // 1. Update the UI
     ui->summaryLabel->setText("🤖 Generating AI Summary... Please wait.");
@@ -242,51 +354,137 @@ void MainWindow::fetchAiSummary(std::string courseId, std::string profId) {
     }
 }
 
-void MainWindow::on_mehFlair_clicked()
+void MainWindow::on_mehFlair_clicked(bool checked)
+{   
+    std::cout << "Meh flair button clicked." << std::endl;
+    if (!checked){
+        selected_flairs.erase(std::remove(selected_flairs.begin(), selected_flairs.end(), meh), selected_flairs.end());
+        std::cout << "Meh flair removed." << std::endl;
+        std::cout << "Current selected flairs: ";
+        for (const auto& flair : selected_flairs) {
+            std::cout << flair << " ";
+        }
+        std::cout << std::endl;
+    }
+    else{
+        selected_flairs.push_back(meh);
+        std::cout << "Meh flair added." << std::endl;
+        std::cout << "Current selected flairs: ";
+        for (const auto& flair : selected_flairs) {
+            std::cout << flair << " ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+void MainWindow::on_avoidFlair_clicked(bool checked)
 {
-    if (ui->avoidFlair->isChecked()) ui->avoidFlair->setChecked(false);
-    if (ui->recommendFlair->isChecked()) ui->recommendFlair->setChecked(false);
+    std::cout << "Avoid flair button clicked." << std::endl;
+    if (!checked){
+        selected_flairs.erase(std::remove(selected_flairs.begin(), selected_flairs.end(), avoid), selected_flairs.end());
+        std::cout << "Avoid flair removed." << std::endl;
+        std::cout << "Current selected flairs: ";
+        for (const auto& flair : selected_flairs) {
+            std::cout << flair << " ";
+        }
+        std::cout << std::endl;
+    }
+    else{
+        selected_flairs.push_back(avoid);
+        std::cout << "Avoid flair added." << std::endl;
+        std::cout << "Current selected flairs: ";
+        for (const auto& flair : selected_flairs) {
+            std::cout << flair << " ";
+        }
+        std::cout << std::endl;
+    }
 }
 
-
-void MainWindow::on_avoidFlair_clicked()
+void MainWindow::on_recommendFlair_clicked(bool checked)
 {
-    if (ui->mehFlair->isChecked()) ui->mehFlair->setChecked(false);
-    if (ui->recommendFlair->isChecked()) ui->recommendFlair->setChecked(false);
-    if (ui->easyAFlair->isChecked()) ui->easyAFlair->setChecked(false);
-    if (ui->highWorkLoadFlair->isChecked()) ui->highWorkLoadFlair->setChecked(false);
-    if (ui->fastPacedFlair->isChecked()) ui->fastPacedFlair->setChecked(false);
+    std::cout << "Recommend flair button clicked." << std::endl;
+    if (!checked){
+        selected_flairs.erase(std::remove(selected_flairs.begin(), selected_flairs.end(), recommend), selected_flairs.end());
+        std::cout << "Recommend flair removed." << std::endl;
+        std::cout << "Current selected flairs: ";
+        for (const auto& flair : selected_flairs) {
+            std::cout << flair << " ";
+        }
+        std::cout << std::endl;
+    }
+    else{
+        selected_flairs.push_back(recommend);
+        std::cout << "Recommend flair added." << std::endl;
+        std::cout << "Current selected flairs: ";
+        for (const auto& flair : selected_flairs) {
+            std::cout << flair << " ";
+        }
+        std::cout << std::endl;
+    }
 }
 
-void MainWindow::on_recommendFlair_clicked()
+void MainWindow::on_easyAFlair_clicked(bool checked)
 {
-    if (ui->mehFlair->isChecked()) ui->mehFlair->setChecked(false);
-    if (ui->avoidFlair->isChecked()) ui->avoidFlair->setChecked(false);
-    if (ui->easyAFlair->isChecked()) ui->easyAFlair->setChecked(false);
-    if (ui->highWorkLoadFlair->isChecked()) ui->highWorkLoadFlair->setChecked(false);
-    if (ui->fastPacedFlair->isChecked()) ui->fastPacedFlair->setChecked(false);
+    std::cout << "Easy A flair button clicked." << std::endl;
+    if (!checked){
+        selected_flairs.erase(std::remove(selected_flairs.begin(), selected_flairs.end(), easyA), selected_flairs.end());
+        std::cout << "Easy A flair removed." << std::endl;
+        std::cout << "Current selected flairs: ";
+        for (const auto& flair : selected_flairs) {
+            std::cout << flair << " ";
+        }
+        std::cout << std::endl;
+    }
+    else{
+        selected_flairs.push_back(easyA);
+        std::cout << "Easy A flair added." << std::endl;
+        std::cout << "Current selected flairs: ";
+        for (const auto& flair : selected_flairs) {
+            std::cout << flair << " ";
+        }
+        std::cout << std::endl;
+    }
 }
 
-void MainWindow::on_easyAFlair_clicked() {
-    if (ui->mehFlair->isChecked()) ui->mehFlair->setChecked(false);
-    if (ui->avoidFlair->isChecked()) ui->avoidFlair->setChecked(false);
-    if (ui->recommendFlair->isChecked()) ui->recommendFlair->setChecked(false);
-    if (ui->highWorkLoadFlair->isChecked()) ui->highWorkLoadFlair->setChecked(false);
-    if (ui->fastPacedFlair->isChecked()) ui->fastPacedFlair->setChecked(false);
+void MainWindow::on_highWorkLoadFlair_clicked(bool checked)
+{
+    std::cout << "High Workload flair button clicked." << std::endl;
+    if (!checked){
+        selected_flairs.erase(std::remove(selected_flairs.begin(), selected_flairs.end(), highWorkLoad), selected_flairs.end());
+        std::cout << "High Workload flair removed." << std::endl;
+        std::cout << "Current selected flairs: ";
+        for (const auto& flair : selected_flairs) {
+            std::cout << flair << " ";
+        }
+        std::cout << std::endl;
+    }
+    else{
+        selected_flairs.push_back(highWorkLoad);
+        std::cout << "High Workload flair added." << std::endl;
+        std::cout << "Current selected flairs: ";
+        for (const auto& flair : selected_flairs) {
+            std::cout << flair << " ";
+        }
+        std::cout << std::endl;
+    }
 }
 
-void MainWindow::on_highWorkLoadFlair_clicked() {
-    if (ui->mehFlair->isChecked()) ui->mehFlair->setChecked(false);
-    if (ui->avoidFlair->isChecked()) ui->avoidFlair->setChecked(false);
-    if (ui->easyAFlair->isChecked()) ui->easyAFlair->setChecked(false);
-    if (ui->recommendFlair->isChecked()) ui->recommendFlair->setChecked(false);
-    if (ui->fastPacedFlair->isChecked()) ui->fastPacedFlair->setChecked(false);
+void MainWindow::on_fastPacedFlair_clicked(bool checked)
+{
+    std::cout << "Fast Paced flair button clicked." << std::endl;
+    if (!checked){
+        selected_flairs.erase(std::remove(selected_flairs.begin(), selected_flairs.end(), fastPaced), selected_flairs.end());
+        std::cout << "Fast Paced flair removed." << std::endl;
+        std::cout << "Current selected flairs: ";
+        for (const auto& flair : selected_flairs) {
+            std::cout << flair << " ";
+        }
+        std::cout << std::endl;
+    }
+    else{
+        selected_flairs.push_back(fastPaced);
+        std::cout << "Fast Paced flair added." << std::endl;
+        std::cout << "Current selected flairs: ";
+    }
 }
 
-void MainWindow::on_fastPacedFlair_clicked() {
-    if (ui->mehFlair->isChecked()) ui->mehFlair->setChecked(false);
-    if (ui->avoidFlair->isChecked()) ui->avoidFlair->setChecked(false);
-    if (ui->easyAFlair->isChecked()) ui->easyAFlair->setChecked(false);
-    if (ui->highWorkLoadFlair->isChecked()) ui->highWorkLoadFlair->setChecked(false);
-    if (ui->recommendFlair->isChecked()) ui->recommendFlair->setChecked(false);
-}
