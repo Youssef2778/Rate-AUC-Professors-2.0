@@ -46,6 +46,7 @@ void MainWindow::Logout()
     // Clear the user session
     delete user;
     user = nullptr;
+    selected_flairs.clear();
     // Return to the login page
     LoginPage();
 }

@@ -488,7 +488,7 @@ void GetComments(const http::request<http::string_body>& req, tcp::socket& socke
     try {
         sql::Connection* con = dbPool->get();
         sql::PreparedStatement* pstmt(
-            con->prepareStatement("SELECT usr.username, cmnt.user_id, cmnt.id, cmnt.content, cmnt.timestamp FROM comments cmnt JOIN users usr ON cmnt.user_id = usr.id WHERE cmnt.course_id = ? AND cmnt.professor_id = ? "
+            con->prepareStatement("SELECT usr.username, cmnt.user_id, cmnt.id, cmnt.content, cmnt.timestamp, cmnt.flair_ids FROM comments cmnt JOIN users usr ON cmnt.user_id = usr.id WHERE cmnt.course_id = ? AND cmnt.professor_id = ? "
                 "ORDER BY cmnt.timestamp ASC"));
         pstmt->setString(1, Course_ID);
         pstmt->setString(2, Prof_ID);
@@ -500,6 +500,7 @@ void GetComments(const http::request<http::string_body>& req, tcp::socket& socke
             row["id"] = (int)res->getInt("id");
             row["content"] = (std::string)res->getString("content");
             row["timestamp"] = (std::string)res->getString("timestamp");
+            row["flairs"] = (std::string)res->getString("flair_ids");
             Comments.push_back(row);
         }
         delete res;
