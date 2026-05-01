@@ -86,7 +86,7 @@ MySQLConnectionPool* dbPool = nullptr;  // Global pointer to the connection pool
 
 std::string generateSummaryFromHuggingFace(const std::string& allComments) {
     try {
-        std::string apiKey = "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";
+        std::string apiKey = "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";
 
         // 1. Prepare JSON (Groq uses the 'messages' format)
         boost::json::object userMessage;

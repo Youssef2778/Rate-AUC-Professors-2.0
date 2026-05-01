@@ -25,6 +25,12 @@ void MainWindow::HomePage()
     
     ui->DepartmentCB->clear();
     ui->CourseCB->clear();  
+    ui->usernameLabel->setText(QString::fromStdString(user->GetUsername()));
+    ui->emailLabel->setText(QString::fromStdString(user->GetEmail()));
+
+    
+    
+    
     // Request the departments from the server
     try {
         // Send GET /get-departments

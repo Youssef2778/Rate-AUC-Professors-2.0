@@ -101,6 +101,9 @@ class MainWindow : public QMainWindow
     void on_fastPacedFlair_clicked(bool checked);
     void on_BackToHomepage_clicked();
     void on_BackToLeaderboard_clicked();
+    void on_logoutButton_clicked();
+    void on_logoutButton_2_clicked();
+    void on_logoutButton_3_clicked();
 };
 
 #endif  // MAINWINDOW_H

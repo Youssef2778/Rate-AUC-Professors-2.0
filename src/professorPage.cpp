@@ -30,10 +30,13 @@ enum flairID {
 
 void MainWindow::professorPage() {
     
-    selected_flairs.clear(); 
+    selected_flairs.clear();
     ui->stackedWidget->setCurrentIndex(4);
     ui->scrollArea->setWidgetResizable(true);
     ui->widget_7->setMaximumHeight(QWIDGETSIZE_MAX);
+
+    ui->usernameLabel_2->setText(QString::fromStdString(user->GetUsername()));
+    ui->emailLabel_2->setText(QString::fromStdString(user->GetEmail()));
 
 	ui->professorName->setText("Dr. " + QString::fromStdString(Profs[user->GetCurrentProfID()]));
 	ui->courseName->setText(QString::fromStdString(Courses[user->GetCurrentCourseID()]));

@@ -93,6 +93,11 @@ void MainWindow::CenterWidget(int pageIndex, QWidget* TargetWidget)
 
     // Create a horizontal layout for centering
     QHBoxLayout* hLayout = new QHBoxLayout();
+
+    if(pageIndex == 3){
+        vLayout->addWidget(ui->HomePageHeader);
+    }
+
     hLayout->addStretch();             // left spacer
     hLayout->addWidget(TargetWidget);  // your target widget
     hLayout->addStretch();             // right spacer
@@ -103,9 +108,6 @@ void MainWindow::CenterWidget(int pageIndex, QWidget* TargetWidget)
 
     page->setLayout(vLayout);
 }
-
-
-
 
 void MainWindow::ClearLayout(QLayout* layout) {
     if (!layout) return;
@@ -147,4 +149,16 @@ bool MainWindow::presenceChecks(QString username, QString password, QString pass
     }
 
     return true;
+}
+
+void MainWindow::on_logoutButton_clicked() {
+    Logout();
+}
+
+void MainWindow::on_logoutButton_2_clicked() {
+    Logout();
+}
+
+void MainWindow::on_logoutButton_3_clicked() {
+    Logout();
 }
