@@ -21,6 +21,7 @@ namespace http = beast::http;
 void MainWindow::LeaderboardPage(){
 
     ui->stackedWidget->setCurrentIndex(2);
+    ui->CourseName->setText(QString::fromStdString(Courses[user->GetCurrentCourseID()]));
 
             // ==========================================
             // 1. LAYOUT & BACK BUTTON FIX
@@ -30,33 +31,17 @@ void MainWindow::LeaderboardPage(){
         delete page->layout();
     }
 
+    QWidget* headerWidget = new QWidget();
+    headerWidget->setLayout(ui->horizontalLayout_10);
+    headerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
     QVBoxLayout *mainLayout = new QVBoxLayout(page);
 
     // Add some padding around the edges of the screen so it breathes
     mainLayout->setContentsMargins(20, 20, 20, 20);
-    mainLayout->setSpacing(15); // Adds a gap between the top bar and the table
 
-    QHBoxLayout *topBarLayout = new QHBoxLayout();
-    topBarLayout->addStretch(); // Pushes the button to the right
-
-            // Style the Back Button so it looks good!
-    ui->backButton->setText("⬅ Back to Courses");
-    ui->backButton->setCursor(Qt::PointingHandCursor);
-    ui->backButton->setStyleSheet(
-        "QPushButton { "
-        "background-color: #1d8e9e; "
-        "color: white; "
-        "border-radius: 5px; "
-        "font-size: 16px; "
-        "font-weight: bold; "
-        "padding: 8px 20px; "
-        "} "
-        "QPushButton:hover { background-color: #0b2239; border: 2px solid #1d8e9e; }"
-        );
-
-    topBarLayout->addWidget(ui->backButton);
-
-    mainLayout->addLayout(topBarLayout);
+    mainLayout->addWidget(headerWidget);
+    mainLayout->addSpacing(10);
     mainLayout->addWidget(ui->tableWidget);
 
     page->setLayout(mainLayout);
@@ -267,9 +252,9 @@ void MainWindow::handleDownvote(const std::string& profID, int courseID, std::st
 }
 
 
-void MainWindow::on_backButton_clicked()
+void MainWindow::on_BackToHomepage_clicked()
 {
-    // 1. Go back to the Course Selection page (Index 3 based on your earlier code)
+    user->SetCurrentCourseID(-1);
     HomePage();
 }
 

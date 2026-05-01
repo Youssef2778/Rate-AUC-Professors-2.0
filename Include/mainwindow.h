@@ -91,7 +91,6 @@ class MainWindow : public QMainWindow
     // ✅ NEW: Added declarations for the upvote and downvote handlers
     void handleUpvote(const std::string& profID, int courseID, std::string CourseName);
     void handleDownvote(const std::string& profID, int courseID, std::string CourseName);
-    void on_backButton_clicked();
     void on_postComment_clicked();
     void on_mehFlair_clicked(bool checked);
     void on_avoidFlair_clicked(bool checked);
@@ -99,6 +98,8 @@ class MainWindow : public QMainWindow
     void on_easyAFlair_clicked(bool checked);
     void on_highWorkLoadFlair_clicked(bool checked);
     void on_fastPacedFlair_clicked(bool checked);
+    void on_BackToHomepage_clicked();
+    void on_BackToLeaderboard_clicked();
 };
 
 #endif  // MAINWINDOW_H

@@ -22,7 +22,9 @@ void MainWindow::HomePage()
 {
     ui->stackedWidget->setCurrentIndex(3);
     CenterWidget(3, ui->widget_3);
-
+    
+    ui->DepartmentCB->clear();
+    ui->CourseCB->clear();  
     // Request the departments from the server
     try {
         // Send GET /get-departments

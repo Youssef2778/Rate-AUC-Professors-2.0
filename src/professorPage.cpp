@@ -69,7 +69,6 @@ void MainWindow::professorPage() {
             boost::json::object& comment = entry.as_object();
             vector<int> flairs;
             auto& flairs_val = comment["flairs"];
-            std::cout << flairs_val.kind() << ": " << flairs_val << std::endl; 
             if (flairs_val != "") {
                 boost::json::array flairs_arr;
                 flairs_arr = boost::json::parse((std::string)flairs_val.as_string()).as_array();
@@ -486,5 +485,10 @@ void MainWindow::on_fastPacedFlair_clicked(bool checked)
         std::cout << "Fast Paced flair added." << std::endl;
         std::cout << "Current selected flairs: ";
     }
+}
+
+void MainWindow::on_BackToLeaderboard_clicked() {
+    user->SetCurrentProfID(-1);
+    LeaderboardPage();
 }
 

@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1844</width>
-    <height>1207</height>
+    <width>1745</width>
+    <height>938</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,7 +33,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="page_0">
        <property name="styleSheet">
@@ -83,7 +83,7 @@ QLabel#email_notFound_error, #password_incorrect_error{color: red}</string>
          </rect>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
-         <item>
+         <item alignment="Qt::AlignmentFlag::AlignHCenter">
           <widget class="QWidget" name="widget_1" native="true">
            <property name="maximumSize">
             <size>
@@ -463,14 +463,46 @@ QLabel#empty_email_error, #empty_username_error, #auc_email_error, #empty_pass_e
        </widget>
       </widget>
       <widget class="QWidget" name="page">
+       <property name="styleSheet">
+        <string notr="true">/* QPushButton */
+QPushButton#BackToHomepage {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    color: white;
+}
+QPushButton#BackToHomepage:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+QPushButton#BackToHomepage:pressed {
+    background-color: rgba(255, 255, 255, 0.35);
+}
+QWidget#page {
+    background-color: #006FB8;
+}
+
+QLabel#CourseName {
+    font-family: &quot;Arial&quot;, sans-serif;
+    font-size: 30px;
+    font-weight: bold;
+    color: white;
+}</string>
+       </property>
        <widget class="QTableWidget" name="tableWidget">
         <property name="geometry">
          <rect>
           <x>230</x>
-          <y>100</y>
+          <y>290</y>
           <width>741</width>
           <height>311</height>
          </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
         <property name="styleSheet">
          <string notr="true">/* The background of the whole page */
@@ -648,31 +680,129 @@ QHeaderView::section {
          </property>
         </item>
        </widget>
-       <widget class="QPushButton" name="backButton">
+       <widget class="QWidget" name="horizontalLayoutWidget_3">
         <property name="geometry">
          <rect>
-          <x>1540</x>
-          <y>0</y>
-          <width>80</width>
-          <height>22</height>
+          <x>13</x>
+          <y>23</y>
+          <width>1701</width>
+          <height>141</height>
          </rect>
         </property>
-        <property name="styleSheet">
-         <string notr="true">ui-&gt;backButton-&gt;setStyleSheet(
-    &quot;QPushButton { &quot;
-    &quot;background-color: #0b2239; &quot;
-    &quot;color: white; &quot;
-    &quot;border: 1px solid #1d8e9e; &quot;
-    &quot;border-radius: 5px; &quot;
-    &quot;padding: 5px 15px; &quot;
-    &quot;font-weight: bold; &quot;
-    &quot;} &quot;
-    &quot;QPushButton:hover { background-color: #1d8e9e; }&quot;
-);</string>
-        </property>
-        <property name="text">
-         <string>backButton</string>
-        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_10">
+         <property name="sizeConstraint">
+          <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
+         </property>
+         <item>
+          <spacer name="horizontalSpacer_20">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Policy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>10</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="BackToHomepage">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>100</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources.qrc">
+             <normaloff>:/icons/Back.png</normaloff>:/icons/Back.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>50</width>
+             <height>50</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_21">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Policy::Expanding</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="CourseName">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Course Name</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_22">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_23">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Policy::Fixed</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>150</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
        </widget>
       </widget>
       <widget class="QWidget" name="page_3">
@@ -1185,9 +1315,36 @@ QScrollBar::handle:vertical:hover {
 
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
     height: 0px;
+}
+
+/* QPushButton */
+QPushButton {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    color: white;
+}
+QPushButton:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+QPushButton:pressed {
+    background-color: rgba(255, 255, 255, 0.35);
 }</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_7">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
          <widget class="QScrollArea" name="scrollArea">
           <property name="widgetResizable">
@@ -1198,11 +1355,17 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1818</width>
-             <height>1137</height>
+             <width>1723</width>
+             <height>1052</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_6">
+            <property name="leftMargin">
+             <number>6</number>
+            </property>
+            <property name="rightMargin">
+             <number>6</number>
+            </property>
             <item>
              <widget class="QWidget" name="widget_6" native="true">
               <property name="sizePolicy">
@@ -1224,79 +1387,176 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                </size>
               </property>
               <layout class="QVBoxLayout" name="verticalLayout_2">
-               <item alignment="Qt::AlignmentFlag::AlignHCenter">
-                <widget class="QWidget" name="widget" native="true">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_2">
+                 <property name="sizeConstraint">
+                  <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
                  </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>655</width>
-                   <height>154</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>904</width>
-                   <height>204</height>
-                  </size>
-                 </property>
-                 <layout class="QVBoxLayout" name="verticalLayout_3">
-                  <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignBottom">
-                   <widget class="QLabel" name="professorName">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>Dr Youssef Sameh</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item alignment="Qt::AlignmentFlag::AlignHCenter">
-                   <widget class="QLabel" name="courseName">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>PY101: Introduction to Python</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </widget>
+                 <item>
+                  <spacer name="horizontalSpacer_10">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeType">
+                    <enum>QSizePolicy::Policy::Fixed</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>10</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item alignment="Qt::AlignmentFlag::AlignTop">
+                  <widget class="QPushButton" name="BackToLeaderboard">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>100</width>
+                     <height>100</height>
+                    </size>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="icon">
+                    <iconset resource="../resources.qrc">
+                     <normaloff>:/icons/Back.png</normaloff>:/icons/Back.png</iconset>
+                   </property>
+                   <property name="iconSize">
+                    <size>
+                     <width>50</width>
+                     <height>50</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_4">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeType">
+                    <enum>QSizePolicy::Policy::Expanding</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item alignment="Qt::AlignmentFlag::AlignHCenter">
+                  <widget class="QWidget" name="widget" native="true">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>504</width>
+                     <height>154</height>
+                    </size>
+                   </property>
+                   <property name="maximumSize">
+                    <size>
+                     <width>904</width>
+                     <height>204</height>
+                    </size>
+                   </property>
+                   <layout class="QVBoxLayout" name="verticalLayout_3">
+                    <item alignment="Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignBottom">
+                     <widget class="QLabel" name="professorName">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>Dr Youssef Sameh</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item alignment="Qt::AlignmentFlag::AlignHCenter">
+                     <widget class="QLabel" name="courseName">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>0</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>PY101: Introduction to Python</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_5">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_11">
+                   <property name="orientation">
+                    <enum>Qt::Orientation::Horizontal</enum>
+                   </property>
+                   <property name="sizeType">
+                    <enum>QSizePolicy::Policy::Fixed</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>150</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
                </item>
                <item alignment="Qt::AlignmentFlag::AlignHCenter">
                 <widget class="QWidget" name="widget_4" native="true">
                  <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
                    <horstretch>0</horstretch>
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
                  <property name="minimumSize">
                   <size>
-                   <width>655</width>
+                   <width>504</width>
                    <height>404</height>
                   </size>
                  </property>
@@ -1307,6 +1567,18 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                   </size>
                  </property>
                  <layout class="QVBoxLayout" name="verticalLayout_4">
+                  <property name="leftMargin">
+                   <number>10</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>10</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>10</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>10</number>
+                  </property>
                   <item>
                    <widget class="QLabel" name="addYourComment">
                     <property name="text">
@@ -1517,13 +1789,13 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>655</width>
+                     <width>504</width>
                      <height>404</height>
                     </size>
                    </property>
                    <property name="maximumSize">
                     <size>
-                     <width>655</width>
+                     <width>1504</width>
                      <height>1004</height>
                     </size>
                    </property>
@@ -1656,6 +1928,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
   </widget>
  </widget>
  <resources>
+  <include location="../resources.qrc"/>
   <include location="../resources.qrc"/>
  </resources>
  <connections/>

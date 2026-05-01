@@ -4,8 +4,10 @@
         <file>images/AUC_Background.jpeg</file>
         <file>images/Background.jpg</file>
         <file>images/Glass_AUC.png</file>
-        <file>icons/MG.svg</file>
         <file>images/up.png</file>
         <file>images/down.png</file>
+	<file>images/Profile.png</file>
+        <file>icons/MG.svg</file>
+        <file>icons/Back.png</file>
     </qresource>
 </RCC>

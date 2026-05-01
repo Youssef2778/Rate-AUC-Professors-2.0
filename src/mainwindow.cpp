@@ -83,6 +83,12 @@ void MainWindow::CenterWidget(int pageIndex, QWidget* TargetWidget)
 
     // Assume you have a widget inside the stacked page
     QWidget* page = ui->stackedWidget->widget(pageIndex);  // page by index
+
+        // Clear any existing layout on the page
+    if (page->layout()) {
+        delete page->layout();
+    }
+
     QVBoxLayout* vLayout = new QVBoxLayout(page);
 
     // Create a horizontal layout for centering
