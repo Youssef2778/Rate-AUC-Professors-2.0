@@ -31,10 +31,13 @@ void MainWindow::LeaderboardPage(){
         delete page->layout();
     }
 
+    ui->usernameLabel_3->setText(QString::fromStdString(user->GetUsername()));
+    ui->emailLabel_3->setText(QString::fromStdString(user->GetEmail()));
+
     QWidget* headerWidget = new QWidget();
     headerWidget->setLayout(ui->horizontalLayout_10);
     headerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
+    
     QVBoxLayout *mainLayout = new QVBoxLayout(page);
 
     // Add some padding around the edges of the screen so it breathes

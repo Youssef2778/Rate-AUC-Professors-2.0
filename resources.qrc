@@ -6,7 +6,7 @@
         <file>images/Glass_AUC.png</file>
         <file>images/up.png</file>
         <file>images/down.png</file>
-	<file>images/Profile.png</file>
+	<file>icons/Profile.svg</file>
         <file>icons/MG.svg</file>
         <file>icons/Back.png</file>
     </qresource>
