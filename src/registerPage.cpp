@@ -55,45 +55,27 @@ void MainWindow::on_checkBox_6_stateChanged(int arg1)
 void MainWindow::on_pushButton_6_clicked()
 {
     // Client-side validation (presence check + format check of email)
+    QString username = ui->username_register_lineEdit->text();
+    QString password = ui->password_register_lineEdit->text();
+    QString confPassword = ui->confPassword_register_lineEdit->text();
+    QString email = ui->email_register_lineEdit->text();
 
-    // Presence Checks
-    if (ui->username_register_lineEdit->text() == "") {
-        ui->empty_username_error->show();
-        return;
-    } else
-        ui->empty_username_error->hide();
+    if (!presenceChecks(username, password, confPassword, email)) return;
 
-    if (ui->password_register_lineEdit->text() == "") {
-        ui->empty_pass_error->show();
-        return;
-    } else
-        ui->empty_pass_error->hide();
-
-    if (ui->confPassword_register_lineEdit->text() == "") {
-        ui->empty_confPass_error->show();
-        return;
-    } else
-        ui->empty_confPass_error->hide();
-
-    if (ui->email_register_lineEdit->text() == "") {
+    // Checking the format of the email..
+    int i = email.toStdString().find('@');
+    if (!validEmail(email.toStdString())) {
         ui->empty_email_error->show();
         return;
-    } else {
-        ui->empty_email_error->hide();
-
-        // Checking the format of the email..
-        std::string email = ui->email_register_lineEdit->text().toStdString();
-        int i = email.find('@');
-        if (!validEmail(email))
-            ui->empty_email_error->show();
-        else {
-            if (email.substr(i + 1, email.size() - i - 1) != "aucegypt.edu") {
-                ui->auc_email_error->show();
-                return;
-            } else
-                ui->auc_email_error->hide();
-        }
     }
+    else {
+        if (email.toStdString().substr(i + 1, email.size() - i - 1) != "aucegypt.edu") {
+            ui->auc_email_error->show();
+            return;
+        } else
+            ui->auc_email_error->hide();
+    }
+    
 
     // Checking if the two passwords input are the same..
     if (ui->password_register_lineEdit->text() != ui->confPassword_register_lineEdit->text()) {

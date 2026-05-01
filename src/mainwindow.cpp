@@ -119,3 +119,32 @@ void MainWindow::ClearLayout(QLayout* layout) {
         delete item;
     }
 }
+
+bool MainWindow::presenceChecks(QString username, QString password, QString passwordTwo, QString email) {
+    if (username == "") {
+        ui->empty_username_error->show();
+        return false;
+    } else
+        ui->empty_username_error->hide();
+
+    if (password == "") {
+        ui->empty_pass_error->show();
+        return false;
+    } else
+        ui->empty_pass_error->hide();
+
+    if (passwordTwo == "") {
+        ui->empty_confPass_error->show();
+        return false;
+    } else
+        ui->empty_confPass_error->hide();
+
+    if (email == "") {
+        ui->empty_email_error->show();
+        return false;
+    } else {
+        ui->empty_email_error->hide();
+    }
+
+    return true;
+}

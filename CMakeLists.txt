@@ -86,7 +86,20 @@ endif()
 enable_testing()
 
 add_executable(RateAUC_test ./tests/tests.cpp ./src/helpers.cpp)
-target_link_libraries(RateAUC_test PRIVATE GTest::gtest_main)
+target_link_libraries(RateAUC_test PRIVATE GTest::gtest_main GTest::gmock)
+target_link_libraries(RateAUC_test PRIVATE Boost::json)
+
 target_include_directories(RateAUC_test PRIVATE Include)
+
+add_executable(RateAUC_QTtest ./tests/qt_tests.cpp ${PROJECT_SOURCES})
+target_link_libraries(RateAUC_QTtest PRIVATE GTest::gtest_main Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network GTest::gmock)
+target_link_libraries(RateAUC_QTtest PRIVATE Boost::json)
+target_link_libraries(RateAUC_QTtest PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
+target_link_libraries(RateAUC_QTtest PRIVATE mysqlcppconn)
+target_link_libraries(RateAUC_QTtest PRIVATE bcrypt)
+target_link_libraries(RateAUC_QTtest PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+target_include_directories(RateAUC_QTtest PRIVATE Include)
+
+
 include(GoogleTest)
-gtest_discover_tests(RateAUC_test)
+gtest_discover_tests(RateAUC_QTtest DISCOVERY_MODE PRE_TEST)

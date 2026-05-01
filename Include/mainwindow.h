@@ -72,6 +72,7 @@ class MainWindow : public QMainWindow
 	void DisplayComments();
 	void CreateComment(Comment comment);
     void ClearLayout(QLayout* layout);
+    virtual bool presenceChecks(QString username, QString password, QString passwordTwo, QString email);
 
 
 
