@@ -12,6 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql Network)
 find_package(Boost REQUIRED COMPONENTS json)
+find_package(GTest REQUIRED)
 
 find_package(OpenSSL REQUIRED)
 
@@ -25,6 +26,7 @@ set(PROJECT_SOURCES
         ./src/professorPage.cpp
         ./src/leaderboardPage.cpp
         ./src/homePage.cpp
+        ./src/helpers.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -47,7 +49,9 @@ endif()
 
 target_link_libraries(Rate_AUC PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network)
 target_link_libraries(Rate_AUC PRIVATE Boost::json)
-target_link_libraries(Rate_AUC PRIVATE bcrypt) 
+target_link_libraries(Rate_AUC PRIVATE bcrypt)
+target_include_directories(Rate_AUC PRIVATE Include)
+
 add_executable(server server.cpp server.hpp)
 target_link_libraries(server PRIVATE Boost::json)
 target_link_libraries(server PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
@@ -55,7 +59,7 @@ target_link_libraries(server PRIVATE mysqlcppconn)
 target_link_libraries(server PRIVATE bcrypt)
 target_link_libraries(server PRIVATE OpenSSL::SSL OpenSSL::Crypto)
 
-target_include_directories(Rate_AUC PRIVATE Include)
+
 
 if(${QT_VERSION} VERSION_LESS 6.1.0)
   set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.Rate_AUC)
@@ -78,3 +82,11 @@ install(TARGETS Rate_AUC
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(Rate_AUC)
 endif()
+
+enable_testing()
+
+add_executable(RateAUC_test ./tests/tests.cpp ./src/helpers.cpp)
+target_link_libraries(RateAUC_test PRIVATE GTest::gtest_main)
+target_include_directories(RateAUC_test PRIVATE Include)
+include(GoogleTest)
+gtest_discover_tests(RateAUC_test)

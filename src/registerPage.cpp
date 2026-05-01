@@ -10,12 +10,17 @@
 #include <fstream>
 #include <iostream>
 #include <thread>
+#include <regex>
+#include "helpers.hpp"
 
 #include "ui_mainwindow.h" //removed "./" because ui_mainwindow.h is generated in build\Rate_AUC_autogen\include\ and not the build directory
 #include "bcrypt/BCrypt.hpp"
 
 namespace beast = boost::beast;
 namespace http = beast::http;
+
+
+
 
 void MainWindow::RegisterPage()
 {
@@ -79,7 +84,7 @@ void MainWindow::on_pushButton_6_clicked()
         // Checking the format of the email..
         std::string email = ui->email_register_lineEdit->text().toStdString();
         int i = email.find('@');
-        if (!i)
+        if (!validEmail(email))
             ui->empty_email_error->show();
         else {
             if (email.substr(i + 1, email.size() - i - 1) != "aucegypt.edu") {
