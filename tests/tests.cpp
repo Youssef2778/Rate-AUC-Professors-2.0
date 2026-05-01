@@ -1,4 +1,5 @@
 #include "helpers.hpp"
+#include "servers.hpp"
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -23,5 +24,6 @@ TEST(RegistrationValidation, validateEmail) {
     EXPECT_EQ(validEmail("user@domain..com"), false);  // double dot in domain
     EXPECT_EQ(validEmail("@"), false);                 // only @
 }
+
 
 

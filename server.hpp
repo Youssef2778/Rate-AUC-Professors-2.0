@@ -20,7 +20,7 @@
 #include <fstream>
 #include <cstdio>
 #include <memory>
-
+#include <unordered_map>
 #include "bcrypt/BCrypt.hpp"
 
 namespace beast = boost::beast;
@@ -621,21 +621,16 @@ void GetSummary(const http::request<http::string_body>& req, tcp::socket& socket
 }
 
 void handle_request(const http::request<http::string_body>& req,
-                    tcp::socket& socket)  // Socket passed to write back response
+                    tcp::socket& socket, // Socket passed to write back response
+                    std::unordered_map<std::string, std::function<void(const http::request<http::string_body>&, tcp::socket&)>> route_function)  
 {
     std::cout << "Request target: " << req.target() << "\n";
-
-    // The user clicks on the "Register" button on the register page..
-    if (req.target() == "/register") {Register(req, socket);}
-    else if (req.target() == "/get-departments") {GetDepartments(req, socket);}
+    auto it = route_function.find(req.target());
+    if (it != route_function.end()) it->second(req, socket);
     else if (req.target().starts_with("/get-leaderboard")) {GetLeaderboard(req, socket);}
     else if (req.target().starts_with("/get-courses")) {GetCourses(req, socket);}
-    else if (req.target() == "/login") {Login(req, socket);}
-    else if (req.target() == "/upvote") {Upvote(req, socket);}
-    else if (req.target() == "/downvote") {Downvote(req, socket);}
     else if (req.target().starts_with("/get-professors")) {GetProfessors(req, socket);}
     else if (req.target().starts_with("/get-comments")) {GetComments(req, socket);}
-    else if (req.target() == "/comment") {Comment(req, socket);}
     else if (req.target().starts_with("/get-summary")) {GetSummary(req, socket);}
     else std::cout << "Unidentified Request: " << req.target() << std::endl;
 }

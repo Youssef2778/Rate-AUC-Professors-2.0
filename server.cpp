@@ -2,6 +2,13 @@
 
 int main()
 {
+    std::unordered_map<std::string, std::function<void(const http::request<http::string_body>&, tcp::socket&)>> route_function;
+    route_function["/login"] = Login;
+    route_function["/register"] = Register;
+    route_function["/get-departments"] = GetDepartments;
+    route_function["/upvote"] = Upvote;
+    route_function["/downvote"] = Downvote;
+    route_function["/comment"] = Comment;
     std::cout << "Server starting..." << std::endl;
 
     // The MySQL connector library has a one-time internal setup that happens the  first time get_mysql_driver_instance() is called and a call using threading caused conflict and crash
@@ -48,7 +55,7 @@ int main()
         // We are using a pool of threads for the server to handle requests asynchronously.
         // This means that when we have several users making several requests to the server
         // simultaneously, the server will be able to handle them without much delay.
-        boost::asio::post(pool, [socket = std::move(socket)]() mutable {
+        boost::asio::post(pool, [socket = std::move(socket), &route_function]() mutable {
             try {
                 beast::flat_buffer buffer;
                 while (true) {
@@ -57,7 +64,7 @@ int main()
                     http::read(socket, buffer, req, ec);
                     if (ec == http::error::end_of_stream || ec)
                         break;
-                    handle_request(req, socket);
+                    handle_request(req, socket, route_function);
                 }
             } catch (std::exception& e) {
                 std::cerr << "Thread error: " << e.what() << std::endl;
