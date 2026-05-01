@@ -9,8 +9,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql Network)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql Network)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Sql Network Test)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Sql Network Test)
 find_package(Boost REQUIRED COMPONENTS json)
 find_package(GTest REQUIRED)
 
@@ -18,6 +18,18 @@ find_package(OpenSSL REQUIRED)
 
 set(PROJECT_SOURCES
         ./src/main.cpp
+        ./src/mainwindow.cpp
+        ./Include/mainwindow.h
+        ./src/mainwindow.ui
+        ./src/loginPage.cpp
+        ./src/registerPage.cpp
+        ./src/professorPage.cpp
+        ./src/leaderboardPage.cpp
+        ./src/homePage.cpp
+        ./src/helpers.cpp
+)
+
+set(QT_TEST_PROJECT_SOURCES
         ./src/mainwindow.cpp
         ./Include/mainwindow.h
         ./src/mainwindow.ui
@@ -94,8 +106,8 @@ target_link_libraries(RateAUC_test PRIVATE mysqlcppconn)
 
 target_include_directories(RateAUC_test PRIVATE Include)
 
-add_executable(RateAUC_QTtest ./tests/qt_tests.cpp ${PROJECT_SOURCES})
-target_link_libraries(RateAUC_QTtest PRIVATE GTest::gtest_main Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network GTest::gmock)
+add_executable(RateAUC_QTtest ./tests/qt_tests.cpp ${QT_TEST_PROJECT_SOURCES})
+target_link_libraries(RateAUC_QTtest PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Test)
 target_link_libraries(RateAUC_QTtest PRIVATE Boost::json)
 target_link_libraries(RateAUC_QTtest PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(RateAUC_QTtest PRIVATE mysqlcppconn)

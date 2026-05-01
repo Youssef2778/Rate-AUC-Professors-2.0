@@ -33,6 +33,7 @@ class MainWindow : public QMainWindow
    public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    User *user;
 
    private:
     // Map department_name to id
@@ -54,7 +55,6 @@ class MainWindow : public QMainWindow
 
     // A function we can call anytime to refresh the list
     void refreshList();
-    User *user;
     bool Connected;
 
     // For persistent connection to be established once at startup
