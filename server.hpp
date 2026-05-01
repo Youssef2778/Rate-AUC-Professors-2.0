@@ -36,20 +36,27 @@ boost::asio::thread_pool pool(std::thread::hardware_concurrency());
 // instead of establishing a new connection for each request.
 class MySQLConnectionPool
 {
+   protected:
     std::queue<sql::Connection*> pool;
     std::mutex mtx;
+    MySQLConnectionPool() {}  // for subclasses that populate pool directly
 
    public:
+    virtual sql::Connection* connect() {
+        sql::mysql::MySQL_Driver* driver = sql::mysql::get_mysql_driver_instance();
+        sql::Connection* con = driver->connect("tcp://centerbeam.proxy.rlwy.net:11239",
+                                               "root", "lTfeKOSlLMYPoYSyCQXLVBXKugsnOAHk");
+        con->setSchema("railway");
+        return con;
+    }
+
     // Establishing the connections at startup and storing them in the pool
     MySQLConnectionPool(int size) {
         std::vector<std::thread> threads;
         std::mutex poolMtx;
         for (int i = 0; i < size; i++) {
             threads.emplace_back([this, &poolMtx]() {
-                sql::mysql::MySQL_Driver* driver = sql::mysql::get_mysql_driver_instance();
-                sql::Connection* con = driver->connect("tcp://centerbeam.proxy.rlwy.net:11239",
-                                                       "root", "lTfeKOSlLMYPoYSyCQXLVBXKugsnOAHk");
-                con->setSchema("railway");
+                sql::Connection* con = connect();
                 std::unique_lock<std::mutex> lock(poolMtx);
                 pool.push(con);
             });
@@ -57,6 +64,8 @@ class MySQLConnectionPool
         for (auto& t : threads)
             t.join();
     }
+
+    
 
     sql::Connection* get()
     {
@@ -620,17 +629,19 @@ void GetSummary(const http::request<http::string_body>& req, tcp::socket& socket
         http::write(socket, res);
 }
 
-void handle_request(const http::request<http::string_body>& req,
+bool handle_request(const http::request<http::string_body>& req,
                     tcp::socket& socket, // Socket passed to write back response
                     std::unordered_map<std::string, std::function<void(const http::request<http::string_body>&, tcp::socket&)>> route_function)  
 {
     std::cout << "Request target: " << req.target() << "\n";
     auto it = route_function.find(req.target());
-    if (it != route_function.end()) it->second(req, socket);
-    else if (req.target().starts_with("/get-leaderboard")) {GetLeaderboard(req, socket);}
-    else if (req.target().starts_with("/get-courses")) {GetCourses(req, socket);}
-    else if (req.target().starts_with("/get-professors")) {GetProfessors(req, socket);}
-    else if (req.target().starts_with("/get-comments")) {GetComments(req, socket);}
-    else if (req.target().starts_with("/get-summary")) {GetSummary(req, socket);}
-    else std::cout << "Unidentified Request: " << req.target() << std::endl;
+    if (it != route_function.end()) { it->second(req, socket); return true; }
+    else if (req.target().starts_with("/get-leaderboard")) {GetLeaderboard(req, socket); return true;}
+    else if (req.target().starts_with("/get-courses")) {GetCourses(req, socket); return true;}
+    else if (req.target().starts_with("/get-professors")) {GetProfessors(req, socket); return true;}
+    else if (req.target().starts_with("/get-comments")) {GetComments(req, socket); return true;}
+    else if (req.target().starts_with("/get-summary")) {GetSummary(req, socket); return true;}
+
+    std::cout << "Unidentified Request: " << req.target() << std::endl;
+    return false;
 }

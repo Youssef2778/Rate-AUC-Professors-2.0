@@ -88,6 +88,9 @@ enable_testing()
 add_executable(RateAUC_test ./tests/tests.cpp ./src/helpers.cpp)
 target_link_libraries(RateAUC_test PRIVATE GTest::gtest_main GTest::gmock)
 target_link_libraries(RateAUC_test PRIVATE Boost::json)
+target_link_libraries(RateAUC_test PRIVATE bcrypt)
+target_link_libraries(RateAUC_test PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+target_link_libraries(RateAUC_test PRIVATE mysqlcppconn)
 
 target_include_directories(RateAUC_test PRIVATE Include)
 
