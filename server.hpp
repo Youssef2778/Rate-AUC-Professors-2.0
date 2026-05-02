@@ -1,3 +1,8 @@
+// server.hpp — HTTP request handlers and connection pool for the Rate AUC Professor backend.
+// All route handler functions follow the signature:
+//   void Handler(const http::request<http::string_body>&, tcp::socket&)
+// They read from the global dbPool, execute SQL, and write an HTTP response directly to the socket.
+
 #include <iostream>
 #include <string>
 #include <thread>
@@ -7,9 +12,9 @@
 #include <cppconn/statement.h>
 #include <mysql_connection.h>
 #include <mysql_driver.h>
-#include <boost/asio/ssl.hpp>     // Added for HTTPS
-#include <boost/beast/ssl.hpp>    // Added for HTTPS
-#include <boost/beast/version.hpp> // Added for Beast version
+#include <boost/asio/ssl.hpp>
+#include <boost/beast/ssl.hpp>
+#include <boost/beast/version.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/beast/core.hpp>
@@ -26,14 +31,18 @@
 namespace beast = boost::beast;
 namespace http = beast::http;
 namespace net = boost::asio;
-namespace ssl = net::ssl;         // Added for HTTPS
+namespace ssl = net::ssl;
 namespace json = boost::json;
 using tcp = net::ip::tcp;
 
+// Thread pool sized to the number of hardware threads so concurrent client requests
+// are handled in parallel without spawning unbounded threads.
 boost::asio::thread_pool pool(std::thread::hardware_concurrency());
 
-// This class was generated with the help of Claude, to handle multiple requests simultaneously
-// instead of establishing a new connection for each request.
+// Manages a fixed set of reusable MySQL connections. Connections are opened once at
+// startup (in parallel) and leased/returned via get()/release(). The protected no-arg
+// constructor and protected members exist so unit tests can inject fake connections
+// without hitting a real database.
 class MySQLConnectionPool
 {
    protected:
@@ -42,6 +51,8 @@ class MySQLConnectionPool
     MySQLConnectionPool() {}  // for subclasses that populate pool directly
 
    public:
+    // Opens a single connection to the remote MySQL instance.
+    // Virtual so tests can override it via a mock subclass.
     virtual sql::Connection* connect() {
         sql::mysql::MySQL_Driver* driver = sql::mysql::get_mysql_driver_instance();
         sql::Connection* con = driver->connect("tcp://centerbeam.proxy.rlwy.net:11239",
@@ -50,7 +61,7 @@ class MySQLConnectionPool
         return con;
     }
 
-    // Establishing the connections at startup and storing them in the pool
+    // Opens `size` connections in parallel and stores them in the pool queue.
     MySQLConnectionPool(int size) {
         std::vector<std::thread> threads;
         std::mutex poolMtx;
@@ -65,8 +76,7 @@ class MySQLConnectionPool
             t.join();
     }
 
-    
-
+    // Removes and returns the next available connection. Blocks until one is free.
     sql::Connection* get()
     {
         std::unique_lock<std::mutex> lock(mtx);
@@ -75,6 +85,7 @@ class MySQLConnectionPool
         return con;
     }
 
+    // Returns a connection to the pool after a handler is done using it.
     void release(sql::Connection* con)
     {
         std::unique_lock<std::mutex> lock(mtx);
@@ -82,8 +93,12 @@ class MySQLConnectionPool
     }
 };
 
-MySQLConnectionPool* dbPool = nullptr;  // Global pointer to the connection pool
+// Global connection pool pointer — initialized in main() before the accept loop.
+MySQLConnectionPool* dbPool = nullptr;
 
+// Sends all comments for a professor/course pair to the Groq LLM API and returns
+// a short AI-generated summary with an overall vibe, strengths, and weaknesses.
+// Uses curl via popen because the server has no async HTTP client dependency.
 std::string generateSummaryFromHuggingFace(const std::string& allComments) {
     try {
         std::string apiKey = "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";
@@ -139,6 +154,8 @@ std::string generateSummaryFromHuggingFace(const std::string& allComments) {
     }
 }
 
+// Inserts a new user row and returns the auto-generated user ID so the client
+// can start a session immediately without a follow-up login round-trip.
 void Register(const http::request<http::string_body>& req, tcp::socket& socket){
     auto parsed = json::parse(req.body());
     json::object obj = parsed.as_object();
@@ -178,6 +195,7 @@ void Register(const http::request<http::string_body>& req, tcp::socket& socket){
     }
 }
 
+// Returns all department names and IDs sorted alphabetically.
 void GetDepartments(const http::request<http::string_body>& req, tcp::socket& socket){
     boost::json::array departments;
     try {
@@ -206,6 +224,8 @@ void GetDepartments(const http::request<http::string_body>& req, tcp::socket& so
         http::write(socket, res);
 }
 
+// Returns professors ranked by their total vote score for a given course.
+// Course ID is passed as a query parameter: /get-leaderboard?CourseId=<id>
 void GetLeaderboard(const http::request<http::string_body>& req, tcp::socket& socket){
     boost::json::array leaderboard;
 
@@ -251,6 +271,8 @@ void GetLeaderboard(const http::request<http::string_body>& req, tcp::socket& so
     http::write(socket, res);
 }
 
+// Returns all courses belonging to a department, sorted alphabetically.
+// Department ID is passed as a query parameter: /get-courses?Id=<id>
 void GetCourses(const http::request<http::string_body>& req, tcp::socket& socket){
     boost::json::array courses;
 
@@ -289,6 +311,8 @@ void GetCourses(const http::request<http::string_body>& req, tcp::socket& socket
     http::write(socket, res);
 }
 
+// Looks up the user by email and validates the BCrypt password hash.
+// Returns {status: true, id, username} on success, or {status: false, error} on failure.
 void Login(const http::request<http::string_body>& req, tcp::socket& socket){
             auto parsed = json::parse(req.body());
         json::object login = parsed.as_object();
@@ -332,6 +356,8 @@ void Login(const http::request<http::string_body>& req, tcp::socket& socket){
         }
 }
 
+// Records a +1 vote for a professor in a course. Uses an upsert so a user can change
+// a prior downvote to an upvote but cannot cast two upvotes.
 void Upvote(const http::request<http::string_body>& req, tcp::socket& socket){
     std::cout << "\n--- STARTING UPVOTE ROUTE ---" << std::endl;
     sql::Connection* con = nullptr;
@@ -385,6 +411,8 @@ void Upvote(const http::request<http::string_body>& req, tcp::socket& socket){
     }
 }
 
+// Records a -1 vote for a professor in a course. Mirror of Upvote — upsert enforces
+// one vote per (user, course, professor) tuple.
 void Downvote(const http::request<http::string_body>& req, tcp::socket& socket){
     std::cout << "\n--- STARTING DOWNVOTE ROUTE ---" << std::endl;
     sql::Connection* con = nullptr;
@@ -431,6 +459,8 @@ void Downvote(const http::request<http::string_body>& req, tcp::socket& socket){
     }
 }
 
+// Returns all professors teaching a course, with each professor's live vote score
+// computed by summing the votes table. Course ID: /get-professors?Id=<id>
 void GetProfessors(const http::request<http::string_body>& req, tcp::socket& socket){
     boost::json::array professors;
     std::string target = std::string(req.target());
@@ -480,6 +510,8 @@ void GetProfessors(const http::request<http::string_body>& req, tcp::socket& soc
     http::write(socket, res);
 }
 
+// Returns all comments for a professor/course pair in chronological order.
+// Query parameters: /get-comments?CourseId=<id>&ProfId=<id>
 void GetComments(const http::request<http::string_body>& req, tcp::socket& socket){
     boost::json::array Comments;
     std::string target = std::string(req.target());
@@ -529,6 +561,8 @@ void GetComments(const http::request<http::string_body>& req, tcp::socket& socke
     http::write(socket, res);
 }
 
+// Inserts a new comment and returns the generated ID and server timestamp.
+// Flairs are stored as a JSON array serialised to a VARCHAR column.
 void Comment(const http::request<http::string_body>& req, tcp::socket& socket){
     auto parsed = json::parse(req.body());
     json::object comment = parsed.as_object();
@@ -574,6 +608,8 @@ void Comment(const http::request<http::string_body>& req, tcp::socket& socket){
     http::write(socket, res);
 }
 
+// Fetches all comment text for a professor/course, then calls the Groq LLM to produce
+// an AI summary. Returns a placeholder string when there are no comments yet.
 void GetSummary(const http::request<http::string_body>& req, tcp::socket& socket){
     boost::json::object summaryResponse;
         std::string target = std::string(req.target());
@@ -629,9 +665,14 @@ void GetSummary(const http::request<http::string_body>& req, tcp::socket& socket
         http::write(socket, res);
 }
 
+// Dispatches an incoming HTTP request to the appropriate handler.
+// Exact-match routes (login, register, upvote, downvote, comment) are looked up in
+// route_function. Prefix-match routes (get-*) are handled with starts_with checks
+// because they carry query parameters that prevent an exact key match.
+// Returns true if a handler was found, false for unknown routes.
 bool handle_request(const http::request<http::string_body>& req,
-                    tcp::socket& socket, // Socket passed to write back response
-                    std::unordered_map<std::string, std::function<void(const http::request<http::string_body>&, tcp::socket&)>> route_function)  
+                    tcp::socket& socket,
+                    std::unordered_map<std::string, std::function<void(const http::request<http::string_body>&, tcp::socket&)>> route_function)
 {
     std::cout << "Request target: " << req.target() << "\n";
     auto it = route_function.find(req.target());

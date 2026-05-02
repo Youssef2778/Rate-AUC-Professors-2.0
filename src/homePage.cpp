@@ -17,20 +17,19 @@
 namespace beast = boost::beast;
 namespace http = beast::http;
 
-// Loads the homepage when called.
-void MainWindow::HomePage()
-{
+// Loads the homepage: populates the Department combo box by fetching all
+// departments from the server. The Deps map (name -> id) is populated here
+// so subsequent course requests can look up the correct department ID.
+void MainWindow::HomePage() {
     ui->stackedWidget->setCurrentIndex(3);
     CenterWidget(3, ui->widget_3);
-    
+
     ui->DepartmentCB->clear();
-    ui->CourseCB->clear();  
+    ui->CourseCB->clear();
     ui->usernameLabel->setText(QString::fromStdString(user->GetUsername()));
     ui->emailLabel->setText(QString::fromStdString(user->GetEmail()));
 
-    
-    
-    
+
     // Request the departments from the server
     try {
         // Send GET /get-departments
@@ -46,46 +45,43 @@ void MainWindow::HomePage()
 
         // Parse the JSON array
         auto parsed = boost::json::parse(response.body());
-        boost::json::array& departments = parsed.as_array();
+        boost::json::array &departments = parsed.as_array();
 
-        for (auto& entry : departments) {
-            boost::json::object& dept = entry.as_object();
+        for (auto &entry : departments) {
+            boost::json::object &dept = entry.as_object();
             std::string name = (std::string)dept["department_name"].as_string();
             int ID = (int)dept["id"].as_int64();
-            Deps[name] = ID;  // Store the mapping of department ID to name
+            Deps[name] = ID; // Store the mapping of department ID to name
             // populate the QComboBox
             ui->DepartmentCB->addItem(QString::fromStdString(name));
         }
-    }
-    catch (boost::system::system_error& e) {
-    // Attempt reconnect on connection errors
-    if (e.code() == boost::asio::error::eof ||
-        e.code() == boost::asio::error::connection_reset ||
-        e.code() == boost::asio::error::broken_pipe ||
-        e.code() == boost::asio::error::not_connected ||
-        e.code() == boost::beast::http::error::end_of_stream) {
-        std::cout << "Connection lost, reconnecting..." << std::endl;
-        Reconnect();
-    } else {
-        std::cout << "Network error: " << e.what() << std::endl;
-    }
-    }
-    catch (std::exception& e) {
+    } catch (boost::system::system_error &e) {
+        // Attempt reconnect on connection errors
+        if (e.code() == boost::asio::error::eof || e.code() == boost::asio::error::connection_reset ||
+            e.code() == boost::asio::error::broken_pipe || e.code() == boost::asio::error::not_connected ||
+            e.code() == boost::beast::http::error::end_of_stream) {
+            std::cout << "Connection lost, reconnecting..." << std::endl;
+            Reconnect();
+        } else {
+            std::cout << "Network error: " << e.what() << std::endl;
+        }
+    } catch (std::exception &e) {
         // Non-network errors — don't reconnect
         std::cout << "Error: " << e.what() << std::endl;
     }
 }
 
 
-void MainWindow::on_DepartmentCB_currentIndexChanged(int index)
-{
+// Triggered every time the selected department changes (including when the combo
+// box is cleared programmatically). Fetches courses for the newly selected
+// department and repopulates the Course combo box.
+void MainWindow::on_DepartmentCB_currentIndexChanged(int index) {
     // Request the Courses from the server
     try {
         std::string DepName = ui->DepartmentCB->currentText().toStdString();
-        int DepID = Deps[DepName];  // Get the department ID using the mapping stored
+        int DepID = Deps[DepName]; // Get the department ID using the mapping stored
         // Send GET /get-courses?Id=DepID
-        http::request<http::string_body> request(http::verb::get,
-                                                 "/get-courses?Id=" + std::to_string(DepID), 11);
+        http::request<http::string_body> request(http::verb::get, "/get-courses?Id=" + std::to_string(DepID), 11);
         request.set(http::field::host, "127.0.0.1");
         request.prepare_payload();
         http::write(socket, request);
@@ -97,44 +93,43 @@ void MainWindow::on_DepartmentCB_currentIndexChanged(int index)
 
         // Parse the JSON array
         auto parsed = boost::json::parse(response.body());
-        boost::json::array& courses = parsed.as_array();
+        boost::json::array &courses = parsed.as_array();
 
-        ui->CourseCB->clear();  // Clear previous courses before adding new ones
-        for (auto& entry : courses) {
-            boost::json::object& course = entry.as_object();
+        ui->CourseCB->clear(); // Clear previous courses before adding new ones
+        for (auto &entry : courses) {
+            boost::json::object &course = entry.as_object();
             std::string name = (std::string)course["course_name"].as_string();
             int ID = (int)course["id"].as_int64();
-            Courses[ID] = name;  // Store the mapping of course ID to name
+            Courses[ID] = name; // Store the mapping of course ID to name
             // populate the QComboBox
             ui->CourseCB->addItem(QString::fromStdString(name));
         }
-    }
-        catch (boost::system::system_error& e) {
-    // Attempt reconnect on connection errors
-    if (e.code() == boost::asio::error::eof ||
-        e.code() == boost::asio::error::connection_reset ||
-        e.code() == boost::asio::error::broken_pipe ||
-        e.code() == boost::asio::error::not_connected ||
-        e.code() == boost::beast::http::error::end_of_stream) {
-        std::cout << "Connection lost, reconnecting..." << std::endl;
-        Reconnect();
-    } else {
-        std::cout << "Network error: " << e.what() << std::endl;
-    }
-    }
-    catch (std::exception& e) {
+    } catch (boost::system::system_error &e) {
+        // Attempt reconnect on connection errors
+        if (e.code() == boost::asio::error::eof || e.code() == boost::asio::error::connection_reset ||
+            e.code() == boost::asio::error::broken_pipe || e.code() == boost::asio::error::not_connected ||
+            e.code() == boost::beast::http::error::end_of_stream) {
+            std::cout << "Connection lost, reconnecting..." << std::endl;
+            Reconnect();
+        } else {
+            std::cout << "Network error: " << e.what() << std::endl;
+        }
+    } catch (std::exception &e) {
         // Non-network errors — don't reconnect
         std::cout << "Error: " << e.what() << std::endl;
     }
 }
 
-void MainWindow::on_pushButton_clicked()
-{
+// Navigates to the leaderboard for the selected course. Courses is keyed by ID
+// (int -> name), so a linear search is needed to find the ID that corresponds
+// to the selected name.
+void MainWindow::on_pushButton_clicked() {
     std::string CourseName = ui->CourseCB->currentText().toStdString();
-    if (CourseName.empty()) return; // Don't proceed if no course is selected
+    if (CourseName.empty())
+        return; // Don't proceed if no course is selected
 
     //find the course ID
-    for (const auto& pair : Courses) {
+    for (const auto &pair : Courses) {
         if (pair.second == CourseName) {
             user->SetCurrentCourseID(pair.first);
             break;

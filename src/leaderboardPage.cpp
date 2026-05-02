@@ -18,15 +18,16 @@ namespace beast = boost::beast;
 namespace http = beast::http;
 
 
-void MainWindow::LeaderboardPage(){
-
+// Loads the leaderboard page for the current course: sets up the table layout,
+// column sizing, and triggers a data refresh.
+void MainWindow::LeaderboardPage() {
     ui->stackedWidget->setCurrentIndex(2);
     ui->CourseName->setText(QString::fromStdString(Courses[user->GetCurrentCourseID()]));
 
-            // ==========================================
-            // 1. LAYOUT & BACK BUTTON FIX
-            // ==========================================
-    QWidget* page = ui->stackedWidget->widget(2);
+    // ==========================================
+    // 1. LAYOUT & BACK BUTTON FIX
+    // ==========================================
+    QWidget *page = ui->stackedWidget->widget(2);
     if (page->layout()) {
         delete page->layout();
     }
@@ -34,10 +35,10 @@ void MainWindow::LeaderboardPage(){
     ui->usernameLabel_3->setText(QString::fromStdString(user->GetUsername()));
     ui->emailLabel_3->setText(QString::fromStdString(user->GetEmail()));
 
-    QWidget* headerWidget = new QWidget();
+    QWidget *headerWidget = new QWidget();
     headerWidget->setLayout(ui->horizontalLayout_10);
     headerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    
+
     QVBoxLayout *mainLayout = new QVBoxLayout(page);
 
     // Add some padding around the edges of the screen so it breathes
@@ -52,12 +53,12 @@ void MainWindow::LeaderboardPage(){
     // ==========================================
     // 2. TABLE COLUMN SIZES FIX (BALANCED)
     // ==========================================
-    QHeaderView* header = ui->tableWidget->horizontalHeader();
+    QHeaderView *header = ui->tableWidget->horizontalHeader();
 
-            // Stop the last column from forcing a stretch
+    // Stop the last column from forcing a stretch
     header->setStretchLastSection(false);
 
-            // Rank: Set to a fixed, wider size so it takes up more visual space
+    // Rank: Set to a fixed, wider size so it takes up more visual space
     header->setSectionResizeMode(0, QHeaderView::Fixed);
     ui->tableWidget->setColumnWidth(0, 150); // 150 pixels wide
 
@@ -68,30 +69,30 @@ void MainWindow::LeaderboardPage(){
     header->setSectionResizeMode(2, QHeaderView::Fixed);
     ui->tableWidget->setColumnWidth(2, 150); // 150 pixels wide
 
-            // Up & Down Buttons: Locked to 80 pixels
+    // Up & Down Buttons: Locked to 80 pixels
     header->setSectionResizeMode(3, QHeaderView::Fixed);
     ui->tableWidget->setColumnWidth(3, 80);
 
     header->setSectionResizeMode(4, QHeaderView::Fixed);
     ui->tableWidget->setColumnWidth(4, 80);
 
-            // Style the Header row
-    header->setStyleSheet(
-        "QHeaderView::section { "
-        "font-size: 18px; "
-        "font-weight: bold; "
-        "background-color: #061524; "
-        "color: white; "
-        "border: none; "
-        "border-bottom: 2px solid #1d8e9e; "
-        "}"
-        );
+    // Style the Header row
+    header->setStyleSheet("QHeaderView::section { "
+                          "font-size: 18px; "
+                          "font-weight: bold; "
+                          "background-color: #061524; "
+                          "color: white; "
+                          "border: none; "
+                          "border-bottom: 2px solid #1d8e9e; "
+                          "}");
 
     this->refreshList();
 }
 
 
-void MainWindow::handleUpvote(const std::string& profID, int courseID, std::string CourseName) {
+// Sends an upvote (+1) for the given professor-course pair to the server. On
+// success, refreshes the leaderboard to reflect the updated score.
+void MainWindow::handleUpvote(const std::string &profID, int courseID, std::string CourseName) {
     try {
         boost::json::object voteData;
         // FIX 1 & 2: Correct spelling AND convert the string to an integer!
@@ -117,25 +118,24 @@ void MainWindow::handleUpvote(const std::string& profID, int courseID, std::stri
             // REFRESH the screen immediately
             this->refreshList();
         }
-    }    catch (boost::system::system_error& e) {
-    // Attempt reconnect on connection errors
-    if (e.code() == boost::asio::error::eof ||
-        e.code() == boost::asio::error::connection_reset ||
-        e.code() == boost::asio::error::broken_pipe ||
-        e.code() == boost::asio::error::not_connected ||
-        e.code() == boost::beast::http::error::end_of_stream) {
-        std::cout << "Connection lost, reconnecting..." << std::endl;
-        Reconnect();
-    } else {
-        std::cout << "Network error: " << e.what() << std::endl;
-    }
-    }
-    catch (std::exception& e) {
+    } catch (boost::system::system_error &e) {
+        // Attempt reconnect on connection errors
+        if (e.code() == boost::asio::error::eof || e.code() == boost::asio::error::connection_reset ||
+            e.code() == boost::asio::error::broken_pipe || e.code() == boost::asio::error::not_connected ||
+            e.code() == boost::beast::http::error::end_of_stream) {
+            std::cout << "Connection lost, reconnecting..." << std::endl;
+            Reconnect();
+        } else {
+            std::cout << "Network error: " << e.what() << std::endl;
+        }
+    } catch (std::exception &e) {
         // Non-network errors — don't reconnect
         std::cout << "Error: " << e.what() << std::endl;
     }
 }
 
+// Fetches the current professor list and scores from the server and repopulates
+// the leaderboard table. Called on page load and after every vote.
 void MainWindow::refreshList() {
     try {
         // 1. Ask for professors using the SAVED ID
@@ -154,25 +154,24 @@ void MainWindow::refreshList() {
         ui->tableWidget->setRowCount(0); // Clear old rows
 
         int row = 0;
-        for (auto& entry : professors) {
-            auto& prof = entry.as_object();
+        for (auto &entry : professors) {
+            auto &prof = entry.as_object();
             ui->tableWidget->insertRow(row);
 
             // Data Extraction
-            std::string nameStr = (std::string) prof.at("name").as_string();
+            std::string nameStr = (std::string)prof.at("name").as_string();
             std::string idStr = std::to_string(prof.at("id").as_int64());
-            std::string scoreStr = (std::string) prof.at("score").as_string();
-            Profs[atoi(idStr.c_str())] = nameStr;  // Store the mapping of professor name to ID
+            std::string scoreStr = (std::string)prof.at("score").as_string();
+            Profs[atoi(idStr.c_str())] = nameStr; // Store the mapping of professor name to ID
 
             // Create Items
             QTableWidgetItem *rank = new QTableWidgetItem(QString::number(row + 1));
-            QPushButton* name = new QPushButton(QString::fromStdString(nameStr));
+            QPushButton *name = new QPushButton(QString::fromStdString(nameStr));
             name->setFlat(true);
             name->setCursor(Qt::PointingHandCursor);
             name->setStyleSheet(
                 "QPushButton { color: white; text-decoration: underline; background: transparent; border: none; }"
-                "QPushButton:hover { color: rgba(255, 255, 255, 0.6); }"
-            );
+                "QPushButton:hover { color: rgba(255, 255, 255, 0.6); }");
             QObject::connect(name, &QPushButton::clicked, this, [this, idStr]() {
                 user->SetCurrentProfID(atoi(idStr.c_str()));
                 professorPage();
@@ -200,23 +199,24 @@ void MainWindow::refreshList() {
             QPushButton *up = new QPushButton;
             QPushButton *down = new QPushButton;
 
-            up->setIcon(QIcon(":/images/up.png"));   // Use your exact resource path
+            up->setIcon(QIcon(":/images/up.png"));     // Use your exact resource path
             down->setIcon(QIcon(":/images/down.png")); // Use your exact resource path
 
             // Make the icons look good
             up->setIconSize(QSize(32, 32));
             down->setIconSize(QSize(32, 32));
             QString btnStyle = "QPushButton { "
-                "background-color: #0b2239; "
-                "border: 1px solid #1d8e9e; "
-                "border-radius: 8px; "
-                "} "
-                "QPushButton:hover { background-color: #1d8e9e; } "
-                "QPushButton:pressed { background-color: #091a2b; }";
+                               "background-color: #0b2239; "
+                               "border: 1px solid #1d8e9e; "
+                               "border-radius: 8px; "
+                               "} "
+                               "QPushButton:hover { background-color: #1d8e9e; } "
+                               "QPushButton:pressed { background-color: #091a2b; }";
 
             up->setStyleSheet(btnStyle);
             down->setStyleSheet(btnStyle);
-            // Re-capture the current Course ID and Prof ID for the lambda
+            // Re-capture the current course/prof IDs in the lambda so each button
+            // refers to the correct row even after the list is rebuilt.
             int currentCID = user->GetCurrentCourseID();
             connect(up, &QPushButton::clicked, this, [this, idStr, currentCID]() {
                 handleUpvote(idStr, currentCID, Courses[user->GetCurrentCourseID()]);
@@ -231,26 +231,25 @@ void MainWindow::refreshList() {
             ui->tableWidget->setRowHeight(row, 60);
             row++;
         }
-    }     catch (boost::system::system_error& e) {
-    // Attempt reconnect on connection errors
-    if (e.code() == boost::asio::error::eof ||
-        e.code() == boost::asio::error::connection_reset ||
-        e.code() == boost::asio::error::broken_pipe ||
-        e.code() == boost::asio::error::not_connected ||
-        e.code() == boost::beast::http::error::end_of_stream) {
-        std::cout << "Connection lost, reconnecting..." << std::endl;
-        Reconnect();
-    } else {
-        std::cout << "Network error: " << e.what() << std::endl;
-    }
-    }
-    catch (std::exception& e) {
+    } catch (boost::system::system_error &e) {
+        // Attempt reconnect on connection errors
+        if (e.code() == boost::asio::error::eof || e.code() == boost::asio::error::connection_reset ||
+            e.code() == boost::asio::error::broken_pipe || e.code() == boost::asio::error::not_connected ||
+            e.code() == boost::beast::http::error::end_of_stream) {
+            std::cout << "Connection lost, reconnecting..." << std::endl;
+            Reconnect();
+        } else {
+            std::cout << "Network error: " << e.what() << std::endl;
+        }
+    } catch (std::exception &e) {
         // Non-network errors — don't reconnect
         std::cout << "Error: " << e.what() << std::endl;
     }
 }
 
-void MainWindow::handleDownvote(const std::string& profID, int courseID, std::string CourseName) {
+// Sends a downvote (-1) for the given professor-course pair to the server. On
+// success, refreshes the leaderboard.
+void MainWindow::handleDownvote(const std::string &profID, int courseID, std::string CourseName) {
     try {
         boost::json::object voteData;
         // FIX 2: Convert the string to an integer!
@@ -264,43 +263,39 @@ void MainWindow::handleDownvote(const std::string& profID, int courseID, std::st
         request.body() = boost::json::serialize(voteData);
         request.prepare_payload();
 
-                // 1. Send the vote
+        // 1. Send the vote
         http::write(socket, request);
 
-                // 2. Read the response (Must do this to clear the socket!)
+        // 2. Read the response (Must do this to clear the socket!)
         beast::flat_buffer buffer;
         http::response<http::string_body> response;
         http::read(socket, buffer, response);
 
-                // 3. Check if successful and REFRESH
+        // 3. Check if successful and REFRESH
         if (response.result() == http::status::ok) {
             std::cout << "Downvote success! Refreshing..." << std::endl;
             this->refreshList();
         }
-    }
-        catch (boost::system::system_error& e) {
-    // Attempt reconnect on connection errors
-    if (e.code() == boost::asio::error::eof ||
-        e.code() == boost::asio::error::connection_reset ||
-        e.code() == boost::asio::error::broken_pipe ||
-        e.code() == boost::asio::error::not_connected ||
-        e.code() == boost::beast::http::error::end_of_stream) {
-        std::cout << "Connection lost, reconnecting..." << std::endl;
-        Reconnect();
-    } else {
-        std::cout << "Network error: " << e.what() << std::endl;
-    }
-    }
-    catch (std::exception& e) {
+    } catch (boost::system::system_error &e) {
+        // Attempt reconnect on connection errors
+        if (e.code() == boost::asio::error::eof || e.code() == boost::asio::error::connection_reset ||
+            e.code() == boost::asio::error::broken_pipe || e.code() == boost::asio::error::not_connected ||
+            e.code() == boost::beast::http::error::end_of_stream) {
+            std::cout << "Connection lost, reconnecting..." << std::endl;
+            Reconnect();
+        } else {
+            std::cout << "Network error: " << e.what() << std::endl;
+        }
+    } catch (std::exception &e) {
         // Non-network errors — don't reconnect
         std::cout << "Error: " << e.what() << std::endl;
     }
 }
 
 
-void MainWindow::on_BackToHomepage_clicked()
-{
+// Resets the current course ID before navigating back so stale course state
+// doesn't bleed into the next homepage visit.
+void MainWindow::on_BackToHomepage_clicked() {
     user->SetCurrentCourseID(-1);
     HomePage();
 }
-

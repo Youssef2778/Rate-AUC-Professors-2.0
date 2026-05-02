@@ -1,7 +1,12 @@
+// server.cpp — Entry point for the Rate AUC Professor HTTP server.
+// Registers all route handlers, initialises the MySQL connection pool, then enters
+// an accept loop that dispatches each client connection to the thread pool.
+
 #include "server.hpp"
 
 int main()
 {
+    // Exact-match routes are stored in a map so handle_request can dispatch in O(1).
     std::unordered_map<std::string, std::function<void(const http::request<http::string_body>&, tcp::socket&)>> route_function;
     route_function["/login"] = Login;
     route_function["/register"] = Register;
@@ -11,13 +16,15 @@ int main()
     route_function["/comment"] = Comment;
     std::cout << "Server starting..." << std::endl;
 
-    // The MySQL connector library has a one-time internal setup that happens the  first time get_mysql_driver_instance() is called and a call using threading caused conflict and crash
-    // Alowing MySQL connector library to initialize propery
+    // MySQL Connector/C++ has a one-time internal setup triggered by the first call to
+    // get_mysql_driver_instance(). Calling it from a worker thread while other threads
+    // are also calling it causes a crash. Pre-warming it here on the main thread before
+    // any threads are spawned avoids that race.
     try {
         sql::mysql::MySQL_Driver* driver = sql::mysql::get_mysql_driver_instance();
-        (void)driver; // function cast as void just for initializing, not using
+        (void)driver;
     } catch (...) {
-        // Ignore
+        // Ignore — failure here is non-fatal; pool construction will surface real errors.
     }
 
     try {
@@ -40,21 +47,18 @@ int main()
     std::cout << "Waiting for clients..." << std::endl;
     while (true) {
         tcp::socket socket(io);
-
         acceptor.accept(socket);
-
-        // A Cout statement for debugging purposes. It ensures that we established a TCP connection
-        // with the client
         std::cout << "Client Connected!" << std::endl;
-        boost::system::error_code ignored_error;
 
-        // This ensures that we are able to exchange data with the user.
+        // Send a plain-text greeting so the client knows the TCP handshake succeeded
+        // before it sends its first HTTP request.
+        boost::system::error_code ignored_error;
         std::string msg = "Connected!";
         boost::asio::write(socket, boost::asio::buffer(msg), ignored_error);
 
-        // We are using a pool of threads for the server to handle requests asynchronously.
-        // This means that when we have several users making several requests to the server
-        // simultaneously, the server will be able to handle them without much delay.
+        // Hand the socket off to the thread pool so this loop can immediately accept
+        // the next client without blocking. The lambda owns the socket via move so
+        // it stays alive for the full duration of the session.
         boost::asio::post(pool, [socket = std::move(socket), &route_function]() mutable {
             try {
                 beast::flat_buffer buffer;
