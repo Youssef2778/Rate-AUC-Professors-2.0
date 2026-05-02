@@ -86,8 +86,22 @@ void MainWindow::professorPage() {
                                        flairs));
         }
     }
+    catch (boost::system::system_error& e) {
+    // Attempt reconnect on connection errors
+    if (e.code() == boost::asio::error::eof ||
+        e.code() == boost::asio::error::connection_reset ||
+        e.code() == boost::asio::error::broken_pipe ||
+        e.code() == boost::asio::error::not_connected ||
+        e.code() == boost::beast::http::error::end_of_stream) {
+        std::cout << "Connection lost, reconnecting..." << std::endl;
+        Reconnect();
+    } else {
+        std::cout << "Network error: " << e.what() << std::endl;
+    }
+    }
     catch (std::exception& e) {
-        std::cout << "Failed: " << e.what() << std::endl;
+        // Non-network errors — don't reconnect
+        std::cout << "Error: " << e.what() << std::endl;
     }
 	cout << "Comments for Professor " << Profs[user->GetCurrentProfID()] << " and Course " << Courses[user->GetCurrentCourseID()] << " loaded: " << Comments.size() << endl;
     DisplayComments();
@@ -304,8 +318,22 @@ void MainWindow::on_postComment_clicked() {
 		CreateComment(commentObj);
 
     }
+        catch (boost::system::system_error& e) {
+    // Attempt reconnect on connection errors
+    if (e.code() == boost::asio::error::eof ||
+        e.code() == boost::asio::error::connection_reset ||
+        e.code() == boost::asio::error::broken_pipe ||
+        e.code() == boost::asio::error::not_connected ||
+        e.code() == boost::beast::http::error::end_of_stream) {
+        std::cout << "Connection lost, reconnecting..." << std::endl;
+        Reconnect();
+    } else {
+        std::cout << "Network error: " << e.what() << std::endl;
+    }
+    }
     catch (std::exception& e) {
-        std::cout << "Connection failed: " << e.what() << std::endl;
+        // Non-network errors — don't reconnect
+        std::cout << "Error: " << e.what() << std::endl;
     }
 	ui->commentLineEdit->clear(); // Clear the input field after posting
     ui->mehFlair->setChecked(false);
@@ -350,9 +378,22 @@ void MainWindow::fetchAiSummary(std::string courseId, std::string profId) {
             ui->summaryLabel->setText("Failed to load AI summary. (Server error)");
         }
     }
+        catch (boost::system::system_error& e) {
+    // Attempt reconnect on connection errors
+    if (e.code() == boost::asio::error::eof ||
+        e.code() == boost::asio::error::connection_reset ||
+        e.code() == boost::asio::error::broken_pipe ||
+        e.code() == boost::asio::error::not_connected ||
+        e.code() == boost::beast::http::error::end_of_stream) {
+        std::cout << "Connection lost, reconnecting..." << std::endl;
+        Reconnect();
+    } else {
+        std::cout << "Network error: " << e.what() << std::endl;
+    }
+    }
     catch (std::exception& e) {
-        ui->summaryLabel->setText("Failed to connect to AI service.");
-        std::cout << "AI Summary Network Error: " << e.what() << std::endl;
+        // Non-network errors — don't reconnect
+        std::cout << "Error: " << e.what() << std::endl;
     }
 }
 

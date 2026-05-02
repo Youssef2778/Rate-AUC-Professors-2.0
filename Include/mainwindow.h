@@ -62,6 +62,7 @@ class MainWindow : public QMainWindow
     boost::asio::ip::tcp::socket socket{io};
 
     void EstablishConnection();
+    void Reconnect();
     void CenterWidget(int pageIndex, QWidget *TargetWidget);
     void LoginPage();
     void RegisterPage();

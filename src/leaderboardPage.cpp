@@ -117,8 +117,22 @@ void MainWindow::handleUpvote(const std::string& profID, int courseID, std::stri
             // REFRESH the screen immediately
             this->refreshList();
         }
-    } catch (std::exception& e) {
-        std::cout << "Upvote failed: " << e.what() << std::endl;
+    }    catch (boost::system::system_error& e) {
+    // Attempt reconnect on connection errors
+    if (e.code() == boost::asio::error::eof ||
+        e.code() == boost::asio::error::connection_reset ||
+        e.code() == boost::asio::error::broken_pipe ||
+        e.code() == boost::asio::error::not_connected ||
+        e.code() == boost::beast::http::error::end_of_stream) {
+        std::cout << "Connection lost, reconnecting..." << std::endl;
+        Reconnect();
+    } else {
+        std::cout << "Network error: " << e.what() << std::endl;
+    }
+    }
+    catch (std::exception& e) {
+        // Non-network errors — don't reconnect
+        std::cout << "Error: " << e.what() << std::endl;
     }
 }
 
@@ -217,8 +231,22 @@ void MainWindow::refreshList() {
             ui->tableWidget->setRowHeight(row, 60);
             row++;
         }
-    } catch (std::exception& e) {
-        std::cerr << "Refresh failed: " << e.what() << std::endl;
+    }     catch (boost::system::system_error& e) {
+    // Attempt reconnect on connection errors
+    if (e.code() == boost::asio::error::eof ||
+        e.code() == boost::asio::error::connection_reset ||
+        e.code() == boost::asio::error::broken_pipe ||
+        e.code() == boost::asio::error::not_connected ||
+        e.code() == boost::beast::http::error::end_of_stream) {
+        std::cout << "Connection lost, reconnecting..." << std::endl;
+        Reconnect();
+    } else {
+        std::cout << "Network error: " << e.what() << std::endl;
+    }
+    }
+    catch (std::exception& e) {
+        // Non-network errors — don't reconnect
+        std::cout << "Error: " << e.what() << std::endl;
     }
 }
 
@@ -249,8 +277,23 @@ void MainWindow::handleDownvote(const std::string& profID, int courseID, std::st
             std::cout << "Downvote success! Refreshing..." << std::endl;
             this->refreshList();
         }
-    } catch (std::exception& e) {
-        std::cout << "Downvote failed: " << e.what() << std::endl;
+    }
+        catch (boost::system::system_error& e) {
+    // Attempt reconnect on connection errors
+    if (e.code() == boost::asio::error::eof ||
+        e.code() == boost::asio::error::connection_reset ||
+        e.code() == boost::asio::error::broken_pipe ||
+        e.code() == boost::asio::error::not_connected ||
+        e.code() == boost::beast::http::error::end_of_stream) {
+        std::cout << "Connection lost, reconnecting..." << std::endl;
+        Reconnect();
+    } else {
+        std::cout << "Network error: " << e.what() << std::endl;
+    }
+    }
+    catch (std::exception& e) {
+        // Non-network errors — don't reconnect
+        std::cout << "Error: " << e.what() << std::endl;
     }
 }
 

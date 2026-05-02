@@ -33,6 +33,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     // Attempt to establish a persistent connection in the background once the app launches
     std::thread(&MainWindow::EstablishConnection, this).detach();
+    
 }
 
 MainWindow::~MainWindow()
@@ -161,4 +162,12 @@ void MainWindow::on_logoutButton_2_clicked() {
 
 void MainWindow::on_logoutButton_3_clicked() {
     Logout();
+}
+
+// This function can be called whenever we detect a connection failure to attempt reconnection
+void MainWindow::Reconnect()
+{
+    Connected = false;
+    socket.close();
+    std::thread(&MainWindow::EstablishConnection, this).detach();
 }
