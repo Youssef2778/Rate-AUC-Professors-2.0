@@ -57,7 +57,7 @@ void MainWindow::Logout() {
 // until it succeeds. Sets Connected = true only after the server's handshake
 // message is received.
 void MainWindow::EstablishConnection() {
-    const std::string server_address = "127.0.0.1";
+    const std::string server_address = "16.171.132.23";
     boost::asio::ip::tcp::resolver resolver(io);
     auto endpoints = resolver.resolve(server_address, "8080");
     // continuously attempt to connect to the server until successful
