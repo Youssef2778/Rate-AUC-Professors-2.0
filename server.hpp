@@ -103,7 +103,7 @@ std::string generateSummaryFromHuggingFace(const std::string& allComments) {
     try {
         std::string apiKey = "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";
 
-        // 1. Prepare JSON (Groq uses the 'messages' format)
+        // 1. Prepare JSON (Groq uses the 'messages' format which needs to be an array)
         boost::json::object userMessage;
         userMessage["role"] = "user";
         userMessage["content"] = "Summarize these professor reviews into a short 'Overall Vibe' and bullet points for Strengths and Weaknesses:\n\n" + allComments;
@@ -111,10 +111,12 @@ std::string generateSummaryFromHuggingFace(const std::string& allComments) {
         boost::json::array messages;
         messages.push_back(userMessage);
 
+        //sending the data to groq
         boost::json::object payload;
         payload["model"] = "llama-3.3-70b-versatile"; // A powerful, fast model
         payload["messages"] = messages;
 
+        // serlise json so it can be sent in the http request
         std::string json_body = boost::json::serialize(payload);
 
         // 2. Save to file
