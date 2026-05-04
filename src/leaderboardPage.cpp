@@ -10,8 +10,7 @@
 #include <fstream>
 #include <iostream>
 #include <thread>
-
-#include "ui_mainwindow.h" //removed "./" because ui_mainwindow.h is generated in build\Rate_AUC_autogen\include\ and not the build directory
+#include "ui_mainwindow.h"
 #include "bcrypt/BCrypt.hpp"
 
 namespace beast = boost::beast;
@@ -25,7 +24,7 @@ void MainWindow::LeaderboardPage() {
     ui->CourseName->setText(QString::fromStdString(Courses[user->GetCurrentCourseID()]));
 
     // ==========================================
-    // 1. LAYOUT & BACK BUTTON FIX
+    // 1. LAYOUT & BACK BUTTON
     // ==========================================
     QWidget *page = ui->stackedWidget->widget(2);
     if (page->layout()) {
@@ -51,7 +50,7 @@ void MainWindow::LeaderboardPage() {
     page->setLayout(mainLayout);
 
     // ==========================================
-    // 2. TABLE COLUMN SIZES FIX (BALANCED)
+    // 2. TABLE COLUMN SIZES
     // ==========================================
     QHeaderView *header = ui->tableWidget->horizontalHeader();
 
@@ -99,7 +98,7 @@ void MainWindow::handleUpvote(const std::string &profID, int courseID, std::stri
     }
     try {
         boost::json::object voteData;
-        // FIX 1 & 2: Correct spelling AND convert the string to an integer!
+
         voteData["professor_id"] = std::stoi(profID);
         voteData["course_id"] = courseID;
         voteData["user_id"] = user->GetID();
@@ -208,8 +207,8 @@ void MainWindow::refreshList() {
             QPushButton *up = new QPushButton;
             QPushButton *down = new QPushButton;
 
-            up->setIcon(QIcon(":/images/up.png"));     // Use your exact resource path
-            down->setIcon(QIcon(":/images/down.png")); // Use your exact resource path
+            up->setIcon(QIcon(":/images/up.png"));
+            down->setIcon(QIcon(":/images/down.png"));
 
             // Make the icons look good
             up->setIconSize(QSize(32, 32));
