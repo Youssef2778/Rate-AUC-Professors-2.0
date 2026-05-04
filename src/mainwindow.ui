@@ -39,7 +39,7 @@
        <number>1</number>
       </property>
       <property name="currentIndex">
-       <number>4</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_0">
        <property name="styleSheet">
@@ -131,7 +131,7 @@ QLabel#email_notFound_error, #password_incorrect_error{color: red}</string>
                 <item>
                  <widget class="QLineEdit" name="email_login_lineEdit">
                   <property name="text">
-                   <string>@aucegypt.edu</string>
+                   <string/>
                   </property>
                   <property name="placeholderText">
                    <string>example@aucegypt.edu</string>
@@ -160,7 +160,7 @@ QLabel#email_notFound_error, #password_incorrect_error{color: red}</string>
                  <string/>
                 </property>
                 <property name="text">
-                 <string>a</string>
+                 <string/>
                 </property>
                 <property name="echoMode">
                  <enum>QLineEdit::EchoMode::Normal</enum>
@@ -2721,7 +2721,6 @@ QPushButton#logoutButton_2:hover {
   </widget>
  </widget>
  <resources>
-  <include location="../resources.qrc"/>
   <include location="../resources.qrc"/>
  </resources>
  <connections/>

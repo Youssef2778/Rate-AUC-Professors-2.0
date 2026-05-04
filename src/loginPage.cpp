@@ -47,6 +47,10 @@ void MainWindow::on_register_label_6_linkActivated(const QString &link) {
 // The server returns a status bool along with either user data (on success) or
 // an error string (on failure) to determine which error label to show.
 void MainWindow::on_pushButton_4_clicked() {
+    if (!Connected) {
+        ConnectionFailedPopup();
+        return;
+    }
     try {
         boost::json::object login;
         login["email"] = ui->email_login_lineEdit->text().toStdString();
@@ -97,6 +101,7 @@ void MainWindow::on_pushButton_4_clicked() {
             e.code() == boost::asio::error::broken_pipe || e.code() == boost::asio::error::not_connected ||
             e.code() == boost::beast::http::error::end_of_stream) {
             std::cout << "Connection lost, reconnecting..." << std::endl;
+            Connected = false; // Set to false to prevent multiple simultaneous reconnect attempts
             Reconnect();
         } else {
             std::cout << "Network error: " << e.what() << std::endl;

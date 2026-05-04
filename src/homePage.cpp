@@ -21,6 +21,10 @@ namespace http = beast::http;
 // departments from the server. The Deps map (name -> id) is populated here
 // so subsequent course requests can look up the correct department ID.
 void MainWindow::HomePage() {
+    if (!Connected) {
+        ConnectionFailedPopup();
+        return;
+    }
     ui->stackedWidget->setCurrentIndex(3);
     CenterWidget(3, ui->widget_3);
 
@@ -61,6 +65,7 @@ void MainWindow::HomePage() {
             e.code() == boost::asio::error::broken_pipe || e.code() == boost::asio::error::not_connected ||
             e.code() == boost::beast::http::error::end_of_stream) {
             std::cout << "Connection lost, reconnecting..." << std::endl;
+            Connected = false; // Set to false to prevent multiple simultaneous reconnect attempts
             Reconnect();
         } else {
             std::cout << "Network error: " << e.what() << std::endl;
@@ -76,6 +81,10 @@ void MainWindow::HomePage() {
 // box is cleared programmatically). Fetches courses for the newly selected
 // department and repopulates the Course combo box.
 void MainWindow::on_DepartmentCB_currentIndexChanged(int index) {
+        if (!Connected) {
+        ConnectionFailedPopup();
+        return;
+    }
     // Request the Courses from the server
     try {
         std::string DepName = ui->DepartmentCB->currentText().toStdString();
@@ -110,6 +119,7 @@ void MainWindow::on_DepartmentCB_currentIndexChanged(int index) {
             e.code() == boost::asio::error::broken_pipe || e.code() == boost::asio::error::not_connected ||
             e.code() == boost::beast::http::error::end_of_stream) {
             std::cout << "Connection lost, reconnecting..." << std::endl;
+            Connected = false; // Set to false to prevent multiple simultaneous reconnect attempts
             Reconnect();
         } else {
             std::cout << "Network error: " << e.what() << std::endl;

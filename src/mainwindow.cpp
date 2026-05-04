@@ -80,6 +80,8 @@ void MainWindow::EstablishConnection() {
     }
 }
 
+
+
 // Centers TargetWidget both horizontally and vertically within the given stacked
 // page. Re-creates the page layout on every call because switching pages can
 // leave stale layouts behind. Generated with the help of ChatGPT.
@@ -180,7 +182,110 @@ void MainWindow::on_logoutButton_3_clicked() {
 
 // This function can be called whenever we detect a connection failure to attempt reconnection
 void MainWindow::Reconnect() {
+    if (!Connected) return; // Already connecting, no need to reconnect again
     Connected = false;
     socket.close();
     std::thread(&MainWindow::EstablishConnection, this).detach();
+}
+
+void MainWindow::ConnectionFailedPopup()
+{
+    QDialog* popup = new QDialog(this);
+    popup->setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+    popup->setAttribute(Qt::WA_TranslucentBackground);
+    popup->setModal(true);
+
+    // Outer container with glass effect — darker for visibility on light backgrounds
+    QWidget* card = new QWidget(popup);
+    card->setObjectName("popupCard");
+    card->setStyleSheet(
+        "QWidget#popupCard {"
+        "   background-color: rgba(215, 0, 0, 0.62);"
+        "   border: 1px solid rgba(255, 255, 255, 0.25);"
+        "   border-radius: 16px;"
+        "}"
+    );
+
+    QGraphicsDropShadowEffect* shadow = new QGraphicsDropShadowEffect();
+    shadow->setBlurRadius(20);
+    shadow->setColor(QColor(0, 0, 0, 160));
+    shadow->setOffset(0, 4);
+    card->setGraphicsEffect(shadow);
+
+    QVBoxLayout* cardLayout = new QVBoxLayout(card);
+    cardLayout->setContentsMargins(32, 28, 32, 28);
+    cardLayout->setSpacing(16);
+
+    QLabel* icon = new QLabel("⚠️");
+    icon->setAlignment(Qt::AlignCenter);
+    icon->setStyleSheet("font-size: 36px; color: rgb(255, 255, 255); background: transparent; border: none;");
+
+    QLabel* title = new QLabel("Failed to connect to server");
+    title->setAlignment(Qt::AlignCenter);
+    title->setStyleSheet(
+        "font-family: 'Segoe UI';"
+        "font-size: 18px;"
+        "font-weight: bold;"
+        "color: rgba(255, 255, 255, 0.95);"
+        "background: transparent;"
+        "border: none;"
+    );
+
+    QLabel* subtitle = new QLabel("Please check your connection and try again.");
+    subtitle->setAlignment(Qt::AlignCenter);
+    subtitle->setWordWrap(true);
+    subtitle->setStyleSheet(
+        "font-family: 'Segoe UI';"
+        "font-size: 13px;"
+        "color: rgba(255, 255, 255, 0.6);"
+        "background: transparent;"
+        "border: none;"
+    );
+
+    QPushButton* retryBtn = new QPushButton("Retry");
+    retryBtn->setFixedHeight(42);
+    retryBtn->setCursor(Qt::PointingHandCursor);
+    retryBtn->setStyleSheet(
+        "QPushButton {"
+        "   background-color: rgba(255, 255, 255, 0.15);"
+        "   border: 1px solid rgba(255, 255, 255, 0.3);"
+        "   border-radius: 10px;"
+        "   color: white;"
+        "   font-family: 'Segoe UI';"
+        "   font-size: 15px;"
+        "   font-weight: bold;"
+        "}"
+        "QPushButton:hover {"
+        "   background-color: rgba(255, 255, 255, 0.25);"
+        "   border: 1px solid rgba(255, 255, 255, 0.5);"
+        "}"
+        "QPushButton:pressed {"
+        "   background-color: rgba(255, 255, 255, 0.35);"
+        "}"
+    );
+
+    cardLayout->addWidget(icon);
+    cardLayout->addWidget(title);
+    cardLayout->addWidget(subtitle);
+    cardLayout->addSpacing(8);
+    cardLayout->addWidget(retryBtn);
+
+    QVBoxLayout* popupLayout = new QVBoxLayout(popup);
+    popupLayout->setContentsMargins(10, 10, 10, 10); // Room for shadow
+    popupLayout->addWidget(card);
+    popup->setMinimumWidth(360);
+
+    // Center on parent window
+    popup->adjustSize();
+    QPoint center = this->geometry().center();
+    popup->move(center.x() - popup->width() / 2, center.y() - popup->height() / 2);
+
+    connect(retryBtn, &QPushButton::clicked, this, [this, popup]() {
+        popup->accept();
+        Reconnect();
+    });
+
+
+
+    popup->exec();
 }

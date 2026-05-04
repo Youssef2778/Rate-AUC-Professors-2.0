@@ -93,6 +93,10 @@ void MainWindow::LeaderboardPage() {
 // Sends an upvote (+1) for the given professor-course pair to the server. On
 // success, refreshes the leaderboard to reflect the updated score.
 void MainWindow::handleUpvote(const std::string &profID, int courseID, std::string CourseName) {
+        if (!Connected) {
+        ConnectionFailedPopup();
+        return;
+    }
     try {
         boost::json::object voteData;
         // FIX 1 & 2: Correct spelling AND convert the string to an integer!
@@ -124,6 +128,7 @@ void MainWindow::handleUpvote(const std::string &profID, int courseID, std::stri
             e.code() == boost::asio::error::broken_pipe || e.code() == boost::asio::error::not_connected ||
             e.code() == boost::beast::http::error::end_of_stream) {
             std::cout << "Connection lost, reconnecting..." << std::endl;
+            Connected = false; // Set to false to prevent multiple simultaneous reconnect attempts
             Reconnect();
         } else {
             std::cout << "Network error: " << e.what() << std::endl;
@@ -137,6 +142,10 @@ void MainWindow::handleUpvote(const std::string &profID, int courseID, std::stri
 // Fetches the current professor list and scores from the server and repopulates
 // the leaderboard table. Called on page load and after every vote.
 void MainWindow::refreshList() {
+        if (!Connected) {
+        ConnectionFailedPopup();
+        return;
+    }
     try {
         // 1. Ask for professors using the SAVED ID
         std::string target = "/get-professors?Id=" + std::to_string(user->GetCurrentCourseID());
@@ -237,6 +246,7 @@ void MainWindow::refreshList() {
             e.code() == boost::asio::error::broken_pipe || e.code() == boost::asio::error::not_connected ||
             e.code() == boost::beast::http::error::end_of_stream) {
             std::cout << "Connection lost, reconnecting..." << std::endl;
+            Connected = false; // Set to false to prevent multiple simultaneous reconnect attempts
             Reconnect();
         } else {
             std::cout << "Network error: " << e.what() << std::endl;
@@ -250,6 +260,10 @@ void MainWindow::refreshList() {
 // Sends a downvote (-1) for the given professor-course pair to the server. On
 // success, refreshes the leaderboard.
 void MainWindow::handleDownvote(const std::string &profID, int courseID, std::string CourseName) {
+        if (!Connected) {
+        ConnectionFailedPopup();
+        return;
+    }
     try {
         boost::json::object voteData;
         // FIX 2: Convert the string to an integer!
@@ -282,6 +296,7 @@ void MainWindow::handleDownvote(const std::string &profID, int courseID, std::st
             e.code() == boost::asio::error::broken_pipe || e.code() == boost::asio::error::not_connected ||
             e.code() == boost::beast::http::error::end_of_stream) {
             std::cout << "Connection lost, reconnecting..." << std::endl;
+            Connected = false; // Set to false to prevent multiple simultaneous reconnect attempts
             Reconnect();
         } else {
             std::cout << "Network error: " << e.what() << std::endl;

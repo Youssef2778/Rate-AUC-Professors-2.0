@@ -18,6 +18,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <vector>
+#include <QDialog>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -42,9 +43,7 @@ class MainWindow : public QMainWindow
     std::unordered_map<int, std::string> Courses;
     std::unordered_map<int, std::string> Profs;
 	std::vector<Comment> Comments;
-
     std::vector<int> selected_flairs;
-
 
 
     // ... your other private variables
@@ -63,6 +62,7 @@ class MainWindow : public QMainWindow
 
     void EstablishConnection();
     void Reconnect();
+    void ConnectionFailedPopup();
     void CenterWidget(int pageIndex, QWidget *TargetWidget);
     void LoginPage();
     void RegisterPage();

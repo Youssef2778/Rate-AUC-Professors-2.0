@@ -87,6 +87,10 @@ void MainWindow::on_pushButton_6_clicked() {
         ui->unequal_pass_error->hide();
 
     // Now, let's see what the server thinks about the data!
+        if (!Connected) {
+        ConnectionFailedPopup();
+        return;
+    }
     try {
         if (Connected == false)
             return;
@@ -134,6 +138,7 @@ void MainWindow::on_pushButton_6_clicked() {
             e.code() == boost::asio::error::broken_pipe || e.code() == boost::asio::error::not_connected ||
             e.code() == boost::beast::http::error::end_of_stream) {
             std::cout << "Connection lost, reconnecting..." << std::endl;
+            Connected = false; // Set to false to prevent multiple simultaneous reconnect attempts
             Reconnect();
         } else {
             std::cout << "Network error: " << e.what() << std::endl;

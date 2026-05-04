@@ -23,6 +23,10 @@ enum flairID { null, recommend, avoid, meh, easyA, fastPaced, highWorkLoad };
 // Loads the professor page: fetches comments for the current professor/course
 // pair, renders them, then triggers an AI summary fetch.
 void MainWindow::professorPage() {
+        if (!Connected) {
+        ConnectionFailedPopup();
+        return;
+    }
     selected_flairs.clear();
     ui->stackedWidget->setCurrentIndex(4);
     ui->scrollArea->setWidgetResizable(true);
@@ -90,6 +94,7 @@ void MainWindow::professorPage() {
             e.code() == boost::asio::error::broken_pipe || e.code() == boost::asio::error::not_connected ||
             e.code() == boost::beast::http::error::end_of_stream) {
             std::cout << "Connection lost, reconnecting..." << std::endl;
+            Connected = false; // Set to false to prevent multiple simultaneous reconnect attempts
             Reconnect();
         } else {
             std::cout << "Network error: " << e.what() << std::endl;
@@ -242,6 +247,10 @@ void MainWindow::DisplayComments() {
 // the generated comment ID and timestamp, which are used to construct the local
 // Comment object so the UI can be updated without a second fetch.
 void MainWindow::on_postComment_clicked() {
+    if (!Connected) {
+        ConnectionFailedPopup();
+        return;
+    }
     std::string ProfName = ui->professorName->text().toStdString().substr(4); // Remove "Dr.  " prefix
     std::string CourseName = ui->courseName->text().toStdString();
     std::string content = ui->commentLineEdit->text().toStdString();
@@ -304,6 +313,7 @@ void MainWindow::on_postComment_clicked() {
             e.code() == boost::asio::error::broken_pipe || e.code() == boost::asio::error::not_connected ||
             e.code() == boost::beast::http::error::end_of_stream) {
             std::cout << "Connection lost, reconnecting..." << std::endl;
+            Connected = false; // Set to false to prevent multiple simultaneous reconnect attempts
             Reconnect();
         } else {
             std::cout << "Network error: " << e.what() << std::endl;
@@ -326,6 +336,7 @@ void MainWindow::on_postComment_clicked() {
 // which proxies the request to the Groq API. processEvents() is called before
 // the blocking HTTP read so the 'Generating...' label is visible during the wait.
 void MainWindow::fetchAiSummary(std::string courseId, std::string profId) {
+    
     // 1. Update the UI
     ui->summaryLabel->setText("🤖 Generating AI Summary... Please wait.");
 
@@ -363,6 +374,7 @@ void MainWindow::fetchAiSummary(std::string courseId, std::string profId) {
             e.code() == boost::asio::error::broken_pipe || e.code() == boost::asio::error::not_connected ||
             e.code() == boost::beast::http::error::end_of_stream) {
             std::cout << "Connection lost, reconnecting..." << std::endl;
+            Connected = false; // Set to false to prevent multiple simultaneous reconnect attempts
             Reconnect();
         } else {
             std::cout << "Network error: " << e.what() << std::endl;
