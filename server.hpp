@@ -101,7 +101,7 @@ MySQLConnectionPool* dbPool = nullptr;
 // Uses curl via popen because the server has no async HTTP client dependency.
 std::string generateSummaryFromHuggingFace(const std::string& allComments) {
     try {
-        std::string apiKey = "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";
+        std::string apiKey = "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";
 
         // 1. Prepare JSON (Groq uses the 'messages' format which needs to be an array)
         boost::json::object userMessage;
