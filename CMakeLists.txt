@@ -2,6 +2,13 @@ cmake_minimum_required(VERSION 3.5)
 
 project(Rate_AUC VERSION 0.1 LANGUAGES CXX)
 
+include(FetchContent)
+FetchContent_Declare(dotenv_cpp
+    GIT_REPOSITORY https://github.com/laserpants/dotenv-cpp.git
+    GIT_TAG v0.9.3
+)
+FetchContent_MakeAvailable(dotenv_cpp)
+
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -70,6 +77,9 @@ target_link_libraries(server PRIVATE Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(server PRIVATE mysqlcppconn)
 target_link_libraries(server PRIVATE bcrypt)
 target_link_libraries(server PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+target_include_directories(server PRIVATE
+    ${dotenv_cpp_SOURCE_DIR}/include/laserpants/dotenv
+)
 
 
 

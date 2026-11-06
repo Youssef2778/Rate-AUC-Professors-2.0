@@ -24,8 +24,11 @@
 #include <queue>
 #include <fstream>
 #include <cstdio>
+#include <cstdlib>
 #include <memory>
 #include <unordered_map>
+#include <stdexcept>
+#include <dotenv.h>
 #include "bcrypt/BCrypt.hpp"
 
 namespace beast = boost::beast;
@@ -101,7 +104,16 @@ MySQLConnectionPool* dbPool = nullptr;
 // Uses curl via popen because the server has no async HTTP client dependency.
 std::string generateSummaryFromHuggingFace(const std::string& allComments) {
     try {
-        std::string apiKey = "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";
+        static const bool dotenvLoaded = [] {
+            dotenv::init();
+            return true;
+        }();
+        (void)dotenvLoaded;
+
+        const char* apiKeyValue = std::getenv("GROQ_API_KEY");
+        if (apiKeyValue == nullptr || *apiKeyValue == '\0')
+            throw std::runtime_error("GROQ_API_KEY is missing or empty in .env");
+        std::string apiKey = apiKeyValue;
 
         // 1. Prepare JSON (Groq uses the 'messages' format which needs to be an array)
         boost::json::object userMessage;
